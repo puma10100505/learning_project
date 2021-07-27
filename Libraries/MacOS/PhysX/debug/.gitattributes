@@ -1,0 +1,11 @@
+libSnippetUtils_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXCommon_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXFoundation_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXVehicle_static_64.a filter=lfs diff=lfs merge=lfs -text
+libSnippetRender_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysX_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXCharacterKinematic_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXCooking_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXExtensions_static_64.a filter=lfs diff=lfs merge=lfs -text
+libPhysXPvdSDK_static_64.a filter=lfs diff=lfs merge=lfs -text
+*.a filter=lfs diff=lfs merge=lfs -text
