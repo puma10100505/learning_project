@@ -112,15 +112,50 @@ macro(link_extra_libs param_project_name)
 
 endmacro(link_extra_libs )
 
-macro(deploy_bin param_project_name)    
+# 部署输出文件
+# param_project_name: PROJECT_NAME
+macro(deploy_files param_project_name)
     add_custom_command(TARGET ${param_project_name} 
         COMMAND ${CMAKE_COMMAND} -E make_directory 
         ${SOLUTION_ROOT}/Bin
     )
 
-    add_custom_command(TARGET ${param_project_name} 
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different 
-        ${PROJECT_BINARY_DIR}/${param_project_name}
-        ${SOLUTION_ROOT}/Bin/
-    )
-endmacro(deploy_bin)
+    if (WIN32)
+        list(APPEND DYNAMIC_LIBS 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysX_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXCommon_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXFoundation_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/assimp-vc142-mtd.dll
+        )
+
+        add_custom_command(TARGET ${param_project_name} 
+            COMMAND ${CMAKE_COMMAND} -E copy 
+            ${DYNAMIC_LIBS}
+            ${PROJECT_BINARY_DIR}/Debug/
+        )
+
+        add_custom_command(TARGET ${param_project_name} 
+            COMMAND ${CMAKE_COMMAND} -E copy 
+            ${DYNAMIC_LIBS}
+            ${SOLUTION_ROOT}/Bin
+        )
+
+        add_custom_command(TARGET ${param_project_name} 
+            COMMAND ${CMAKE_COMMAND} -E copy 
+            ${PROJECT_BINARY_DIR}/Debug/${param_project_name}.exe 
+            ${SOLUTION_ROOT}/Bin
+        )
+    elseif (APPLE)
+        add_custom_command(TARGET ${param_project_name} 
+            COMMAND ${CMAKE_COMMAND} -E copy 
+            ${PROJECT_BINARY_DIR}/${param_project_name}
+            ${SOLUTION_ROOT}/Bin
+        )
+    elseif (UNIX)
+        add_custom_command(TARGET ${param_project_name} 
+            COMMAND ${CMAKE_COMMAND} -E copy 
+            ${PROJECT_BINARY_DIR}/${param_project_name}
+            ${SOLUTION_ROOT}/Bin
+        )
+    endif()
+endmacro(deploy_files)

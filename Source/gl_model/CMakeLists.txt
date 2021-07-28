@@ -16,4 +16,4 @@ include_directories(${PROJECT_NAME})
 
 link_extra_libs(${PROJECT_NAME})
 
-deploy_bin(${PROJECT_NAME})
+deploy_files(${PROJECT_NAME})

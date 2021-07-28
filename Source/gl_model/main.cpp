@@ -38,10 +38,10 @@ int main() {
 
     GLScene mainScene(glm::vec3(0.0f, -1.70f, 6.0f));
     Shader model_shader(
-        (solution_base_path + "assets/shaders/multilights.object.vs").c_str(), 
-        (solution_base_path + "assets/shaders/multilights.object.fs").c_str());
+        (solution_base_path + "Assets/Shaders/multilights.object.vs").c_str(), 
+        (solution_base_path + "Assets/Shaders/multilights.object.fs").c_str());
 
-    GLModel our_model(solution_base_path + "assets/meshes/cyborg/cyborg.obj");
+    GLModel our_model(solution_base_path + "Assets/Meshes/cyborg/cyborg.obj");
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec3 trans_mat = glm::vec3(0.0f, 0.0f, 0.0f);
