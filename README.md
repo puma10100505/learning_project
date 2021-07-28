@@ -31,4 +31,9 @@
 - Thirdparty: 第三方库的目录，部分以源码形式提供的库放在这里构建产生静态链接库文件
 
 ## 编译构建方法
-TODO
+0. 确保系统中已经安装cmake最新版本
+1. 下载源代码后在工程根目录创建一个用于构建的目录，可使用命令：cmake -E make_directory cmake-build-debug, cmake-build-debug可以换成其它任何名称
+2. 在工程根目录执行命令：
+    - cmake -B cmake-build-debug
+    - cmake --build cmake-build-debug
+3. 等待构建完成后在工程根目录可以看到Bin文件夹，里边就是构建的输出（可执行文件）

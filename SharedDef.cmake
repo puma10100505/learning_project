@@ -35,7 +35,7 @@ macro(link_extra_libs param_project_name)
             -lPhysXFoundation_static_64
             -lPhysXPvdSDK_static_64
             -lPhysXVehicle_static_64
-            -lPhysXCooking_64
+            #-lPhysXCooking_64
             libpthread.a
             -lm
             -lstdc++

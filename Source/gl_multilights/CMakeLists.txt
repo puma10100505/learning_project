@@ -16,3 +16,5 @@ add_executable(${PROJECT_NAME} ${SRC})
 include_directories(${PROJECT_NAME})
 
 link_extra_libs(${PROJECT_NAME})
+
+deploy_files(${PROJECT_NAME})

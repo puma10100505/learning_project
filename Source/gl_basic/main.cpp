@@ -13,7 +13,7 @@
 #include "stb_image.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "learning/learning.h"
+#include "learning.h"
 #include "CommonDefines.h"
 
 int main() {
