@@ -4,8 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
-
+#include "learning.h"
 #include "PxPhysicsAPI.h"
+#include "CommonDefines.h"
 
 #define PX_RELEASE(x)	if(x)	{ x->release(); x = NULL;	}
 
@@ -30,6 +31,9 @@ PxDefaultCpuDispatcher* gDispatcher = nullptr;
 PxScene* gScene = nullptr;
 PxMaterial* gMaterial = nullptr;
 PxPvd* gPvd = nullptr;
+
+GLScene MainScene(__back * 6.f);
+GLCubic* Cube = nullptr;
 
 
 void FramebufferChangedCallback(GLFWwindow* InWindow, int InWidth, int InHeight)
@@ -243,6 +247,20 @@ void InitializePhysics()
     printf("Initialize physics succeed...\n");
 }
 
+void InitializeScene()
+{
+    Cube = MainScene.AddCube(solution_base_path + "Assets/Shaders/multilights.object.vs", 
+    solution_base_path + "Assets/Shaders/multilights.object.fs");
+    Cube->SetDiffuseTexture(solution_base_path + "Assets/Textures/container2.png");
+    Cube->SetSpecularTexture(solution_base_path + "Assets/Textures/container2_specular.png");
+
+    // MainScene.MainCamera.get()->Position.x = ShapeTrans.p.x;
+    // MainScene.MainCamera.get()->Position.y = ShapeTrans.p.y;
+    // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 20.f;
+
+    MainScene.MainCamera.get()->Zoom = 60.f;
+}
+
 void StepPhysics()
 {
     gScene->simulate(1.f / 60.f);
@@ -275,6 +293,7 @@ void RenderGeometryHolder(const PxGeometry& Geom)
             const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
             glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
             // glutSolidCube(2); TODO: 使用OPENGL原生方法渲染 Ref: learning_opengl
+            
             printf("Finished draw a cube with box_extent: %f, %f, %f\n", 
                 BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
             break;
@@ -310,7 +329,8 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
 
         for (PxU32 j = 0; j < NbShapes; j++)
         {
-            const PxMat44 ShapePose(PxShapeExt::getGlobalPose(*Shapes[j], *InActors[i]));
+            const PxTransform ShapeTrans = PxShapeExt::getGlobalPose(*Shapes[j], *InActors[i]);
+            const PxMat44 ShapePose(ShapeTrans);
             const PxGeometryHolder Holder = Shapes[j]->getGeometry();
             const bool bIsTrigger = Shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE;
             if (bIsTrigger)
@@ -331,7 +351,48 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
                 glColor4f(InColor.x, InColor.y, InColor.z, 1.f);
             }
 
-            RenderGeometryHolder(Holder.any());
+            //RenderGeometryHolder(Holder.any());
+            switch (Holder.any().getType())
+            {
+                case PxGeometryType::eBOX:
+                {
+                    const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Holder.any());
+                    glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
+
+                    if (Cube)
+                    {
+                        Cube->transform.position.x = ShapeTrans.p.x;
+                        Cube->transform.position.y = ShapeTrans.p.y;
+                        Cube->transform.position.z = ShapeTrans.p.z;
+
+                        Cube->transform.rotation.x = 34.f * glfwGetTime(); //ShapeTrans.q.x;
+                        Cube->transform.rotation.y = 21.f * glfwGetTime(); //ShapeTrans.q.y;
+                        Cube->transform.rotation.z = 90.f * glfwGetTime(); //ShapeTrans.q.z;
+                        
+                        // MainScene.MainCamera.get()->Position.x = ShapeTrans.p.x;
+                        // MainScene.MainCamera.get()->Position.y = ShapeTrans.p.y;
+                        // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 20.f;
+
+
+                        printf("Finished draw a cube with pos: %f, %f, %f\n", 
+                            ShapePose.getPosition().x, ShapePose.getPosition().y, ShapePose.getPosition().z);
+
+                        Cube->BeforeDraw();
+                        Cube->Draw();
+                    }
+                    break;
+                }
+
+                case PxGeometryType::eSPHERE:
+                {
+                    break;
+                }
+
+                case PxGeometryType::eCAPSULE:
+                {
+                    break;
+                }
+            }
             glPopMatrix();
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -379,6 +440,8 @@ int main()
         bIsFullScreen ? FullScreenHeight : ScreenHeight);
 
     InitializePhysics();
+
+    InitializeScene();
 
     // 渲染循环
     while (!glfwWindowShouldClose(Window))
