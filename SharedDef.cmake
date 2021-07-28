@@ -18,6 +18,7 @@ endmacro(include_directories)
 # 构造库引用信息
 macro(link_extra_libs param_project_name)    
     list(APPEND EXTRA_LIBS imgui glad learning_foundation stb_image SOIL)
+
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
 
@@ -34,6 +35,7 @@ macro(link_extra_libs param_project_name)
             -lPhysXFoundation_static_64
             -lPhysXPvdSDK_static_64
             -lPhysXVehicle_static_64
+            -lPhysXCooking_64
             libpthread.a
             -lm
             -lstdc++
@@ -43,7 +45,7 @@ macro(link_extra_libs param_project_name)
         target_link_directories(${param_project_name}
             PRIVATE 
             ${SOLUTION_ROOT}/Libraries/MacOS
-            ${SOLUTION_ROOT}/Libraries/MacOS/PhysX/debug
+            ${SOLUTION_ROOT}/Libraries/MacOS/PhysX/Debug
         )
 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo")
@@ -93,12 +95,13 @@ macro(link_extra_libs param_project_name)
             PhysXCommon_64.lib
             PhysXFoundation_64.lib
             PhysXExtensions_static_64.lib
+            PhysXCooking_64.lib
         )
 
         target_link_directories(${param_project_name}
             PRIVATE 
             ${SOLUTION_ROOT}/Libraries/Windows
-            ${SOLUTION_ROOT}/Libraries/Windows/PhysX
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug
         )
     endif()
 
@@ -122,9 +125,10 @@ macro(deploy_files param_project_name)
 
     if (WIN32)
         list(APPEND DYNAMIC_LIBS 
-            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysX_64.dll 
-            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXCommon_64.dll 
-            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXFoundation_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysX_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXCommon_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXFoundation_64.dll 
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXCooking_64.dll 
             ${SOLUTION_ROOT}/Libraries/Windows/assimp-vc142-mtd.dll
         )
 

@@ -154,6 +154,8 @@ int InitializeWindowAttributes()
     FullScreenWidth = mode->width;
     FullScreenHeight = mode->height;
     /* 设置窗口属性 */
+
+    return EXIT_SUCCESS;
 }
 
 int CreateAndSetupWindow()
@@ -193,7 +195,6 @@ void InitializePhysics()
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
     gPvd = PxCreatePvd(*gFoundation);
-    //PxPvdTransport* Transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
     gPvd->connect(*PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10), PxPvdInstrumentationFlag::eALL);
     gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
@@ -374,17 +375,10 @@ int main()
     CreateAndSetupWindow();
 
     // 设置OPENGL视口大小（OPENGL渲染区域）
-    glViewport(0, 0, FullScreenWidth, FullScreenHeight);
+    glViewport(0, 0, bIsFullScreen ? FullScreenWidth : ScreenWidth, 
+        bIsFullScreen ? FullScreenHeight : ScreenHeight);
 
     InitializePhysics();
-
-    ClearScreen();
-
-    // 刷新物理
-    StepPhysics();
-
-    // 渲染物理对象
-    RenderScene(); 
 
     // 渲染循环
     while (!glfwWindowShouldClose(Window))
@@ -392,10 +386,10 @@ int main()
         ClearScreen();
 
         // 刷新物理
-        // StepPhysics();
+        StepPhysics();
 
         // 渲染物理对象
-        // RenderScene(); 
+        RenderScene(); 
 
         glfwSwapBuffers(Window);
         glfwPollEvents();
