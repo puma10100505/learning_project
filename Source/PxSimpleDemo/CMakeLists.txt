@@ -11,9 +11,9 @@ link_extra_libs(${PROJECT_NAME})
 
 if (WIN32)
     set(DYNAMIC_LIBS 
-        ${SOLUTION_ROOT}/lib/win64/PhysX/PhysX_64.dll
-        ${SOLUTION_ROOT}/lib/win64/PhysX/PhysXCommon_64.dll
-        ${SOLUTION_ROOT}/lib/win64/PhysX/PhysXFoundation_64.dll
+        ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysX_64.dll
+        ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXCommon_64.dll
+        ${SOLUTION_ROOT}/Libraries/Windows/PhysX/PhysXFoundation_64.dll
     )
 
     # 部署动态库文件

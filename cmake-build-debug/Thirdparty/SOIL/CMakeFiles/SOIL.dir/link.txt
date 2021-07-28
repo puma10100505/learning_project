@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libSOIL.a CMakeFiles/SOIL.dir/SOIL.c.o CMakeFiles/SOIL.dir/image_DXT.c.o CMakeFiles/SOIL.dir/image_helper.c.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libSOIL.a

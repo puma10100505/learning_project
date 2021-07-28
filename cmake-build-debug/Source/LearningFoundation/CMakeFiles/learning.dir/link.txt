@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc liblearning.a CMakeFiles/learning.dir/GLCubic.cpp.o CMakeFiles/learning.dir/GLMesh.cpp.o CMakeFiles/learning.dir/GLModel.cpp.o CMakeFiles/learning.dir/GLObject.cpp.o CMakeFiles/learning.dir/GLQuad.cpp.o CMakeFiles/learning.dir/GLScene.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib liblearning.a
