@@ -29,3 +29,6 @@
 - Libraries: 工程的统一库目录，其中按平台分为Windows, MacOS和Linux
 - Source: 源代码目录
 - Thirdparty: 第三方库的目录，部分以源码形式提供的库放在这里构建产生静态链接库文件
+
+## 编译构建方法
+TODO
