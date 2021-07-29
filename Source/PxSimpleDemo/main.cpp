@@ -10,16 +10,6 @@
 
 #define PX_RELEASE(x)	if(x)	{ x->release(); x = NULL;	}
 
-static bool bIsFullScreen = false;
-int FullScreenWidth = 0;
-int FullScreenHeight = 0;
-
-int ScreenWidth = 1080;
-int ScreenHeight = 720;
-
-GLFWwindow* Window = nullptr;
-GLFWmonitor* PrimaryMonitor = nullptr;
-
 using namespace physx;
 
 PxDefaultAllocator gAllocator;
@@ -36,12 +26,7 @@ GLScene MainScene(__back * 6.f);
 GLCubic* Cube = nullptr;
 
 
-void FramebufferChangedCallback(GLFWwindow* InWindow, int InWidth, int InHeight)
-{
-    glViewport(0, 0, InWidth, InHeight);
-}
-
-void ProcessInput(GLFWwindow* InWindow, GLFWmonitor* InMonitor)
+static void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
 {
     if (glfwGetKey(InWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
@@ -52,7 +37,7 @@ void ProcessInput(GLFWwindow* InWindow, GLFWmonitor* InMonitor)
         if (glfwGetKey(InWindow, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS &&
             glfwGetKey(InWindow, GLFW_KEY_ENTER) == GLFW_PRESS)
         {
-            const GLFWvidmode* mode = glfwGetVideoMode(InMonitor);
+            const GLFWvidmode* mode = glfwGetVideoMode(GetPrimaryMonitor());
             if (!mode)
             {
                 std::cout << "Not found video mode" << std::endl;
@@ -61,139 +46,24 @@ void ProcessInput(GLFWwindow* InWindow, GLFWmonitor* InMonitor)
 
             if (bIsFullScreen)
             {
-                glfwSetWindowMonitor(InWindow, nullptr, 100, 100, 1280, 720, mode->refreshRate);
-                bIsFullScreen = false;
-                printf("toggle to windowed screen mode, width: %d, height: %d\n", 1280, 720);
-            }
-            else
-            {
-                glfwSetWindowMonitor(InWindow, InMonitor, 0, 0, FullScreenWidth, FullScreenHeight, mode->refreshRate);
-                bIsFullScreen = true;
-                printf("toggle to full screen mode, width: %d, height: %d\n", FullScreenWidth, FullScreenHeight);
-            }
-        }
-    }
-}
-
-void WindowCloseCallback(GLFWwindow* InWindow)
-{
-    printf("Window will be closed...\n");
-}
-
-void WindowResizedCallback(GLFWwindow* window, int width, int height)
-{
-    printf("Window has been resized, width: %d, height: %d\n", width, height);
-}
-
-void ClearScreen()
-{
-    glClearColor(.2f, .3f, .3f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
-{
-    if (glfwGetKey(InWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(InWindow, true);
-    }
-    else
-    {
-        if (glfwGetKey(InWindow, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS &&
-            glfwGetKey(InWindow, GLFW_KEY_ENTER) == GLFW_PRESS)
-        {
-            const GLFWvidmode* mode = glfwGetVideoMode(PrimaryMonitor);
-            if (!mode)
-            {
-                std::cout << "Not found video mode" << std::endl;
-                return;
-            }
-
-            if (bIsFullScreen)
-            {
+                ScreenWidth = WINDOW_WIDTH;
+                ScreenHeight = WINDOW_HEIGHT;
                 glfwSetWindowMonitor(InWindow, nullptr, 100, 100, ScreenWidth, ScreenHeight, mode->refreshRate);
                 bIsFullScreen = false;
                 printf("toggle to windowed screen mode, width: %d, height: %d\n", ScreenWidth, ScreenHeight);
             }
             else
             {
-                glfwSetWindowMonitor(InWindow, PrimaryMonitor, 0, 0, FullScreenWidth, FullScreenHeight, mode->refreshRate);
+                ScreenWidth = mode->width;
+                ScreenHeight = mode->height;
+                glfwSetWindowMonitor(InWindow, GetPrimaryMonitor(), 0, 0, ScreenWidth, ScreenHeight, mode->refreshRate);
                 bIsFullScreen = true;
-                printf("toggle to full screen mode, width: %d, height: %d\n", FullScreenWidth, FullScreenHeight);
+                printf("toggle to full screen mode, width: %d, height: %d\n", ScreenWidth, ScreenHeight);
             }
         }
     }
 }
 
-int InitializeWindowAttributes()
-{
-/* 设置窗口属性 */
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
-#endif
-
-    PrimaryMonitor = glfwGetPrimaryMonitor();
-    if (!PrimaryMonitor)
-    {
-        std::cout << "Not found primary monitor" << std::endl;        
-        return EXIT_FAILURE;
-    }
-
-    const GLFWvidmode* mode = glfwGetVideoMode(PrimaryMonitor);
-    if (!mode)
-    {
-        std::cout << "Not found video mode object" << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-
-    FullScreenWidth = mode->width;
-    FullScreenHeight = mode->height;
-    /* 设置窗口属性 */
-
-    return EXIT_SUCCESS;
-}
-
-int CreateAndSetupWindow()
-{
-    Window = glfwCreateWindow(bIsFullScreen ? FullScreenWidth : ScreenWidth, 
-        bIsFullScreen ? FullScreenHeight : ScreenHeight, "Learning PhysX Window", 
-        bIsFullScreen ? PrimaryMonitor : nullptr, nullptr);
-    if (!Window)
-    {
-        std::cout << "Failed to create glfw window" << std::endl;
-        glfwTerminate();
-        return EXIT_FAILURE;
-    }
-    
-    glfwMakeContextCurrent(Window);
-
-    // Setup callbacks
-    glfwSetWindowCloseCallback(Window, WindowCloseCallback);
-    glfwSetWindowSizeCallback(Window, WindowResizedCallback);
-    glfwSetFramebufferSizeCallback(Window, FramebufferChangedCallback);
-    glfwSetKeyCallback(Window, WindowKeyCallback);
-
-    glfwFocusWindow(Window);
-
-    // 创建窗口之后，使用OPENGL之前要初始化GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to init GLAD" << std::endl;
-        glfwTerminate();
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
 
 void InitializePhysics()
 {
@@ -347,6 +217,7 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
             {
                 const PxVec3 DarkColor = InColor * .25f;
                 glColor4f(DarkColor.x, DarkColor.y, DarkColor.z, 1.f);
+                printf("actor is sleeping...\n");
             }
             else
             {
@@ -363,18 +234,10 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
 
                     if (Cube)
                     {
-                        Cube->transform.position.x = ShapeTrans.p.x;
-                        Cube->transform.position.y = ShapeTrans.p.y;
-                        Cube->transform.position.z = ShapeTrans.p.z;
-
+                        Cube->transform.position = glm::vec3(ShapeTrans.p.x, ShapeTrans.p.y, ShapeTrans.p.z);
                         Cube->transform.rotation = glm::eulerAngles(
                             glm::quat(ShapeTrans.q.w, ShapeTrans.q.x, ShapeTrans.q.y, ShapeTrans.q.z));
                         
-                        // MainScene.MainCamera.get()->Position.x = ShapeTrans.p.x;
-                        // MainScene.MainCamera.get()->Position.y = ShapeTrans.p.y;
-                        // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 10.f;
-
-
                         printf("Finished draw a cube with pos: %f, %f, %f\n", 
                             Cube->transform.rotation.x, Cube->transform.rotation.y, Cube->transform.rotation.z);
 
@@ -423,43 +286,58 @@ void RenderScene()
     }
 }
 
+void OnGUI(float DeltaTime)
+{
+    // TODO:
+}
+
+void OnTick(float DeltaTime)
+{
+    // TODO:
+}
+
 int main()
 {
-    if (!glfwInit())
-    {
+    int iRet = 0;
+
+    do {
+        if ((iRet = InitGlfwWindow()) < 0) {
+            std::cout << "init window failed\n";
+            break;
+        }
+
+        FCreateWindowParameters Params {
+            ScreenWidth, 
+            ScreenHeight, 
+            "Sample Window for Px", 
+            false, 
+            16, 
+            WindowKeyCallback};
+
+        if ((iRet = GLCreateWindow(Params)) < 0) {
+            std::cout << "create window failed \n";
+            break;
+        }
+
+        if ((iRet = GLInitGUI()) < 0) {
+            std::cout << "init gui failed\n";
+            break;
+        }
+    } while (false);
+
+    if (iRet < 0) {
+        std::cout << "init application failed\n";
         return EXIT_FAILURE;
     }
-
-    // 初始化窗口属性
-    InitializeWindowAttributes();
-
-    // 创建并设置窗口对象
-    CreateAndSetupWindow();
-
-    // 设置OPENGL视口大小（OPENGL渲染区域）
-    glViewport(0, 0, bIsFullScreen ? FullScreenWidth : ScreenWidth, 
-        bIsFullScreen ? FullScreenHeight : ScreenHeight);
 
     InitializePhysics();
 
     InitializeScene();
 
-    // 渲染循环
-    while (!glfwWindowShouldClose(Window))
-    {
-        ClearScreen();
+    GLWindowTick(OnTick, OnGUI);
 
-        // 刷新物理
-        StepPhysics();
-
-        // 渲染物理对象
-        RenderScene(); 
-
-        glfwSwapBuffers(Window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
+    GLDestroyGUI();
+    GLDestroyWindow();
 
     return EXIT_SUCCESS;
 }

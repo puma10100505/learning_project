@@ -59,7 +59,7 @@ int main() {
 
     // Setup Platform/Renderer bindings
     const char* glsl_version = "#version 130";
-    ImGui_ImplGlfw_InitForOpenGL(get_global_window(), true);
+    ImGui_ImplGlfw_InitForOpenGL(GetGlobalWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // main loop
@@ -136,7 +136,7 @@ int main() {
         ImGui::Render();
         ImGui::EndFrame();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }); 
+    }, [&](){}); 
 
    q.Destroy();
 
