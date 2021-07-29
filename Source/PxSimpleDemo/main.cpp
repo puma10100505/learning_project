@@ -219,6 +219,7 @@ void InitializePhysics()
 
     gMaterial = gPhysics->createMaterial(.5f, .5f, .5f);
 
+    // 地面
     PxRigidStatic* GroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
     gScene->addActor(*GroundPlane);
 
@@ -230,7 +231,7 @@ void InitializePhysics()
         return;
     }
 
-    PxRigidDynamic* Body = gPhysics->createRigidDynamic(PxTransform(0.f, 0.f, 5.f));
+    PxRigidDynamic* Body = gPhysics->createRigidDynamic(PxTransform(0.f, 0.f, 0.f));
     if (!Body)
     {
         printf("Create body failed\n");
@@ -250,20 +251,21 @@ void InitializePhysics()
 void InitializeScene()
 {
     Cube = MainScene.AddCube(solution_base_path + "Assets/Shaders/multilights.object.vs", 
-    solution_base_path + "Assets/Shaders/multilights.object.fs");
+       solution_base_path + "Assets/Shaders/multilights.object.fs");
     Cube->SetDiffuseTexture(solution_base_path + "Assets/Textures/container2.png");
     Cube->SetSpecularTexture(solution_base_path + "Assets/Textures/container2_specular.png");
 
-    // MainScene.MainCamera.get()->Position.x = ShapeTrans.p.x;
-    // MainScene.MainCamera.get()->Position.y = ShapeTrans.p.y;
-    // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 20.f;
+    Cube->transform.position = glm::vec3(0.f, 0.f, 0.f);
 
-    MainScene.MainCamera.get()->Zoom = 60.f;
+    MainScene.MainCamera.get()->Position = glm::vec3(-50.f, 80.f, 30.f);
+    MainScene.MainCamera.get()->Pitch = -45.f;
+
+    MainScene.MainCamera.get()->Zoom = 90.f;
 }
 
 void StepPhysics()
 {
-    gScene->simulate(1.f / 60.f);
+    gScene->simulate(1.f / 120.f);
     gScene->fetchResults(true);
 }
 
@@ -365,17 +367,16 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
                         Cube->transform.position.y = ShapeTrans.p.y;
                         Cube->transform.position.z = ShapeTrans.p.z;
 
-                        Cube->transform.rotation.x = 34.f * glfwGetTime(); //ShapeTrans.q.x;
-                        Cube->transform.rotation.y = 21.f * glfwGetTime(); //ShapeTrans.q.y;
-                        Cube->transform.rotation.z = 90.f * glfwGetTime(); //ShapeTrans.q.z;
+                        Cube->transform.rotation = glm::eulerAngles(
+                            glm::quat(ShapeTrans.q.w, ShapeTrans.q.x, ShapeTrans.q.y, ShapeTrans.q.z));
                         
                         // MainScene.MainCamera.get()->Position.x = ShapeTrans.p.x;
                         // MainScene.MainCamera.get()->Position.y = ShapeTrans.p.y;
-                        // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 20.f;
+                        // MainScene.MainCamera.get()->Position.z = ShapeTrans.p.z + 10.f;
 
 
                         printf("Finished draw a cube with pos: %f, %f, %f\n", 
-                            ShapePose.getPosition().x, ShapePose.getPosition().y, ShapePose.getPosition().z);
+                            Cube->transform.rotation.x, Cube->transform.rotation.y, Cube->transform.rotation.z);
 
                         Cube->BeforeDraw();
                         Cube->Draw();
