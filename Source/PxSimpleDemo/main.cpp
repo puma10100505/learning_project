@@ -22,9 +22,10 @@ PxScene* gScene = nullptr;
 PxMaterial* gMaterial = nullptr;
 PxPvd* gPvd = nullptr;
 
+static float Shininess = 0.01f;
 GLScene MainScene(__back * 6.f);
 GLCubic* Cube = nullptr;
-
+Shader* GlobalShader = nullptr;
 
 static void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
 {
@@ -91,6 +92,7 @@ void InitializePhysics()
 
     // 地面
     PxRigidStatic* GroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
+    GroundPlane->setName("Plane");
     gScene->addActor(*GroundPlane);
 
     // 创建物理形状
@@ -107,6 +109,7 @@ void InitializePhysics()
         printf("Create body failed\n");
         return;
     }
+    Body->setName("CubeActor");
 
     Body->attachShape(*Shape);
     PxRigidBodyExt::updateMassAndInertia(*Body, 10.f);
@@ -120,6 +123,8 @@ void InitializePhysics()
 
 void InitializeScene()
 {
+    InitializePhysics();
+
     Cube = MainScene.AddCube(solution_base_path + "Assets/Shaders/multilights.object.vs", 
        solution_base_path + "Assets/Shaders/multilights.object.fs");
     Cube->SetDiffuseTexture(solution_base_path + "Assets/Textures/container2.png");
@@ -131,6 +136,9 @@ void InitializeScene()
     MainScene.MainCamera.get()->Pitch = -45.f;
 
     MainScene.MainCamera.get()->Zoom = 90.f;
+
+    GlobalShader = new Shader((solution_base_path + "Assets/Shaders/multilights.object.vs").c_str(), 
+        (solution_base_path + "Assets/Shaders/multilights.object.fs").c_str());
 }
 
 void StepPhysics()
@@ -289,53 +297,115 @@ void RenderScene()
 void OnGUI(float DeltaTime)
 {
     // TODO:
+    ImGui::Begin(u8"Px Simple Demo"); 
+    
+    ImGui::Text("Material:");               // Display some text (you can use a format strings too)
+    ImGui::SliderFloat("Shininess", &Shininess, 0.0f, 256.0f);
+
+    ImGui::Text("Light - Phong:");
+    ImGui::DragFloat3("phong.ambient", (float*)&(MainScene.phong_model.ambient), .01f, 0.0f, 1.0f);
+    ImGui::DragFloat3("phong.diffuse", (float*)&(MainScene.phong_model.diffuse), .01f, 0.0f, 1.0f);
+    ImGui::DragFloat3("phong.specular", (float*)&(MainScene.phong_model.specular), .01f, 0.0f, 1.0f);
+
+    ImGui::Text("Light - Direction:");
+    ImGui::DragFloat3("direction-light.direction", (float*)&(MainScene.FirstDirectionLight()->direction), .1f);
+
+    ImGui::Text("Light - Point:");
+    ImGui::DragFloat3("point-light.position", (float*)&(MainScene.FirstPointLight()->transform.position), .1f);
+    ImGui::SliderFloat("point-light.constant", (float*)&(MainScene.FirstPointLight()->constant), 0.001f, 1.0f);
+    ImGui::SliderFloat("point-light.linear", (float*)&(MainScene.FirstPointLight()->linear), 0.001f, 1.0f);
+    ImGui::SliderFloat("point-light.quadratic", (float*)&(MainScene.FirstPointLight()->quadratic), 0.001f, 1.0f);
+
+    ImGui::Text("Light - Spot:");
+    ImGui::DragFloat3("spot-light.direction", (float*)&(MainScene.FirstSpotLight()->direction), .1f);
+    ImGui::DragFloat3("spot-light.position", (float*)&(MainScene.FirstSpotLight()->transform.position), .1f);
+    ImGui::SliderFloat("spot-light.cutoff", &(MainScene.FirstSpotLight()->cutoff), 0.0f, 179.0f);
+    ImGui::SliderFloat("spot-light.outerCutoff", &(MainScene.FirstSpotLight()->outerCutoff), 0.0f, 179.0f);
+    ImGui::SliderFloat("spot-light.constant", (float*)&(MainScene.FirstSpotLight()->constant), 0.001f, 1.0f);
+    ImGui::SliderFloat("spot-light.linear", (float*)&(MainScene.FirstSpotLight()->linear), 0.001f, 1.0f);
+    ImGui::SliderFloat("spot-light.quadratic", (float*)&(MainScene.FirstSpotLight()->quadratic), 0.001f, 1.0f);
+
+    ImGui::Text("Camera:");
+    ImGui::SliderFloat("FOV", &(MainScene.MainCamera.get()->Zoom), 0.0f, 170.0f);
+    ImGui::DragFloat3("camera.position", (float*)&(MainScene.MainCamera.get()->Position), .1f);
+    
+    ImGui::Text("Background Color:");
+    ImGui::ColorEdit3("Background Color", (float*)&BackgroundColor); // Edit 3 floats representing a color
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
 }
+
+
 
 void OnTick(float DeltaTime)
 {
-    // TODO:
+    if (GlobalShader == nullptr)
+    {
+        return;
+    }
+    
+    GlobalShader->use();
+    glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(MainScene.MainCamera->Zoom), MainScene.WindowRatio, .1f, 100.f);
+    glm::mat4 ViewMatrix = MainScene.MainCamera->GetViewMatrix();
+    GlobalShader->setMat4("projection", ProjectionMatrix);
+    GlobalShader->setMat4("view", ViewMatrix);
+
+    // 冯氏模型
+    GlobalShader->setVec3("phong_model.ambient", MainScene.phong_model.ambient);
+    GlobalShader->setVec3("phong_model.diffuse", MainScene.phong_model.diffuse);
+    GlobalShader->setVec3("phong_model.specular", MainScene.phong_model.specular);
+
+    // 材质
+    GlobalShader->setFloat("material.shininess", Shininess);
+
+    // 点光源
+    GlobalShader->setVec3("pointLight.position", MainScene.FirstPointLight()->transform.position);
+    GlobalShader->setFloat("pointLight.constant", MainScene.FirstPointLight()->constant);
+    GlobalShader->setFloat("pointLight.linear", MainScene.FirstPointLight()->linear);
+    GlobalShader->setFloat("pointLight.quadratic", MainScene.FirstPointLight()->quadratic);
+
+    // 方向光源
+    GlobalShader->setVec3("directionLight.direction", MainScene.FirstDirectionLight()->direction);
+
+    // 聚光光源 
+    GlobalShader->setVec3("spotLight.position", MainScene.FirstSpotLight()->transform.position);
+    GlobalShader->setVec3("spotLight.direction", MainScene.FirstSpotLight()->direction);
+    GlobalShader->setFloat("spotLight.cutoff", MainScene.FirstSpotLight()->cutoff);
+    GlobalShader->setFloat("spotLight.outerCutoff", MainScene.FirstSpotLight()->outerCutoff);
+    GlobalShader->setFloat("spotLight.constant", MainScene.FirstSpotLight()->constant);
+    GlobalShader->setFloat("spotLight.linear", MainScene.FirstSpotLight()->linear);
+    GlobalShader->setFloat("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
+
+    RenderScene();
 }
 
 int main()
 {
     int iRet = 0;
 
-    do {
-        if ((iRet = InitGlfwWindow()) < 0) {
-            std::cout << "init window failed\n";
-            break;
-        }
-
-        FCreateWindowParameters Params {
-            ScreenWidth, 
-            ScreenHeight, 
-            "Sample Window for Px", 
-            false, 
-            16, 
-            WindowKeyCallback};
-
-        if ((iRet = GLCreateWindow(Params)) < 0) {
-            std::cout << "create window failed \n";
-            break;
-        }
-
-        if ((iRet = GLInitGUI()) < 0) {
-            std::cout << "init gui failed\n";
-            break;
-        }
-    } while (false);
-
-    if (iRet < 0) {
-        std::cout << "init application failed\n";
+    if ((iRet = GLCreateWindow({
+        ScreenWidth, 
+        ScreenHeight, 
+        "Sample Window for Px", // 窗口TITLE
+        false,                  // 是否隐藏鼠标
+        true,                   // 是否显示 IMGUI
+        16,                     // 帧间隔
+        WindowKeyCallback       // 输入回调
+    })) < 0) {
+        
+        printf("Create window failed, ret: %d\n", iRet);
         return EXIT_FAILURE;
     }
-
-    InitializePhysics();
-
+    
     InitializeScene();
 
+    // Logic Loop
     GLWindowTick(OnTick, OnGUI);
 
+    // Finalization
+    delete GlobalShader;
+    GlobalShader = nullptr;
     GLDestroyGUI();
     GLDestroyWindow();
 

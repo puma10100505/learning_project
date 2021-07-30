@@ -12,14 +12,14 @@ static bool bIsFullScreen = false;
 static int FullScreenWidth = 0;
 static int FullScreenHeight = 0;
 
-static int ScreenWidth = 1080;
-static int ScreenHeight = 720;
+static int ScreenWidth = 1680;
+static int ScreenHeight = 960;
 
-const int WINDOW_WIDTH = 1280;
-const int WINDOW_HEIGHT = 720;
+const int WINDOW_WIDTH = 1680;
+const int WINDOW_HEIGHT = 960;
 const std::string title = "Sample Window";
 static int32_t FPS = 60;
-static glm::vec4 BackgroundColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+static glm::vec4 BackgroundColor = glm::vec4(0.5f, 0.6f, 0.7f, 1.0f);
 
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
 
@@ -266,6 +266,7 @@ public:
     int InitHeight = ScreenHeight;
     const std::string& Title = "Sample Window";
     bool bHideCursor = false;
+    bool bWithGUI = true;
     int FrameInterval = 60;
     GLFWkeyfun KeyEventCallback = OnKeyEventDefault;
     GLFWerrorfun GlfwErrCallback = OnGlfwErrorDefault;
@@ -276,12 +277,14 @@ public:
         int H, 
         const std::string& T, 
         bool bHideC, 
+        bool InWithGUI,
         int FI, 
         GLFWkeyfun KeyFunc)
             :InitWidth(W), 
             InitHeight(H), 
             Title(T), 
             bHideCursor(bHideC), 
+            bWithGUI(InWithGUI),
             FrameInterval(FI), 
             KeyEventCallback(KeyFunc)
         {
@@ -291,10 +294,17 @@ public:
 
 // create glfw window
 static inline int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
-    const std::string& Title = "Sample Window", bool bHideCursor = false, int32_t FrameInterval = 60,
+    const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
     GLFWerrorfun GlfwErrCallback = OnGlfwErrorDefault, 
     GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault, 
-    GLFWkeyfun KeyEventCallback = OnKeyEventDefault) {
+    GLFWkeyfun KeyEventCallback = OnKeyEventDefault) 
+{
+    int iRet = InitGlfwWindow();
+    if (iRet < 0)
+    {
+        printf("Init glfw window failed, ret: %d\n", iRet);
+        return EXIT_FAILURE;
+    }
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -337,6 +347,13 @@ static inline int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = S
         glfwSetInputMode(GetGlobalWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
+    if (bWithGUI)
+    {
+        if ((iRet = GLInitGUI()) < 0) {
+            printf("Init imgui failed, iRet: %d\n", iRet);
+        }
+    }
+
     FPS = 1000 / FrameInterval;
 
     return EXIT_SUCCESS;    
@@ -345,7 +362,7 @@ static inline int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = S
 static inline int GLCreateWindow(const FCreateWindowParameters& Params)
 {
     return GLCreateWindow(Params.InitWidth, Params.InitHeight, Params.Title,
-        Params.bHideCursor, Params.FrameInterval, Params.GlfwErrCallback, 
+        Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, Params.GlfwErrCallback, 
         Params.FrameBufferSizeChanged, Params.KeyEventCallback);
 }
 
@@ -376,7 +393,8 @@ static inline int GLWindowTick(
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (OnGUI)
+        // GetCurrentContext == nullptr说明没有初始化GUI
+        if (OnGUI && ImGui::GetCurrentContext() != nullptr)
         {
             OnGUI(DeltaTime);
         }
