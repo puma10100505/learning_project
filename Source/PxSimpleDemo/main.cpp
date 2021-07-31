@@ -134,7 +134,7 @@ void InitializeScene()
 
     Cube->transform.position = glm::vec3(0.f, 0.f, 0.f);
 
-    MainScene.MainCamera.get()->Position = glm::vec3(-50.f, 80.f, 30.f);
+    MainScene.MainCamera.get()->Position = glm::vec3(0.f, 80.f, 30.f);
     MainScene.MainCamera.get()->Pitch = -45.f;
 
     MainScene.MainCamera.get()->Zoom = 90.f;
@@ -174,7 +174,6 @@ void RenderGeometryHolder(const PxGeometry& Geom)
         {
             const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
             glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-            // glutSolidCube(2); TODO: 使用OPENGL原生方法渲染 Ref: learning_opengl
             
             printf("Finished draw a cube with box_extent: %f, %f, %f\n", 
                 BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
@@ -299,7 +298,7 @@ void RenderScene()
 void OnGUI(float DeltaTime)
 {
     // TODO:
-    ImGui::Begin(u8"Px Simple Demo"); 
+    ImGui::Begin("Px Simple Demo"); 
     
     ImGui::Text("Material:");               // Display some text (you can use a format strings too)
     ImGui::SliderFloat("Shininess", &Shininess, 0.0f, 256.0f);
@@ -330,6 +329,8 @@ void OnGUI(float DeltaTime)
     ImGui::Text("Camera:");
     ImGui::SliderFloat("FOV", &(MainScene.MainCamera.get()->Zoom), 0.0f, 170.0f);
     ImGui::DragFloat3("camera.position", (float*)&(MainScene.MainCamera.get()->Position), .1f);
+    ImGui::SliderFloat("Camera.Yaw", (float*)&MainScene.MainCamera->Yaw, 0.f, 360.f, "%.2f");
+    ImGui::SliderFloat("Camera.Pitch", (float*)&MainScene.MainCamera->Pitch, 0.f, 360.f, "%.2f");
     
     ImGui::Text("Background Color:");
     ImGui::ColorEdit3("Background Color", (float*)&BackgroundColor); // Edit 3 floats representing a color
@@ -386,9 +387,8 @@ void OnTick(float DeltaTime)
 
 int main()
 {
-    int iRet = 0;
-
-    if ((iRet = GLCreateWindow({
+    // 创建窗口
+    int iRet = GLCreateWindow({
         ScreenWidth, 
         ScreenHeight, 
         "Sample Window for Px", // 窗口TITLE
@@ -396,8 +396,9 @@ int main()
         true,                   // 是否显示 IMGUI
         16,                     // 帧间隔
         WindowKeyCallback       // 输入回调
-    })) < 0) {
-        
+    });
+
+    if (iRet < 0) {
         printf("Create window failed, ret: %d\n", iRet);
         return EXIT_FAILURE;
     }
@@ -410,7 +411,7 @@ int main()
     // Finalization
     delete GlobalShader;
     GlobalShader = nullptr;
-    GLDestroyGUI();
+    
     GLDestroyWindow();
 
     return EXIT_SUCCESS;
