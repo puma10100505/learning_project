@@ -1,14 +1,17 @@
 # pragma warning (disable:4819)
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <cstdio>
 #include <string.h>
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <vector>
 #include "learning.h"
 #include "PxPhysicsAPI.h"
 #include "CommonDefines.h"
+
+extern glm::vec4 BackgroundColor;
 
 #define PX_RELEASE(x)	if(x)	{ x->release(); x = NULL;	}
 
@@ -201,7 +204,7 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
     for (PxU32 i = 0; i < NumActors; i++)
     {
         const PxU32 NbShapes = InActors[i]->getNbShapes();
-        printf("There are %u shaped in actor: %s\n", NbShapes, InActors[i]->getName());
+        //printf("There are %u shaped in actor: %s\n", NbShapes, InActors[i]->getName());
 
         PX_ASSERT(NbShapes <= 128);
         InActors[i]->getShapes(Shapes, NbShapes);
@@ -226,7 +229,7 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
             {
                 const PxVec3 DarkColor = InColor * .25f;
                 glColor4f(DarkColor.x, DarkColor.y, DarkColor.z, 1.f);
-                printf("actor is sleeping...\n");
+                //printf("actor is sleeping...\n");
             }
             else
             {
@@ -247,8 +250,8 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
                         Cube->transform.rotation = glm::eulerAngles(
                             glm::quat(ShapeTrans.q.w, ShapeTrans.q.x, ShapeTrans.q.y, ShapeTrans.q.z));
                         
-                        printf("Finished draw a cube with pos: %f, %f, %f\n", 
-                            Cube->transform.rotation.x, Cube->transform.rotation.y, Cube->transform.rotation.z);
+                        //printf("Finished draw a cube with pos: %f, %f, %f\n", 
+                        //    Cube->transform.rotation.x, Cube->transform.rotation.y, Cube->transform.rotation.z);
 
                         Cube->BeforeDraw();
                         Cube->Draw();
@@ -345,6 +348,7 @@ void OnTick(float DeltaTime)
 {
     if (GlobalShader == nullptr)
     {
+        printf("Global shader is null\n");
         return;
     }
     
@@ -380,8 +384,10 @@ void OnTick(float DeltaTime)
     GlobalShader->setFloat("spotLight.linear", MainScene.FirstSpotLight()->linear);
     GlobalShader->setFloat("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
 
-    RenderScene();
 
+    printf("current background color: r: %f, g: %f, b: %f\n", BackgroundColor.x, BackgroundColor.y, BackgroundColor.z);
+    
+    RenderScene();
     StepPhysics();
 }
 
@@ -398,12 +404,13 @@ int main()
         WindowKeyCallback       // 输入回调
     });
 
-    if (iRet < 0) {
+    if (iRet < 0) { 
         printf("Create window failed, ret: %d\n", iRet);
         return EXIT_FAILURE;
     }
     
     InitializeScene();
+        
 
     // Logic Loop
     GLWindowTick(OnTick, OnGUI);

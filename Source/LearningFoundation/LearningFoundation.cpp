@@ -1,5 +1,7 @@
 #include "LearningFoundation.h"
 
+glm::vec4 BackgroundColor = glm::vec4(0.1f, 0.6f, 0.7f, 1.0f);
+
 GLFWwindow* GetGlobalWindow() {
     return __GlobalWindow;
 }
@@ -250,15 +252,35 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     }
 
     glfwMakeContextCurrent(__GlobalWindow);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    //gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
     
     // set some callback func
-    glfwSetErrorCallback(GlfwErrCallback);
-    glfwSetFramebufferSizeCallback(__GlobalWindow, FrameBufferSizeChanged);
-    glfwSetKeyCallback(__GlobalWindow, KeyEventCallback);
-    glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
-    glfwSetWindowSizeCallback(__GlobalWindow, WindowResizedCallback);
+    // if (GlfwErrCallback)
+    // {
+    //     glfwSetErrorCallback(GlfwErrCallback);
+    // }
+
+    // if (FrameBufferSizeChanged)
+    // {
+    //     glfwSetFramebufferSizeCallback(__GlobalWindow, FrameBufferSizeChanged);
+    // }
+
+    if (KeyEventCallback)
+    {
+        glfwSetKeyCallback(__GlobalWindow, KeyEventCallback);
+    }
+
+    if (WindowCloseCallback)
+    {
+        glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
+    }
+
+    // if (WindowResizedCallback)
+    // {
+    //     printf("hit here set the resize callback\n");
+    //     glfwSetWindowSizeCallback(__GlobalWindow, WindowResizedCallback);
+    // }
 
     glfwFocusWindow(__GlobalWindow);
 
@@ -269,9 +291,6 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         glfwTerminate();
         return EXIT_FAILURE;
     }
-
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
 
     if (bHideCursor) {
         // Diable the mouse cursor when startup
@@ -293,8 +312,10 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 int GLCreateWindow(const FCreateWindowParameters& Params)
 {
     return GLCreateWindow(Params.InitWidth, Params.InitHeight, Params.Title,
-        Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, Params.GlfwErrCallback, 
-        Params.FrameBufferSizeChanged, Params.KeyEventCallback);
+        Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, 
+        Params.GlfwErrCallback, 
+        Params.FrameBufferSizeChanged, 
+        Params.KeyEventCallback);
 }
 
 void GLDestroyWindow() {
@@ -307,9 +328,10 @@ void GLDestroyGUI() {
     ImGui::DestroyContext();
 }
 
-int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI) {
-    
+int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI) 
+{
     while (!glfwWindowShouldClose(__GlobalWindow)) {
+        
         glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -322,6 +344,7 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        
         // GetCurrentContext == nullptr说明没有初始化GUI
         if (OnGUI && ImGui::GetCurrentContext() != nullptr)
         {
@@ -329,6 +352,8 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
         }
 
         OnTick(DeltaTime);
+
+        
 
         // Rendering
         ImGui::Render();
@@ -338,8 +363,8 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
         glfwSwapBuffers(__GlobalWindow);
         glfwPollEvents();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

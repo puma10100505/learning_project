@@ -12,6 +12,8 @@
 #include "CommonDefines.h"
 #include "learning.h"
 
+extern glm::vec4 BackgroundColor;
+
 int main() {
     int iRet = 0;
 
@@ -105,7 +107,7 @@ int main() {
         }, 
         
         [&]() -> void {
-            ImGui::Begin(u8"Model"); 
+            ImGui::Begin("Model"); 
             ImGui::Text("Draw Mode: ");
             if (ImGui::Button("Fill Mode")) {
                 draw_mode = GL_FILL;    

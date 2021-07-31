@@ -24,6 +24,8 @@
 #include "utility.h"
 #include "defines.h"
 
+extern glm::vec4 BackgroundColor;
+
 static GLFWwindow* __GlobalWindow = nullptr;
 static GLFWmonitor* __PrimaryMonitor = nullptr;
 
@@ -36,7 +38,6 @@ static const int WINDOW_WIDTH = 1680;
 static const int WINDOW_HEIGHT = 960;
 const std::string title = "Sample Window";
 static int32_t FPS = 60;
-static glm::vec4 BackgroundColor = glm::vec4(0.5f, 0.6f, 0.7f, 1.0f);
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
 static float LastFrameTime = 0.0f;
 static float DeltaTime = 0.0f;
@@ -98,9 +99,9 @@ static void FramebufferChangedDefault(GLFWwindow* Window, int Width, int Height)
 static void OnKeyEventDefault(GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods);
 static void WindowCloseCallback(GLFWwindow* InWindow);
 static void WindowResizedCallback(GLFWwindow* window, int width, int height);
-static int InitGlfwWindow();
-static int GLInitGUI();
 
+int InitGlfwWindow();
+int GLInitGUI();
 GLFWwindow* GetGlobalWindow();
 GLFWmonitor* GetPrimaryMonitor();
 int GLCreateWindow(const FCreateWindowParameters& Params);
@@ -109,6 +110,6 @@ void GLDestroyGUI();
 int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
     const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
-    GLFWerrorfun GlfwErrCallback = OnGlfwErrorDefault, 
-    GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault, 
+    GLFWerrorfun GlfwErrCallback = nullptr, 
+    GLFWframebuffersizefun FrameBufferSizeChanged = nullptr, 
     GLFWkeyfun KeyEventCallback = OnKeyEventDefault);
