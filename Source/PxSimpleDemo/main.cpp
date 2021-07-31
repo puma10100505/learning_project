@@ -1,3 +1,5 @@
+# pragma warning (disable:4819)
+
 #include <cstdio>
 #include <string.h>
 #include <iostream>
@@ -143,7 +145,7 @@ void InitializeScene()
 
 void StepPhysics()
 {
-    gScene->simulate(1.f / 120.f);
+    gScene->simulate(1.f / 30.f);
     gScene->fetchResults(true);
 }
 
@@ -378,6 +380,8 @@ void OnTick(float DeltaTime)
     GlobalShader->setFloat("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
 
     RenderScene();
+
+    StepPhysics();
 }
 
 int main()

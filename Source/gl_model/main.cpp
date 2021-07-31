@@ -1,3 +1,5 @@
+# pragma warning (disable:4819)
+
 #ifdef __linux__
     #include <unistd.h>
 #endif 

@@ -1,4 +1,4 @@
-#include "GLCubic.h"
+﻿#include "GLCubic.h"
 
 #include "shader.h"
 #include "GLObject.h"

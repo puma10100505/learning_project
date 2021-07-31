@@ -5,9 +5,8 @@
 #include <vector>
 #include <string>
 
-
 #include "defines.h"
-#include "glfw_window_helper.h"
+#include "learning.h"
 
 #include "GLCamera.h"
 #include "GLTexture.h"

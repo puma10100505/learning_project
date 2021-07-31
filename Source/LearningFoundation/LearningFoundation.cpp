@@ -1,62 +1,33 @@
-#pragma once
+#include "LearningFoundation.h"
 
-#include <chrono>
-#include <thread>
-#include <cstdio>
-#include <iostream>
-#include <functional>
-
-
-static bool bIsFullScreen = false;
-
-static int FullScreenWidth = 0;
-static int FullScreenHeight = 0;
-
-static int ScreenWidth = 1680;
-static int ScreenHeight = 960;
-
-const int WINDOW_WIDTH = 1680;
-const int WINDOW_HEIGHT = 960;
-const std::string title = "Sample Window";
-static int32_t FPS = 60;
-static glm::vec4 BackgroundColor = glm::vec4(0.5f, 0.6f, 0.7f, 1.0f);
-
-static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
-
-static float LastFrameTime = 0.0f;
-static float DeltaTime = 0.0f;
-
-static GLFWwindow* __GlobalWindow = nullptr;
-static GLFWmonitor* __PrimaryMonitor = nullptr;
-
-static GLFWwindow* GetGlobalWindow() {
+GLFWwindow* GetGlobalWindow() {
     return __GlobalWindow;
 }
 
-static GLFWmonitor* GetPrimaryMonitor()
+GLFWmonitor* GetPrimaryMonitor()
 {
     return __PrimaryMonitor;
 }
 
 // @Old Version
-static inline void on_glfw_error_default(int code, const char* desc) 
+void on_glfw_error_default(int code, const char* desc) 
 {
     // TODO:
 }
 
-static inline void on_frame_buffer_size_changed_default(GLFWwindow* window, int width, int height) {
+void on_frame_buffer_size_changed_default(GLFWwindow* window, int width, int height) {
     // TODO:
     glViewport(0, 0, width, height);
 }
 
-static inline void on_key_event_default(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void on_key_event_default(GLFWwindow* window, int key, int scancode, int action, int mods) {
     // TODO:
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(GetGlobalWindow(), true);
     }
 }
 
-static inline int gl_init_window() {
+int gl_init_window() {
     if (!glfwInit()) {
         return -1;
     }
@@ -68,7 +39,7 @@ static inline int gl_init_window() {
     return 0;
 }
 
-static inline int gl_init_gui() {
+int gl_init_gui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -86,16 +57,14 @@ static inline int gl_init_gui() {
     return 0;
 }
 
-static inline void gl_on_gui_default() {
+void gl_on_gui_default() {
     
 }
 
 // create glfw window
-static inline int gl_create_window(int32_t width = WINDOW_WIDTH, int32_t height = WINDOW_HEIGHT, 
-    const std::string& title = "Sample Window", bool hide_cursor = false, int32_t frameInterval = 60,
-    GLFWerrorfun err_handler = on_glfw_error_default, 
-    GLFWframebuffersizefun fbs_handler = on_frame_buffer_size_changed_default, 
-    GLFWkeyfun key_handler = on_key_event_default) {
+int gl_create_window(int32_t width, int32_t height, 
+    const std::string& title, bool hide_cursor, int32_t frameInterval,
+    GLFWerrorfun err_handler, GLFWframebuffersizefun fbs_handler, GLFWkeyfun key_handler) {
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -130,19 +99,17 @@ static inline int gl_create_window(int32_t width = WINDOW_WIDTH, int32_t height 
     return 0;    
 }
 
-static inline void gl_destroy_window() {
+void gl_destroy_window() {
     glfwTerminate();
 }
 
-static inline void gl_destroy_gui() {
+void gl_destroy_gui() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-static inline int gl_window_loop(
-    std::function<void (void)> on_update,
-    std::function<void (void)> on_gui) {
+int gl_window_loop(std::function<void (void)> on_update, std::function<void (void)> on_gui) {
     
     while (!glfwWindowShouldClose(__GlobalWindow)) {
         glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);
@@ -178,34 +145,34 @@ static inline int gl_window_loop(
 
 // @@@@@@@@@@@@@@@@@ New Version @@@@@@@@@@@@@@@@@@@
 
-static inline void OnGlfwErrorDefault(int Code, const char* Desc)
+void OnGlfwErrorDefault(int Code, const char* Desc)
 {
     // TODO:
 }
 
-static inline void FramebufferChangedDefault(GLFWwindow* Window, int Width, int Height) {
+void FramebufferChangedDefault(GLFWwindow* Window, int Width, int Height) {
     // TODO:
     glViewport(0, 0, Width, Height);
 }
 
-static inline void OnKeyEventDefault(GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods) {
+void OnKeyEventDefault(GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods) {
     // TODO:
     if (Key == GLFW_KEY_ESCAPE && Action == GLFW_PRESS) {
         glfwSetWindowShouldClose(GetGlobalWindow(), true);
     }
 }
 
-static void WindowCloseCallback(GLFWwindow* InWindow)
+void WindowCloseCallback(GLFWwindow* InWindow)
 {
     printf("Window will be closed...\n");
 }
 
-static void WindowResizedCallback(GLFWwindow* window, int width, int height)
+void WindowResizedCallback(GLFWwindow* window, int width, int height)
 {
     printf("Window has been resized, width: %d, height: %d\n", width, height);
 }
 
-static inline int InitGlfwWindow() {
+int InitGlfwWindow() {
     if (!glfwInit()) {
         return -1;
     }
@@ -246,7 +213,7 @@ static inline int InitGlfwWindow() {
     return 0;
 }
 
-static inline int GLInitGUI() {
+int GLInitGUI() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -259,45 +226,9 @@ static inline int GLInitGUI() {
     return 0;
 }
 
-typedef struct CreateWindowParameters
-{
-public:
-    int InitWidth = ScreenWidth;
-    int InitHeight = ScreenHeight;
-    const std::string& Title = "Sample Window";
-    bool bHideCursor = false;
-    bool bWithGUI = true;
-    int FrameInterval = 60;
-    GLFWkeyfun KeyEventCallback = OnKeyEventDefault;
-    GLFWerrorfun GlfwErrCallback = OnGlfwErrorDefault;
-    GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault; 
-
-    CreateWindowParameters(
-        int W, 
-        int H, 
-        const std::string& T, 
-        bool bHideC, 
-        bool InWithGUI,
-        int FI, 
-        GLFWkeyfun KeyFunc)
-            :InitWidth(W), 
-            InitHeight(H), 
-            Title(T), 
-            bHideCursor(bHideC), 
-            bWithGUI(InWithGUI),
-            FrameInterval(FI), 
-            KeyEventCallback(KeyFunc)
-        {
-
-        } 
-} FCreateWindowParameters;
-
 // create glfw window
-static inline int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
-    const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
-    GLFWerrorfun GlfwErrCallback = OnGlfwErrorDefault, 
-    GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault, 
-    GLFWkeyfun KeyEventCallback = OnKeyEventDefault) 
+int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool bHideCursor, bool bWithGUI, 
+    int32_t FrameInterval, GLFWerrorfun GlfwErrCallback, GLFWframebuffersizefun FrameBufferSizeChanged, GLFWkeyfun KeyEventCallback) 
 {
     int iRet = InitGlfwWindow();
     if (iRet < 0)
@@ -359,26 +290,24 @@ static inline int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = S
     return EXIT_SUCCESS;    
 }
 
-static inline int GLCreateWindow(const FCreateWindowParameters& Params)
+int GLCreateWindow(const FCreateWindowParameters& Params)
 {
     return GLCreateWindow(Params.InitWidth, Params.InitHeight, Params.Title,
         Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, Params.GlfwErrCallback, 
         Params.FrameBufferSizeChanged, Params.KeyEventCallback);
 }
 
-static inline void GLDestroyWindow() {
+void GLDestroyWindow() {
     glfwTerminate();
 }
 
-static inline void GLDestroyGUI() {
+void GLDestroyGUI() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-static inline int GLWindowTick(
-    std::function<void (float)> OnTick,
-    std::function<void (float)> OnGUI) {
+int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI) {
     
     while (!glfwWindowShouldClose(__GlobalWindow)) {
         glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);

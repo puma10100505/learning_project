@@ -1,4 +1,6 @@
-#pragma once
+﻿#pragma once
+# pragma warning (disable:4819)
+
 #include "thirdparty_header.h"
 
 #include <string>

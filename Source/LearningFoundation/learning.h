@@ -1,4 +1,5 @@
 #pragma once
+# pragma warning (disable:4819)
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -16,7 +17,7 @@
 
 #include "utility.h"
 #include "defines.h"
-#include "glfw_window_helper.h"
+#include "LearningFoundation.h"
 
 #include "GLMesh.h"
 #include "GLModel.h"
