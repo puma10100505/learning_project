@@ -32,10 +32,10 @@ static GLFWmonitor* __PrimaryMonitor = nullptr;
 static bool bIsFullScreen = false;
 static int FullScreenWidth = 0;
 static int FullScreenHeight = 0;
-static int ScreenWidth = 1680;
-static int ScreenHeight = 960;
-static const int WINDOW_WIDTH = 1680;
-static const int WINDOW_HEIGHT = 960;
+static int ScreenWidth = 1280;
+static int ScreenHeight = 720;
+static const int WINDOW_WIDTH = 1280;
+static const int WINDOW_HEIGHT = 720;
 const std::string title = "Sample Window";
 static int32_t FPS = 60;
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
@@ -53,7 +53,9 @@ public:
     int FrameInterval = 60;
     GLFWkeyfun KeyEventCallback;
     GLFWerrorfun GlfwErrCallback;
-    GLFWframebuffersizefun FrameBufferSizeChanged; 
+    GLFWframebuffersizefun FrameBufferSizeChanged;
+    GLFWcursorposfun MouseCursorPosChanged;
+    GLFWscrollfun MouseScrollCallback;
 
     CreateWindowParameters(
         int W, 
@@ -61,15 +63,13 @@ public:
         const std::string& T, 
         bool bHideC, 
         bool InWithGUI,
-        int FI, 
-        GLFWkeyfun KeyFunc)
+        int FI)
             :InitWidth(W), 
             InitHeight(H), 
             Title(T), 
             bHideCursor(bHideC), 
             bWithGUI(InWithGUI),
-            FrameInterval(FI), 
-            KeyEventCallback(KeyFunc)
+            FrameInterval(FI)
         {
 
         } 
@@ -104,12 +104,15 @@ int InitGlfwWindow();
 int GLInitGUI();
 GLFWwindow* GetGlobalWindow();
 GLFWmonitor* GetPrimaryMonitor();
-int GLCreateWindow(const FCreateWindowParameters& Params);
 void GLDestroyWindow();
 void GLDestroyGUI();
 int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI);
+
+int GLCreateWindow(const FCreateWindowParameters& Params);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
     const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
     GLFWerrorfun GlfwErrCallback = nullptr, 
     GLFWframebuffersizefun FrameBufferSizeChanged = nullptr, 
-    GLFWkeyfun KeyEventCallback = OnKeyEventDefault);
+    GLFWkeyfun KeyEventCallback = nullptr, 
+    GLFWcursorposfun MouseCursorPosCallback = nullptr,
+    GLFWscrollfun MouseScrollCallback = nullptr);

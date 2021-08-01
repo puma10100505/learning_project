@@ -97,6 +97,6 @@ public:
     float Pitch;
 
     float MovementSpeed;
-    float MouseSensitivity;
+    float MouseSensitivity = 0.02f;
     float Zoom = 45.0f;
 };

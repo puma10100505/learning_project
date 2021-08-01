@@ -64,6 +64,7 @@ int main() {
             glm::mat4 projection = glm::perspective(glm::radians(
                 mainScene.MainCamera->Zoom), mainScene.WindowRatio, .1f, 100.0f);
             glm::mat4 view = mainScene.MainCamera->GetViewMatrix();
+            
             model_shader.setMat4("projection", projection);
             model_shader.setMat4("view", view);
 

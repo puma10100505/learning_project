@@ -230,7 +230,9 @@ int GLInitGUI() {
 
 // create glfw window
 int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool bHideCursor, bool bWithGUI, 
-    int32_t FrameInterval, GLFWerrorfun GlfwErrCallback, GLFWframebuffersizefun FrameBufferSizeChanged, GLFWkeyfun KeyEventCallback) 
+    int32_t FrameInterval, GLFWerrorfun GlfwErrCallback, GLFWframebuffersizefun FrameBufferSizeChanged, 
+    GLFWkeyfun KeyEventCallback, GLFWcursorposfun MouseCursorPosCallback, 
+    GLFWscrollfun MouseScrollCallback) 
 {
     int iRet = InitGlfwWindow();
     if (iRet < 0)
@@ -276,6 +278,16 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
     }
 
+    if (MouseCursorPosCallback)
+    {
+        glfwSetCursorPosCallback(__GlobalWindow, MouseCursorPosCallback);
+    }
+
+    if (MouseScrollCallback)
+    {
+        glfwSetScrollCallback(__GlobalWindow, MouseScrollCallback);
+    }
+
     // if (WindowResizedCallback)
     // {
     //     printf("hit here set the resize callback\n");
@@ -315,7 +327,9 @@ int GLCreateWindow(const FCreateWindowParameters& Params)
         Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, 
         Params.GlfwErrCallback, 
         Params.FrameBufferSizeChanged, 
-        Params.KeyEventCallback);
+        Params.KeyEventCallback, 
+        Params.MouseCursorPosChanged, 
+        Params.MouseScrollCallback);
 }
 
 void GLDestroyWindow() {
@@ -363,7 +377,7 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
         glfwSwapBuffers(__GlobalWindow);
         glfwPollEvents();
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
     }
 
     return EXIT_SUCCESS;
