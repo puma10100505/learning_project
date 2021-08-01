@@ -4,7 +4,6 @@
  * 将learning_opengl、learning_physx合并到同一个项目中，因为有部分共用的内容，后续还会增加recastnavigation的实验代码。此工程主要以学习实验为目的，通过搭建一个可用的环境了解OpenGL, PhysX, RecastNavigation等相关的开源项目的使用方法，因为要在不同的地方编写代码，所以这个工程被动地实现了CrossPlatform : ). 在Windows和MacOS都可以运行，Linux在后续也可以运行，不过当前还有一些Linux平台的库和CMake代码没有完善。
  
 
- ---
 
  ## LearningProject涉及的开源库、工具和接口：
  - OpenGL: 从learning_opengl工程引入的部分代码，是在学习LearnOpenGL的时候产生的。https://learnopengl-cn.github.io/, https://learnopengl.com/(英文版)
@@ -18,8 +17,6 @@
  - SOIL: 全称是Simple OpenGL Image Library，是用于加载纹理到OpenGL程序的开源库，它基于stb_image. https://github.com/SpartanJ/SOIL2
  - stb_image: 支持多种主流图像格式的加载与解码，可以从内存或文件加载图像数据。https://github.com/nothings/stb, 除了stb_image之外，stb这个开源库还有很多其它有意思的东西（音频、3D、工具等相关内容）
 
-
----
 
 ## 工程结构介绍
 - Assets: 资源文件夹，包括字体(Fonts)、纹理(Textures)、3D模型（Meshes）以及着色器（Shader）
@@ -37,3 +34,12 @@
     - cmake -B cmake-build-debug
     - cmake --build cmake-build-debug
 3. 等待构建完成后在工程根目录可以看到Bin文件夹，里边就是构建的输出（可执行文件）
+
+## DevLog:
+- 根据https://learnopengl-cn.github.io/01%20Getting%20started/09%20Camera/#_3的方法实现简单的摄像机控制。摄像机控制完成后可以更方便地实现基于物理的场景渲染，更容易跟踪场景物体。
+
+## TODO
+* 重构场景相关对象集中管理渲染对象
+* 重构窗口对象，实现WindowManager以及Window类，集中管理窗口相关上下文
+* 实现基于glfw+PhysX+LearningFoundation的物理场景物体渲染。
+* Linux环境下的工程配置以及构建脚本
