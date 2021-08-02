@@ -6,24 +6,27 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN,
 };
 
-const float YAW = 180.0f;
-const float PITCH = 90.0f;
+const float YAW = 0.0f;
+const float PITCH = -45.0f;
 const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+const float SENSITIVITY = 0.05f;
+const float ZOOM = 90.0f;
 
 
 class GLCamera {
 public:
     GLCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), 
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) {
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 front = glm::vec3(0.f, 0.f, 1.f), float yaw = YAW, float pitch = PITCH) {
             Position = position;
             WorldUp = up;
             Yaw = yaw;
             Pitch = pitch;
+            Front = front;
             updateCameraVectors();
         }
     ~GLCamera(){}
@@ -34,18 +37,38 @@ public:
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
         float velocity = MovementSpeed * deltaTime;
-        if (direction == FORWARD) {
+        if (direction == FORWARD) 
+        {
             Position += Front * velocity;
         }
-        if (direction == BACKWARD) {
+        
+        if (direction == BACKWARD) 
+        {
             Position -= Front * velocity;
         }
-        if (direction == LEFT) {
-            Position -= Right * velocity;
-        }
-        if (direction == RIGHT) {
+        
+        if (direction == LEFT) 
+        {
             Position += Right * velocity;
         }
+        
+        if (direction == RIGHT) 
+        {
+            Position -= Right * velocity;
+        }
+        if (direction == UP)
+        {
+            Position += WorldUp * velocity;
+        }
+
+        if (direction == DOWN)
+        {
+            Position -= WorldUp * velocity;
+        }
+
+        printf("After key drived move, velocity: %F: position: (%f, %f, %f), MovementSpeed: %f, deltaTime: %f\n", 
+            velocity, Position.x, Position.y, Position.z, MovementSpeed, deltaTime);
+        //updateCameraVectors();
     }
 
     void ProcessMoveMovement(float xoffset, float yoffset, bool constrainPitch = true) {
@@ -96,7 +119,7 @@ public:
     float Yaw;
     float Pitch;
 
-    float MovementSpeed;
+    float MovementSpeed = 1.f;
     float MouseSensitivity = 0.02f;
     float Zoom = 45.0f;
 };

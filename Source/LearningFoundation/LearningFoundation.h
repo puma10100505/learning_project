@@ -25,6 +25,7 @@
 #include "defines.h"
 
 extern glm::vec4 BackgroundColor;
+extern float DeltaTime;
 
 static GLFWwindow* __GlobalWindow = nullptr;
 static GLFWmonitor* __PrimaryMonitor = nullptr;
@@ -40,7 +41,6 @@ const std::string title = "Sample Window";
 static int32_t FPS = 60;
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
 static float LastFrameTime = 0.0f;
-static float DeltaTime = 0.0f;
 
 typedef struct CreateWindowParameters
 {
@@ -116,3 +116,4 @@ int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight,
     GLFWkeyfun KeyEventCallback = nullptr, 
     GLFWcursorposfun MouseCursorPosCallback = nullptr,
     GLFWscrollfun MouseScrollCallback = nullptr);
+

@@ -1,6 +1,7 @@
 #include "LearningFoundation.h"
 
 glm::vec4 BackgroundColor = glm::vec4(0.1f, 0.6f, 0.7f, 1.0f);
+float DeltaTime = 0.0f;
 
 GLFWwindow* GetGlobalWindow() {
     return __GlobalWindow;
@@ -358,7 +359,6 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        
         // GetCurrentContext == nullptr说明没有初始化GUI
         if (OnGUI && ImGui::GetCurrentContext() != nullptr)
         {

@@ -9,8 +9,10 @@
 
 #include "CommonDefines.h"
 #include "learning.h"
+#include "LearningStatics.h"
 
 extern glm::vec4 BackgroundColor;
+extern float DeltaTime;
 
 static float LastMouseX = ScreenWidth / 2.f;
 static float LastMouseY = ScreenHeight / 2.f;
@@ -29,6 +31,7 @@ static void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int A
 
     if (glfwGetKey(InWindow, GLFW_KEY_W) == GLFW_PRESS)
     {
+        printf("w for forward key is pressing\n");
         MainScene->MainCamera->ProcessKeyboard(FORWARD, DeltaTime);
     }
 
@@ -46,11 +49,20 @@ static void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int A
     {
         MainScene->MainCamera->ProcessKeyboard(RIGHT, DeltaTime);
     }
+
+    if (glfwGetKey(InWindow, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        MainScene->MainCamera->ProcessKeyboard(UP, DeltaTime);
+    }
+
+    if (glfwGetKey(InWindow, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        MainScene->MainCamera->ProcessKeyboard(DOWN, DeltaTime);
+    }
 }
 
 static void OnGUI(float DeltaTime)
 {
-
     ImGui::Begin("Test");                          // Create a window called "Hello, world!" and append into it.
 
     ImGui::Text("Background Color:");
@@ -59,7 +71,6 @@ static void OnGUI(float DeltaTime)
     ImGui::Text("Camera:");
     ImGui::SliderFloat("FOV", &(MainScene->MainCamera->Zoom), 0.0f, 170.0f);
     ImGui::DragFloat3("camera.position", (float*)&(MainScene->MainCamera->Position), .1f);
-
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 
         1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -80,8 +91,9 @@ static void OnTick(float DeltaTime)
 
     MainShader->use();
 
-    glm::mat4 Projection = glm::perspective(glm::radians(MainScene->MainCamera->Zoom), 
-        MainScene->WindowRatio, .1f, 500.f);
+    LearningStatics::GLDrawWorldGrid(10.f, 100, 2.f, {0.3f, 0.5f, 0.6f, .8f});
+
+    glm::mat4 Projection = glm::perspective(glm::radians(MainScene->MainCamera->Zoom), MainScene->WindowRatio, .1f, 5000.f);
     glm::mat4 View = MainScene->MainCamera->GetViewMatrix();
 
     MainShader->setMat4("projection", Projection);
