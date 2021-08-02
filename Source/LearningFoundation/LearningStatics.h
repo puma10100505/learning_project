@@ -8,19 +8,21 @@
 
 namespace LearningStatics
 {
-    static inline void GLDrawLine(const glm::vec3& P1, const glm::vec3& P2, const int LineWidth, const glm::vec4& LineColor)
+    static inline void GLDrawLine(const glm::vec3& P1, const glm::vec3& P2, const int LineWidth, const glm::vec3& LineColor)
     {
-        glColor4f(LineColor.r, LineColor.g, LineColor.b, LineColor.a);
-        glDisable(GL_LIGHTING);
+        glColor3f(LineColor.x, LineColor.y, LineColor.z);
+        // glDisable(GL_LIGHTING);
         glLineWidth(LineWidth);
-        glShadeModel(GL_FLAT);
+        // glShadeModel(GL_FLAT);
         glBegin(GL_LINES);
         glVertex3f(P1.x, P1.y, P1.z);
         glVertex3f(P2.x, P2.y, P2.z);
         glEnd();
+        printf("Finished draw a line from (%f, %f, %f) to (%f, %f, %f)\n", 
+            P1.x, P1.y, P1.z, P2.x, P2.y, P2.z);
     }
 
-    static inline void GLDrawWorldGrid(const float LineGap, const int LineNum, const int LineWidth, const glm::vec4& LineColor)
+    static inline void GLDrawWorldGrid(const float LineGap, const int LineNum, const int LineWidth, const glm::vec3& LineColor)
     {
         float LineLength = LineGap * LineNum;
 

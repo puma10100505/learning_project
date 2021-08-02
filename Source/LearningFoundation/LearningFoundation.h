@@ -54,8 +54,9 @@ public:
     GLFWkeyfun KeyEventCallback;
     GLFWerrorfun GlfwErrCallback;
     GLFWframebuffersizefun FrameBufferSizeChanged;
-    GLFWcursorposfun MouseCursorPosChanged;
+    GLFWcursorposfun MouseMoveCallback;
     GLFWscrollfun MouseScrollCallback;
+    GLFWmousebuttonfun MouseButtonCallback;
 
     CreateWindowParameters(
         int W, 
@@ -71,7 +72,12 @@ public:
             bWithGUI(InWithGUI),
             FrameInterval(FI)
         {
-
+            KeyEventCallback = nullptr;
+            GlfwErrCallback = nullptr;
+            FrameBufferSizeChanged = nullptr;
+            MouseMoveCallback = nullptr;
+            MouseScrollCallback = nullptr;
+            MouseButtonCallback = nullptr;
         } 
 } FCreateWindowParameters;
 
@@ -114,6 +120,7 @@ int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight,
     GLFWerrorfun GlfwErrCallback = nullptr, 
     GLFWframebuffersizefun FrameBufferSizeChanged = nullptr, 
     GLFWkeyfun KeyEventCallback = nullptr, 
-    GLFWcursorposfun MouseCursorPosCallback = nullptr,
-    GLFWscrollfun MouseScrollCallback = nullptr);
+    GLFWcursorposfun MouseMoveCallback = nullptr,
+    GLFWscrollfun MouseScrollCallback = nullptr, 
+    GLFWmousebuttonfun MouseButtonCallback = nullptr);
 

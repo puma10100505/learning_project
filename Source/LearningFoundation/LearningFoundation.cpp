@@ -232,8 +232,8 @@ int GLInitGUI() {
 // create glfw window
 int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool bHideCursor, bool bWithGUI, 
     int32_t FrameInterval, GLFWerrorfun GlfwErrCallback, GLFWframebuffersizefun FrameBufferSizeChanged, 
-    GLFWkeyfun KeyEventCallback, GLFWcursorposfun MouseCursorPosCallback, 
-    GLFWscrollfun MouseScrollCallback) 
+    GLFWkeyfun KeyEventCallback, GLFWcursorposfun MouseMoveCallback, 
+    GLFWscrollfun MouseScrollCallback, GLFWmousebuttonfun MouseButtonCallback) 
 {
     int iRet = InitGlfwWindow();
     if (iRet < 0)
@@ -255,7 +255,6 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     }
 
     glfwMakeContextCurrent(__GlobalWindow);
-    //gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwSwapInterval(1);
     
     // set some callback func
@@ -272,21 +271,31 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     if (KeyEventCallback)
     {
         glfwSetKeyCallback(__GlobalWindow, KeyEventCallback);
+        printf("Finished register KeyEventCallback\n");
     }
 
     if (WindowCloseCallback)
     {
         glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
+        printf("Finished register WindowCloseCallback\n");
     }
 
-    if (MouseCursorPosCallback)
+    if (MouseMoveCallback)
     {
-        glfwSetCursorPosCallback(__GlobalWindow, MouseCursorPosCallback);
+        glfwSetCursorPosCallback(__GlobalWindow, MouseMoveCallback);
+        printf("Finished register MouseMoveCallback\n");
     }
 
     if (MouseScrollCallback)
     {
         glfwSetScrollCallback(__GlobalWindow, MouseScrollCallback);
+        printf("Finished register MouseScrollCallback\n");
+    }
+
+    if (MouseButtonCallback)
+    {
+        glfwSetMouseButtonCallback(__GlobalWindow, MouseButtonCallback);
+        printf("Finished register MouseButtonCallback\n");
     }
 
     // if (WindowResizedCallback)
@@ -329,8 +338,9 @@ int GLCreateWindow(const FCreateWindowParameters& Params)
         Params.GlfwErrCallback, 
         Params.FrameBufferSizeChanged, 
         Params.KeyEventCallback, 
-        Params.MouseCursorPosChanged, 
-        Params.MouseScrollCallback);
+        Params.MouseMoveCallback, 
+        Params.MouseScrollCallback, 
+        Params.MouseButtonCallback);
 }
 
 void GLDestroyWindow() {
