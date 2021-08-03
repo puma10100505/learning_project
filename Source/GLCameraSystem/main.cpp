@@ -108,7 +108,7 @@ static void OnTick(float DeltaTime)
         return;
     }
 
-    LearningStatics::GLDrawLine({0.f, 0.f, 0.f}, {0.f, 10.f, 10.f}, 2.f, {1.f, 0.f, 0.f});
+    LearningStatics::GLDrawLine({0.f, 0.f, 0.f}, {0.f, 10.f, 10.f}, 20.f, {1.f, 0.f, 0.f});
 
     MainShader->use();
 
@@ -120,8 +120,8 @@ static void OnTick(float DeltaTime)
 
     MainShader->setMat4("projection", Projection);
     MainShader->setMat4("view", View);
-
     MainScene->MainCamera->updateCameraVectors();
+
     MainScene->Render();
 }
 

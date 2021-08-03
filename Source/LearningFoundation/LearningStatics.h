@@ -10,11 +10,11 @@ namespace LearningStatics
 {
     static inline void GLDrawLine(const glm::vec3& P1, const glm::vec3& P2, const int LineWidth, const glm::vec3& LineColor)
     {
-        glColor3f(LineColor.x, LineColor.y, LineColor.z);
         // glDisable(GL_LIGHTING);
-        glLineWidth(LineWidth);
         // glShadeModel(GL_FLAT);
         glBegin(GL_LINES);
+        glLineWidth(LineWidth);
+        glColor3f(LineColor.x, LineColor.y, LineColor.z);
         glVertex3f(P1.x, P1.y, P1.z);
         glVertex3f(P2.x, P2.y, P2.z);
         glEnd();
