@@ -150,16 +150,15 @@ int gl_window_loop(std::function<void (void)> on_update, std::function<void (voi
 
 void OnGlfwErrorDefault(int Code, const char* Desc)
 {
-    // TODO:
+    
 }
 
 void FramebufferChangedDefault(GLFWwindow* Window, int Width, int Height) {
-    // TODO:
     glViewport(0, 0, Width, Height);
+    // printf("Current viewport size, width: %d, height: %d\n", Width, Height);
 }
 
 void OnKeyEventDefault(GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods) {
-    // TODO:
     if (Key == GLFW_KEY_ESCAPE && Action == GLFW_PRESS) {
         glfwSetWindowShouldClose(GetGlobalWindow(), true);
     }
@@ -263,10 +262,10 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     //     glfwSetErrorCallback(GlfwErrCallback);
     // }
 
-    // if (FrameBufferSizeChanged)
-    // {
-    //     glfwSetFramebufferSizeCallback(__GlobalWindow, FrameBufferSizeChanged);
-    // }
+    if (FrameBufferSizeChanged)
+    {
+        glfwSetFramebufferSizeCallback(__GlobalWindow, FrameBufferSizeChanged);
+    }
 
     if (KeyEventCallback)
     {
@@ -314,6 +313,8 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         return EXIT_FAILURE;
     }
 
+    glViewport(0, 0, InitWidth, InitHeight);
+
     if (bHideCursor) {
         // Diable the mouse cursor when startup
         glfwSetInputMode(GetGlobalWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -336,7 +337,7 @@ int GLCreateWindow(const FCreateWindowParameters& Params)
     return GLCreateWindow(Params.InitWidth, Params.InitHeight, Params.Title,
         Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, 
         Params.GlfwErrCallback, 
-        Params.FrameBufferSizeChanged, 
+        Params.FrameBufferSizeChanged == nullptr ? FramebufferChangedDefault : Params.FrameBufferSizeChanged, 
         Params.KeyEventCallback, 
         Params.MouseMoveCallback, 
         Params.MouseScrollCallback, 
@@ -344,6 +345,11 @@ int GLCreateWindow(const FCreateWindowParameters& Params)
 }
 
 void GLDestroyWindow() {
+    if (ImGui::GetCurrentContext())
+    {
+        GLDestroyGUI();
+    }
+
     glfwTerminate();
 }
 
@@ -357,32 +363,29 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
 {
     while (!glfwWindowShouldClose(__GlobalWindow)) {
         
-        glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+        glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);
+        
         float currentFrameTime = glfwGetTime();
         DeltaTime = currentFrameTime - LastFrameTime;
         LastFrameTime = currentFrameTime;
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        OnTick(DeltaTime);
 
         // GetCurrentContext == nullptr说明没有初始化GUI
         if (OnGUI && ImGui::GetCurrentContext() != nullptr)
         {
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
             OnGUI(DeltaTime);
+
+            // Rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
-
-        OnTick(DeltaTime);
-
-        
-
-        // Rendering
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(__GlobalWindow);
         glfwPollEvents();

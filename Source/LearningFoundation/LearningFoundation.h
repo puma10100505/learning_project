@@ -118,7 +118,7 @@ int GLCreateWindow(const FCreateWindowParameters& Params);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
     const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
     GLFWerrorfun GlfwErrCallback = nullptr, 
-    GLFWframebuffersizefun FrameBufferSizeChanged = nullptr, 
+    GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault, 
     GLFWkeyfun KeyEventCallback = nullptr, 
     GLFWcursorposfun MouseMoveCallback = nullptr,
     GLFWscrollfun MouseScrollCallback = nullptr, 

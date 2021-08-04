@@ -107,11 +107,11 @@ static void OnTick(float DeltaTime)
     {
         return;
     }
-
     
     MainShader->use();
 
     LearningStatics::GLDrawLine({0.f, 0.f, 0.f}, {0.f, 10.f, 10.f}, 20.f, {1.f, 0.f, 0.f});
+    printf("Get the last gl error: %x\n", glGetError());
 
     // LearningStatics::GLDrawWorldGrid(10.f, 10, 2.f, {0.3f, 0.5f, 0.6f, .8f});
 

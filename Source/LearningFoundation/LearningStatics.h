@@ -12,14 +12,14 @@ namespace LearningStatics
     {
         // glDisable(GL_LIGHTING);
         // glShadeModel(GL_FLAT);
-        glBegin(GL_LINES);
         glLineWidth(LineWidth);
+        glBegin(GL_LINES);
         glColor3f(LineColor.x, LineColor.y, LineColor.z);
         glVertex3f(P1.x, P1.y, P1.z);
         glVertex3f(P2.x, P2.y, P2.z);
         glEnd();
-        printf("Finished draw a line from (%f, %f, %f) to (%f, %f, %f)\n", 
-            P1.x, P1.y, P1.z, P2.x, P2.y, P2.z);
+        // printf("Finished draw a line from (%f, %f, %f) to (%f, %f, %f)\n", 
+        //     P1.x, P1.y, P1.z, P2.x, P2.y, P2.z);
     }
 
     static inline void GLDrawWorldGrid(const float LineGap, const int LineNum, const int LineWidth, const glm::vec3& LineColor)
