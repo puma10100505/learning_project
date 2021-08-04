@@ -108,11 +108,11 @@ static void OnTick(float DeltaTime)
         return;
     }
 
-    LearningStatics::GLDrawLine({0.f, 0.f, 0.f}, {0.f, 10.f, 10.f}, 20.f, {1.f, 0.f, 0.f});
-
+    
     MainShader->use();
 
-    
+    LearningStatics::GLDrawLine({0.f, 0.f, 0.f}, {0.f, 10.f, 10.f}, 20.f, {1.f, 0.f, 0.f});
+
     // LearningStatics::GLDrawWorldGrid(10.f, 10, 2.f, {0.3f, 0.5f, 0.6f, .8f});
 
     glm::mat4 Projection = glm::perspective(glm::radians(MainScene->MainCamera->Zoom), MainScene->WindowRatio, .1f, 5000.f);

@@ -43,3 +43,4 @@
 * 重构窗口对象，实现WindowManager以及Window类，集中管理窗口相关上下文
 * 实现基于glfw+PhysX+LearningFoundation的物理场景物体渲染。
 * Linux环境下的工程配置以及构建脚本
+* 渲染与逻辑分离，多线程实现*
