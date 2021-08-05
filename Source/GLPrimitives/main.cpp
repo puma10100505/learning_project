@@ -38,24 +38,6 @@ static void OnTick(float DeltaTime)
         GlobalShader->setVec4("Color", glm::vec4(0.5f, sin(glfwGetTime()) / 2.f + 0.5f, 0.5f, 1.f));
     }
 
-    // glLoadIdentity();
-    // glTranslatef(-1.f, -1.f, 0.f);
-
-    // LearningStatics::GLDrawLine(glm::vec3(0.f, 0.f, 0.f), glm::vec3(100.f, 100.f, 100.f), 3.f, glm::vec3(1.f, 0.f, 0.f));
-
-    // glColor3ub(254, 0, 0);
-    // glBegin(GL_LINES);        
-    // glVertex3f(-1.f, 0.f, 0.f); //定点坐标范围
-    // glVertex3f(1.f, 0.f, 0.f);
-    // glEnd();
-
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    // glVertexPointer(3, GL_FLOAT, 0, LineVertices);
-    // glDrawArrays(GL_LINES, 0, 2);
-    // glDisableClientState(GL_VERTEX_ARRAY);
-
-    // glDrawArrays(GL_LINES, 0, 2);
-
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -93,15 +75,6 @@ int main(int argc, char** argv)
     {
         return EXIT_FAILURE;
     }
-
-    // unsigned int Buffer;
-    // glGenBuffers(1, &Buffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, Buffer);
-    // glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), LineVertices, GL_STATIC_DRAW);
-    // glEnableVertexAttribArray(0);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // printf("Get the last gl error: %x\n", glGetError());
 
     GlobalShader = std::make_unique<Shader>(
         (solution_base_path + "Assets/Shaders/demo.vs").c_str(), 
