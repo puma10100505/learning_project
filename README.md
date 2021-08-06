@@ -38,6 +38,7 @@
 ## DevLog:
 - 根据https://learnopengl-cn.github.io/01%20Getting%20started/09%20Camera/#_3的方法实现简单的摄像机控制。摄像机控制完成后可以更方便地实现基于物理的场景渲染，更容易跟踪场景物体。
 - 渲染的时候如果设置了uniform但是没有在程序中设置它们，可能会导致渲染结果出现奇怪的错误，如果通过uniform设置MVP矩阵变换，但是在程序中没有设置MVP矩阵的值，可能会导致图形不能正常显示。
+- OPENGL中VBO, VAO, EBO的概念以及关系，学习使用GL的基础API指令绘制图形
 
 ## TODO
 * 重构场景相关对象集中管理渲染对象
