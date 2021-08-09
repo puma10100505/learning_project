@@ -1,6 +1,6 @@
 ﻿#include "GLCubic.h"
 
-#include "shader.h"
+#include "LearningShader.h"
 #include "GLObject.h"
 #include "GLScene.h"
 #include "GLDirectionLight.h"

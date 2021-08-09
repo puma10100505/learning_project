@@ -313,8 +313,6 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         return EXIT_FAILURE;
     }
 
-    glViewport(0, 0, InitWidth, InitHeight);
-
     if (bHideCursor) {
         // Diable the mouse cursor when startup
         glfwSetInputMode(GetGlobalWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -326,6 +324,8 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
             printf("Init imgui failed, iRet: %d\n", iRet);
         }
     }
+
+    glViewport(0, 0, InitWidth, InitHeight);
 
     FPS = 1000 / FrameInterval;
 
@@ -394,4 +394,12 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
     }
 
     return EXIT_SUCCESS;
+}
+
+void OnKeyboardEventDefault(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
+{
+    if (glfwGetKey(InWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(InWindow, GLFW_TRUE);
+    }
 }

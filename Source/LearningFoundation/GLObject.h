@@ -8,7 +8,7 @@
 
 #include "defines.h"
 #include "thirdparty_header.h"
-#include "shader.h"
+#include "LearningShader.h"
 
 class GLScene;
 class Shader;

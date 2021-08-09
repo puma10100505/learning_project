@@ -18,7 +18,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-#include "shader.h"
+#include "LearningShader.h"
 #include "stb_image.h"
 
 #include "utility.h"
@@ -41,6 +41,8 @@ const std::string title = "Sample Window";
 static int32_t FPS = 60;
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
 static float LastFrameTime = 0.0f;
+
+void OnKeyboardEventDefault(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods);
 
 typedef struct CreateWindowParameters
 {
@@ -79,6 +81,21 @@ public:
             MouseScrollCallback = nullptr;
             MouseButtonCallback = nullptr;
         } 
+
+    static struct CreateWindowParameters DefaultWindowParameters() 
+    {
+        struct CreateWindowParameters Parameters{
+            ScreenWidth, 
+            ScreenHeight,
+            __FILE__,
+            false, 
+            true, 
+            30
+        };
+        Parameters.KeyEventCallback = OnKeyboardEventDefault;
+
+        return Parameters;
+    }
 } FCreateWindowParameters;
 
 // @ 旧版函数，后续不再维护升级，逐步淘汰

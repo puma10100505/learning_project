@@ -4,7 +4,7 @@
 
 #include "defines.h"
 #include "GLMesh.h"
-#include "shader.h"
+#include "LearningShader.h"
 
 #include "thirdparty_header.h"
 

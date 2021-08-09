@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "defines.h"
-#include "shader.h"
+#include "LearningShader.h"
 
 class GLMesh {
 public:

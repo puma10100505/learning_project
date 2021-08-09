@@ -36,3 +36,4 @@ cmake-build-debug
 build
 cmake-build-debug
 Bin
+Include/CommonDefines.h

@@ -2,7 +2,7 @@
 
 #include "GLScene.h"
 #include "GLTexture.h"
-#include "shader.h"
+#include "LearningShader.h"
 #include "GLPointLight.h"
 #include "GLDirectionLight.h"
 #include "GLSpotLight.h"

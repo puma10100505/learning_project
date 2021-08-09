@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string.h>
+#include <memory>
 #include <cstring>
 #include "learning.h"
 #include "LearningStatics.h"
