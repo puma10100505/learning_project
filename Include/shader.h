@@ -13,9 +13,27 @@ class Shader
 {
 public:
     unsigned int ID;
+
+    Shader(const std::string& vsPath, const std::string& fsPath, const std::string& geoPath = "")
+    {
+        if (geoPath.length() > 0)
+        {
+            Init(vsPath.c_str(), fsPath.c_str(), geoPath.c_str());
+        }
+        else
+        {
+            Init(vsPath.c_str(), fsPath.c_str());
+        }
+    }
+
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
     Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
+    {
+        Init(vertexPath, fragmentPath, geometryPath);
+    }
+
+    void Init(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -96,6 +114,7 @@ public:
             glDeleteShader(geometry);
 
     }
+
     // activate the shader
     // ------------------------------------------------------------------------
     void use() 
