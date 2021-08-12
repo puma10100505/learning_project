@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <string.h>
 #include <iostream>
+#include <memory>
 #include <vector>
 #include "learning.h"
 #include "PxPhysicsAPI.h"
@@ -29,8 +30,9 @@ PxPvd* gPvd = nullptr;
 
 static float Shininess = 0.01f;
 GLScene MainScene(__back * 6.f);
-GLCubic* Cube = nullptr;
-Shader* GlobalShader = nullptr;
+
+std::unique_ptr<GLCubic> Cube = nullptr;
+std::unique_ptr<Shader> GlobalShader = nullptr;
 
 static void WindowKeyCallback(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
 {
@@ -130,10 +132,11 @@ void InitializeScene()
 {
     InitializePhysics();
 
-    Cube = MainScene.AddCube(solution_base_path + "Assets/Shaders/multilights.object.vs", 
-       solution_base_path + "Assets/Shaders/multilights.object.fs");
-    Cube->SetDiffuseTexture(solution_base_path + "Assets/Textures/container2.png");
-    Cube->SetSpecularTexture(solution_base_path + "Assets/Textures/container2_specular.png");
+    Cube.reset(MainScene.AddCube(DefaultShaderDirectory + "multilights.object.vs", 
+       DefaultShaderDirectory + "multilights.object.fs"));
+
+    Cube->SetDiffuseTexture(DefaultTextureDirectory + "container2.png");
+    Cube->SetSpecularTexture(DefaultTextureDirectory + "container2_specular.png");
 
     Cube->transform.position = glm::vec3(0.f, 0.f, 0.f);
 
@@ -142,8 +145,7 @@ void InitializeScene()
 
     MainScene.MainCamera.get()->Zoom = 90.f;
 
-    GlobalShader = new Shader((solution_base_path + "Assets/Shaders/multilights.object.vs").c_str(), 
-        (solution_base_path + "Assets/Shaders/multilights.object.fs").c_str());
+    GlobalShader = std::make_unique<Shader>("multilights.object");
 }
 
 void StepPhysics()
@@ -385,7 +387,7 @@ void OnTick(float DeltaTime)
     GlobalShader->setFloat("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
 
 
-    printf("current background color: r: %f, g: %f, b: %f\n", BackgroundColor.x, BackgroundColor.y, BackgroundColor.z);
+    // printf("current background color: r: %f, g: %f, b: %f\n", BackgroundColor.x, BackgroundColor.y, BackgroundColor.z);
     
     RenderScene();
     StepPhysics();
@@ -394,20 +396,11 @@ void OnTick(float DeltaTime)
 int main()
 {
     // 创建窗口
-    int iRet = GLCreateWindow({
-        ScreenWidth, 
-        ScreenHeight, 
-        "Sample Window for Px", // 窗口TITLE
-        false,                  // 是否隐藏鼠标
-        true,                   // 是否显示 IMGUI
-        16,                     // 帧间隔
-        WindowKeyCallback       // 输入回调
-    });
-
-    if (iRet < 0) { 
-        printf("Create window failed, ret: %d\n", iRet);
+    if (GLCreateWindow(FCreateWindowParameters::DefaultWindowParameters()) < 0)
+    {
         return EXIT_FAILURE;
     }
+
     
     InitializeScene();
         
@@ -415,10 +408,6 @@ int main()
     // Logic Loop
     GLWindowTick(OnTick, OnGUI);
 
-    // Finalization
-    delete GlobalShader;
-    GlobalShader = nullptr;
-    
     GLDestroyWindow();
 
     return EXIT_SUCCESS;
