@@ -38,20 +38,7 @@ static void OnGUI(float DeltaTime)
 
 int main()
 {
-    FCreateWindowParameters Parameters
-    {
-        ScreenWidth, 
-        ScreenHeight,
-        "GL Primitives Test",
-        false, 
-        true, 
-        30
-    };
-
-    Parameters.KeyEventCallback = OnKeyboardEvent;
-
-    int iRet = GLCreateWindow(Parameters);
-    if (iRet < 0)
+    if (GLCreateWindow(FCreateWindowParameters::DefaultWindowParameters()) < 0)
     {
         return EXIT_FAILURE;
     }

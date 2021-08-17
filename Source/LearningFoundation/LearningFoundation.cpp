@@ -155,7 +155,7 @@ void OnGlfwErrorDefault(int Code, const char* Desc)
 
 void FramebufferChangedDefault(GLFWwindow* Window, int Width, int Height) {
     glViewport(0, 0, Width, Height);
-    // printf("Current viewport size, width: %d, height: %d\n", Width, Height);
+    // printf("Current viewport size, Width: %d, Height: %d\n", Width, Height);
 }
 
 void OnKeyEventDefault(GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods) {
@@ -247,7 +247,9 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 
     __GlobalWindow = glfwCreateWindow(InitWidth, InitHeight, Title.c_str(), 
         bIsFullScreen ? GetPrimaryMonitor() : nullptr, nullptr);
-    if (!__GlobalWindow) {
+    
+    if (!__GlobalWindow) 
+    {
         glfwTerminate();
         std::cout << "gl_create_window create window failed\n";
         return EXIT_FAILURE;
@@ -325,7 +327,7 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         }
     }
 
-    glViewport(0, 0, InitWidth, InitHeight);
+    // glViewport(0, 0, InitWidth, InitHeight);
 
     FPS = 1000 / FrameInterval;
 
@@ -402,4 +404,34 @@ void OnKeyboardEventDefault(GLFWwindow* InWindow, int Key, int ScanCode, int Act
     {
         glfwSetWindowShouldClose(InWindow, GLFW_TRUE);
     }
+}
+
+FCreateWindowParameters FCreateWindowParameters::DefaultWindowParameters(
+        /*int32_t InWidth = 1280, int32_t InHeight = 720*/) 
+{
+    struct CreateWindowParameters Parameters{
+        ScreenWidth, 
+        ScreenHeight,
+        "Default Window",
+        false, 
+        true, 
+        30
+    };
+    Parameters.KeyEventCallback = OnKeyboardEventDefault;
+
+    return Parameters;
+}
+
+FCreateWindowParameters FCreateWindowParameters::WindowBySizeParameters(int W, int H)
+{
+    struct CreateWindowParameters Parameters{
+        W, H,
+        "Default Window",
+        false, 
+        true, 
+        30
+    };
+    Parameters.KeyEventCallback = OnKeyboardEventDefault;
+
+    return Parameters;
 }

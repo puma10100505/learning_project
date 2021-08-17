@@ -33,10 +33,10 @@ static GLFWmonitor* __PrimaryMonitor = nullptr;
 static bool bIsFullScreen = false;
 static int FullScreenWidth = 0;
 static int FullScreenHeight = 0;
-static int ScreenWidth = 1280;
-static int ScreenHeight = 720;
-static const int WINDOW_WIDTH = 1280;
-static const int WINDOW_HEIGHT = 720;
+static int ScreenWidth = 800;
+static int ScreenHeight = 600;
+static const int WINDOW_WIDTH = 800;
+static const int WINDOW_HEIGHT = 600;
 const std::string title = "Sample Window";
 static int32_t FPS = 60;
 static float WINDOW_RATIO = (float)ScreenWidth/(float)ScreenHeight;
@@ -82,20 +82,10 @@ public:
             MouseButtonCallback = nullptr;
         } 
 
-    static struct CreateWindowParameters DefaultWindowParameters() 
-    {
-        struct CreateWindowParameters Parameters{
-            ScreenWidth, 
-            ScreenHeight,
-            __FILE__,
-            false, 
-            true, 
-            30
-        };
-        Parameters.KeyEventCallback = OnKeyboardEventDefault;
+    static struct CreateWindowParameters DefaultWindowParameters();
+    static struct CreateWindowParameters WindowBySizeParameters(int W, int H);
 
-        return Parameters;
-    }
+
 } FCreateWindowParameters;
 
 // @ 旧版函数，后续不再维护升级，逐步淘汰
@@ -135,7 +125,7 @@ int GLCreateWindow(const FCreateWindowParameters& Params);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 
     const std::string& Title = "Sample Window", bool bHideCursor = false, bool bWithGUI = true, int32_t FrameInterval = 60,
     GLFWerrorfun GlfwErrCallback = nullptr, 
-    GLFWframebuffersizefun FrameBufferSizeChanged = FramebufferChangedDefault, 
+    GLFWframebuffersizefun FrameBufferSizeChanged = nullptr, 
     GLFWkeyfun KeyEventCallback = nullptr, 
     GLFWcursorposfun MouseMoveCallback = nullptr,
     GLFWscrollfun MouseScrollCallback = nullptr, 
