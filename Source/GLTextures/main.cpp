@@ -17,12 +17,14 @@ static uint32_t TextureId, TextureId2;
 
 static uint32_t VBO, VAO, EBO;
 
+static float MixAlpha = 0.5f;
+
 static float Vertices[] = {
 //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.f, 1.f,   // 右上
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.f, 0.f,   // 右下
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.f, 0.f,   // 左下
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.f, 1.f    // 左上
 };
 
 static uint32_t Indices[] = {
@@ -52,6 +54,7 @@ static void OnTick(float DeltaTime)
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        GlobalShader->SetFloatValue("alpha", MixAlpha);
         GlobalShader->Activate();
     }
 }
@@ -60,6 +63,7 @@ static void OnGUI(float DeltaTime)
 {
     ImGui::Text("Background Color:");
     ImGui::ColorEdit3("Background Color", (float*)&BackgroundColor);
+    ImGui::SliderFloat("Mix Alpha", &MixAlpha, 0.f, 1.f, "%.2f");
 }
 
 static void InitTexture()
@@ -70,11 +74,12 @@ static void InitTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     int Width, Height, NrChannels;
     //stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(1);
     unsigned char* TexData = stbi_load((DefaultTextureDirectory + "container.jpg").c_str(), &Width, &Height, &NrChannels, 0);
     if (TexData)
     {
@@ -102,7 +107,7 @@ static void InitTexture()
     TexData = stbi_load((DefaultTextureDirectory + "awesomeface.png").c_str(), &Width, &Height, &NrChannels, 0);
     if (TexData)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, TexData);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, TexData);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
@@ -145,8 +150,6 @@ int main(int argc, char** argv)
     }
 
     GlobalShader = std::make_unique<Shader>("texture.ex");
-
-    
 
     InitVertexData();
     InitTexture();
