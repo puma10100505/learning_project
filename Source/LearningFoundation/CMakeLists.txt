@@ -9,5 +9,5 @@ add_library(${PROJECT_NAME} STATIC ${LEARNING_SRC})
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/Source/LearningFoundation
     ${SOLUTION_ROOT}/Include
-    ${SOLUTION_ROOT}/Thirdparty/stb_image
+    ${SOLUTION_ROOT}/Thirdparty/SOIL2
 )

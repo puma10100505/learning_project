@@ -8,7 +8,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Include/
         ${SOLUTION_ROOT}/Include/imgui
         ${SOLUTION_ROOT}/Thirdparty/stb_image
-        ${SOLUTION_ROOT}/Thirdparty/SOIL
+        #${SOLUTION_ROOT}/Thirdparty/SOIL2
         ${SOLUTION_ROOT}/Include/PhysX/include
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include
@@ -17,7 +17,8 @@ endmacro(include_directories)
 
 # 构造库引用信息
 macro(link_extra_libs param_project_name)    
-    list(APPEND EXTRA_LIBS imgui glad learning_foundation stb_image SOIL)
+    list(APPEND EXTRA_LIBS imgui glad learning_foundation stb_image)
+    #list(APPEND EXTRA_LIBS SOIL2)
 
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
