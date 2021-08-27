@@ -33,6 +33,12 @@ static uint32_t Indices[] = {
     0, 1, 3, 1, 2, 3
 };
 
+static float Model_X_Rot = -55.f;
+static float Model_Y_Rot = -55.f;
+static float Model_Z_Rot = -55.f;
+
+static glm::vec3 Model_Rot = glm::vec3(0.f);
+
 static std::unique_ptr<Shader> GlobalShader = nullptr;
 
 static void OnKeyboardEvent(GLFWwindow* InWindow, int Key, int ScanCode, int Action, int Mods)
@@ -47,6 +53,18 @@ static void OnTick(float DeltaTime)
 {
     if (GlobalShader.get())
     {
+        /** 这里一定要先初始化为mat4(1.f)，否则渲染后无法正常显示 */
+        glm::mat4 Model = glm::mat4(1.f);
+        glm::mat4 View = glm::mat4(1.f);
+        glm::mat4 Projection = glm::mat4(1.f);
+
+        Model = glm::rotate(Model, glm::radians(Model_Rot.x), glm::vec3(1.f, 0.f, 0.f));
+        Model = glm::rotate(Model, glm::radians(Model_Rot.y), glm::vec3(0.f, 1.f, 0.f));
+        Model = glm::rotate(Model, glm::radians(Model_Rot.z), glm::vec3(0.f, 0.f, 1.f));
+
+        View = glm::translate(View, glm::vec3(0.f, 0.f, -3.f));
+        Projection = glm::perspective(glm::radians(45.f), ScreenWidth * 1.f / ScreenHeight * 1.f, 0.1f, 100.f);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, TextureId);
 
@@ -57,9 +75,9 @@ static void OnTick(float DeltaTime)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         GlobalShader->SetFloatValue("alpha", MixAlpha);
-        //Translate = glm::vec3(0.f, 0.f, 0.f);
-        Trans = glm::translate(Trans, Translate);
-        GlobalShader->SetMatrix4Value("transform_matrix", Trans);
+        GlobalShader->SetMatrix4Value("model", Model);
+        GlobalShader->SetMatrix4Value("view", View);
+        GlobalShader->SetMatrix4Value("projection", Projection);
         GlobalShader->Activate();
     }
 }
@@ -69,11 +87,7 @@ static void OnGUI(float DeltaTime)
     ImGui::Text("Background Color:");
     ImGui::ColorEdit3("Background Color", (float*)&BackgroundColor);
     ImGui::SliderFloat("Mix Alpha", &MixAlpha, 0.f, 1.f, "%.2f");
-    if (ImGui::DragFloat("Translate.x", &Translate.x, 0.1f, 0.f, 100.f, "%.2f"))
-    {
-
-    }
-    ImGui::DragFloat("Translate.y", &Translate.y, 0.1f, 0.f, 100.f, "%.2f");
+    ImGui::SliderFloat3("Model Rot", (float *)&Model_Rot, 0.f, 360.f);
 }
 
 static void InitTexture()
