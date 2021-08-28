@@ -21,6 +21,7 @@ typedef struct _stTransform {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+    bool bIsDirty = false;
 
     _stTransform() {
         position = __zero;
