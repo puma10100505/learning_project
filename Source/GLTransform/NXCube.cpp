@@ -1,5 +1,5 @@
 #include "NXCube.h"
-
+#include "CommonDefines.h"
 #include <glad/glad.h>
 
 const float NXCube::VertexData[] = {

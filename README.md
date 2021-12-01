@@ -16,6 +16,7 @@
  - glad: gl接口加载助手，可在https://glad.dav1d.de/ 生成针对不同GL版本的加载程序
  - SOIL: 全称是Simple OpenGL Image Library，是用于加载纹理到OpenGL程序的开源库，它基于stb_image. https://github.com/SpartanJ/SOIL2
  - stb_image: 支持多种主流图像格式的加载与解码，可以从内存或文件加载图像数据。https://github.com/nothings/stb, 除了stb_image之外，stb这个开源库还有很多其它有意思的东西（音频、3D、工具等相关内容）
+ - glut: OpenGL的工具函数库，用于快速创建基本形状
 
 
 ## 工程结构介绍

@@ -11,6 +11,8 @@
 #include "learning.h"
 #include "PxPhysicsAPI.h"
 #include "CommonDefines.h"
+#include "GL/glut.h"
+#include "gl/GLU.h"
 
 extern glm::vec4 BackgroundColor;
 
@@ -95,6 +97,7 @@ void InitializePhysics()
         PvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
     }
 
+
     gMaterial = gPhysics->createMaterial(.5f, .5f, .5f);
 
     // 地面
@@ -132,15 +135,15 @@ void InitializeScene()
 {
     InitializePhysics();
 
-    Cube.reset(MainScene.AddCube(DefaultShaderDirectory + "multilights.object.vs", 
-       DefaultShaderDirectory + "multilights.object.fs"));
+    //Cube.reset(MainScene.AddCube(DefaultShaderDirectory + "multilights.object.vs", 
+       //DefaultShaderDirectory + "multilights.object.fs"));
 
-    Cube->SetDiffuseTexture(DefaultTextureDirectory + "container2.png");
-    Cube->SetSpecularTexture(DefaultTextureDirectory + "container2_specular.png");
+   // Cube->SetDiffuseTexture(DefaultTextureDirectory + "container2.png");
+    //Cube->SetSpecularTexture(DefaultTextureDirectory + "container2_specular.png");
 
-    Cube->transform.position = glm::vec3(0.f, 0.f, 0.f);
+    //Cube->transform.position = glm::vec3(0.f, 0.f, 0.f);
 
-    MainScene.MainCamera.get()->Position = glm::vec3(0.f, 80.f, 30.f);
+    MainScene.MainCamera.get()->Position = glm::vec3(0.f, 0.f, 0.f);
     MainScene.MainCamera.get()->Pitch = -45.f;
 
     MainScene.MainCamera.get()->Zoom = 90.f;
@@ -176,17 +179,21 @@ void RenderGeometryHolder(const PxGeometry& Geom)
     switch (Geom.getType())
     {
         case PxGeometryType::eBOX:
-        {
-            const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
-            glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
+            {
+                const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
+                glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
+
+                glutSolidCube(2);
             
-            printf("Finished draw a cube with box_extent: %f, %f, %f\n", 
-                BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-            break;
-        }
+                printf("Finished draw a cube with box_extent: %f, %f, %f\n", 
+                    BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
+                break;
+            }
 
         case PxGeometryType::eSPHERE:
         {
+            const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);
+            glutSolidSphere(GLdouble(SphereGeom.radius), 10, 10);
             break;
         }
 
@@ -194,13 +201,14 @@ void RenderGeometryHolder(const PxGeometry& Geom)
         {
             break;
         }
+    default: ;
     }
 }
 
 void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows, const PxVec3& InColor/*, TriggerRender* Callback*/)
 {
-    //const PxVec3 ShadowDir(0.f, 0.7f, 0.7f);
-    //const PxReal ShadowMat[] = {1, 0, 0, 0, -ShadowDir.x/ShadowDir.y, 0, -ShadowDir.z/ShadowDir.y, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    const PxVec3 ShadowDir(0.f, 0.7f, 0.7f);
+    const PxReal ShadowMat[] = {1, 0, 0, 0, -ShadowDir.x/ShadowDir.y, 0, -ShadowDir.z/ShadowDir.y, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
     PxShape* Shapes[128];
     for (PxU32 i = 0; i < NumActors; i++)
@@ -227,6 +235,8 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
 
             glPushMatrix();
             glMultMatrixf(&ShapePose.column0.x);
+            printf("shape pose x: %f, y: %f, z: %f\n", ShapePose.column0.x , 
+                ShapePose.column0.y, ShapePose.column0.z);
             if (bIsSleeping)
             {
                 const PxVec3 DarkColor = InColor * .25f;
@@ -238,45 +248,22 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
                 glColor4f(InColor.x, InColor.y, InColor.z, 1.f);
             }
 
-            //RenderGeometryHolder(Holder.any());
-            switch (Holder.any().getType())
-            {
-                case PxGeometryType::eBOX:
-                {
-                    const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Holder.any());
-                    glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-
-                    if (Cube)
-                    {
-                        Cube->transform.position = glm::vec3(ShapeTrans.p.x, ShapeTrans.p.y, ShapeTrans.p.z);
-                        Cube->transform.rotation = glm::eulerAngles(
-                            glm::quat(ShapeTrans.q.w, ShapeTrans.q.x, ShapeTrans.q.y, ShapeTrans.q.z));
-                        
-                        //printf("Finished draw a cube with pos: %f, %f, %f\n", 
-                        //    Cube->transform.rotation.x, Cube->transform.rotation.y, Cube->transform.rotation.z);
-
-                        Cube->BeforeDraw();
-                        Cube->Draw();
-                    }
-                    break;
-                }
-
-                case PxGeometryType::eSPHERE:
-                {
-                    break;
-                }
-
-                case PxGeometryType::eCAPSULE:
-                {
-                    break;
-                }
-            }
+            RenderGeometryHolder(Holder.any());
+            
             glPopMatrix();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             if (bShadows)
             {
                 // TODO: Shadow process
+                glPushMatrix();
+                glMultMatrixf(ShadowMat);
+                glMultMatrixf(&ShapePose.column0.x);
+                glDisable(GL_LIGHTING);
+                glColor4f(0.1f, 0.2f, 0.3f, 1.f);
+                RenderGeometryHolder(Holder.any());
+                glEnable(GL_LIGHTING);
+                glPopMatrix();
             }
         }
     }
@@ -309,36 +296,36 @@ void OnGUI(float DeltaTime)
     ImGui::SliderFloat("Shininess", &Shininess, 0.0f, 256.0f);
 
     ImGui::Text("Light - Phong:");
-    ImGui::DragFloat3("phong.ambient", (float*)&(MainScene.phong_model.ambient), .01f, 0.0f, 1.0f);
-    ImGui::DragFloat3("phong.diffuse", (float*)&(MainScene.phong_model.diffuse), .01f, 0.0f, 1.0f);
-    ImGui::DragFloat3("phong.specular", (float*)&(MainScene.phong_model.specular), .01f, 0.0f, 1.0f);
+    ImGui::DragFloat3("phong.ambient", reinterpret_cast<float*>(&(MainScene.phong_model.ambient)), .01f, 0.0f, 1.0f);
+    ImGui::DragFloat3("phong.diffuse", reinterpret_cast<float*>(&(MainScene.phong_model.diffuse)), .01f, 0.0f, 1.0f);
+    ImGui::DragFloat3("phong.specular", reinterpret_cast<float*>(&(MainScene.phong_model.specular)), .01f, 0.0f, 1.0f);
 
     ImGui::Text("Light - Direction:");
-    ImGui::DragFloat3("direction-light.direction", (float*)&(MainScene.FirstDirectionLight()->direction), .1f);
+    ImGui::DragFloat3("direction-light.direction", reinterpret_cast<float*>(&(MainScene.FirstDirectionLight()->direction)), .1f);
 
     ImGui::Text("Light - Point:");
-    ImGui::DragFloat3("point-light.position", (float*)&(MainScene.FirstPointLight()->transform.position), .1f);
-    ImGui::SliderFloat("point-light.constant", (float*)&(MainScene.FirstPointLight()->constant), 0.001f, 1.0f);
-    ImGui::SliderFloat("point-light.linear", (float*)&(MainScene.FirstPointLight()->linear), 0.001f, 1.0f);
-    ImGui::SliderFloat("point-light.quadratic", (float*)&(MainScene.FirstPointLight()->quadratic), 0.001f, 1.0f);
+    ImGui::DragFloat3("point-light.position", reinterpret_cast<float*>(&(MainScene.FirstPointLight()->transform.position)), .1f);
+    ImGui::SliderFloat("point-light.constant", static_cast<float*>(&(MainScene.FirstPointLight()->constant)), 0.001f, 1.0f);
+    ImGui::SliderFloat("point-light.linear", static_cast<float*>(&(MainScene.FirstPointLight()->linear)), 0.001f, 1.0f);
+    ImGui::SliderFloat("point-light.quadratic", static_cast<float*>(&(MainScene.FirstPointLight()->quadratic)), 0.001f, 1.0f);
 
     ImGui::Text("Light - Spot:");
-    ImGui::DragFloat3("spot-light.direction", (float*)&(MainScene.FirstSpotLight()->direction), .1f);
-    ImGui::DragFloat3("spot-light.position", (float*)&(MainScene.FirstSpotLight()->transform.position), .1f);
+    ImGui::DragFloat3("spot-light.direction", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->direction)), .1f);
+    ImGui::DragFloat3("spot-light.position", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->transform.position)), .1f);
     ImGui::SliderFloat("spot-light.cutoff", &(MainScene.FirstSpotLight()->cutoff), 0.0f, 179.0f);
     ImGui::SliderFloat("spot-light.outerCutoff", &(MainScene.FirstSpotLight()->outerCutoff), 0.0f, 179.0f);
-    ImGui::SliderFloat("spot-light.constant", (float*)&(MainScene.FirstSpotLight()->constant), 0.001f, 1.0f);
-    ImGui::SliderFloat("spot-light.linear", (float*)&(MainScene.FirstSpotLight()->linear), 0.001f, 1.0f);
-    ImGui::SliderFloat("spot-light.quadratic", (float*)&(MainScene.FirstSpotLight()->quadratic), 0.001f, 1.0f);
+    ImGui::SliderFloat("spot-light.constant", static_cast<float*>(&(MainScene.FirstSpotLight()->constant)), 0.001f, 1.0f);
+    ImGui::SliderFloat("spot-light.linear", static_cast<float*>(&(MainScene.FirstSpotLight()->linear)), 0.001f, 1.0f);
+    ImGui::SliderFloat("spot-light.quadratic", static_cast<float*>(&(MainScene.FirstSpotLight()->quadratic)), 0.001f, 1.0f);
 
     ImGui::Text("Camera:");
     ImGui::SliderFloat("FOV", &(MainScene.MainCamera.get()->Zoom), 0.0f, 170.0f);
-    ImGui::DragFloat3("camera.position", (float*)&(MainScene.MainCamera.get()->Position), .1f);
-    ImGui::SliderFloat("Camera.Yaw", (float*)&MainScene.MainCamera->Yaw, 0.f, 360.f, "%.2f");
-    ImGui::SliderFloat("Camera.Pitch", (float*)&MainScene.MainCamera->Pitch, 0.f, 360.f, "%.2f");
+    ImGui::DragFloat3("camera.position", reinterpret_cast<float*>(&(MainScene.MainCamera.get()->Position)), .1f);
+    ImGui::SliderFloat("Camera.Yaw", static_cast<float*>(&MainScene.MainCamera->Yaw), 0.f, 360.f, "%.2f");
+    ImGui::SliderFloat("Camera.Pitch", static_cast<float*>(&MainScene.MainCamera->Pitch), 0.f, 360.f, "%.2f");
     
     ImGui::Text("Background Color:");
-    ImGui::ColorEdit3("Background Color", (float*)&BackgroundColor); // Edit 3 floats representing a color
+    ImGui::ColorEdit3("Background Color", reinterpret_cast<float*>(&BackgroundColor)); // Edit 3 floats representing a color
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
@@ -354,37 +341,37 @@ void OnTick(float DeltaTime)
         return;
     }
     
-    GlobalShader->use();
+    GlobalShader->Activate();
     glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(MainScene.MainCamera->Zoom), MainScene.WindowRatio, .1f, 100.f);
     glm::mat4 ViewMatrix = MainScene.MainCamera->GetViewMatrix();
-    GlobalShader->setMat4("projection", ProjectionMatrix);
-    GlobalShader->setMat4("view", ViewMatrix);
+    GlobalShader->SetMatrix4Value("projection", ProjectionMatrix);
+    GlobalShader->SetMatrix4Value("view", ViewMatrix);
 
     // 冯氏模型
-    GlobalShader->setVec3("phong_model.ambient", MainScene.phong_model.ambient);
-    GlobalShader->setVec3("phong_model.diffuse", MainScene.phong_model.diffuse);
-    GlobalShader->setVec3("phong_model.specular", MainScene.phong_model.specular);
+    GlobalShader->SetVector3Value("phong_model.ambient", MainScene.phong_model.ambient);
+    GlobalShader->SetVector3Value("phong_model.diffuse", MainScene.phong_model.diffuse);
+    GlobalShader->SetVector3Value("phong_model.specular", MainScene.phong_model.specular);
 
     // 材质
-    GlobalShader->setFloat("material.shininess", Shininess);
+    GlobalShader->SetFloatValue("material.shininess", Shininess);
 
     // 点光源
-    GlobalShader->setVec3("pointLight.position", MainScene.FirstPointLight()->transform.position);
-    GlobalShader->setFloat("pointLight.constant", MainScene.FirstPointLight()->constant);
-    GlobalShader->setFloat("pointLight.linear", MainScene.FirstPointLight()->linear);
-    GlobalShader->setFloat("pointLight.quadratic", MainScene.FirstPointLight()->quadratic);
+    GlobalShader->SetVector3Value("pointLight.position", MainScene.FirstPointLight()->transform.position);
+    GlobalShader->SetFloatValue("pointLight.constant", MainScene.FirstPointLight()->constant);
+    GlobalShader->SetFloatValue("pointLight.linear", MainScene.FirstPointLight()->linear);
+    GlobalShader->SetFloatValue("pointLight.quadratic", MainScene.FirstPointLight()->quadratic);
 
     // 方向光源
-    GlobalShader->setVec3("directionLight.direction", MainScene.FirstDirectionLight()->direction);
+    GlobalShader->SetVector3Value("directionLight.direction", MainScene.FirstDirectionLight()->direction);
 
     // 聚光光源 
-    GlobalShader->setVec3("spotLight.position", MainScene.FirstSpotLight()->transform.position);
-    GlobalShader->setVec3("spotLight.direction", MainScene.FirstSpotLight()->direction);
-    GlobalShader->setFloat("spotLight.cutoff", MainScene.FirstSpotLight()->cutoff);
-    GlobalShader->setFloat("spotLight.outerCutoff", MainScene.FirstSpotLight()->outerCutoff);
-    GlobalShader->setFloat("spotLight.constant", MainScene.FirstSpotLight()->constant);
-    GlobalShader->setFloat("spotLight.linear", MainScene.FirstSpotLight()->linear);
-    GlobalShader->setFloat("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
+    GlobalShader->SetVector3Value("spotLight.position", MainScene.FirstSpotLight()->transform.position);
+    GlobalShader->SetVector3Value("spotLight.direction", MainScene.FirstSpotLight()->direction);
+    GlobalShader->SetFloatValue("spotLight.cutoff", MainScene.FirstSpotLight()->cutoff);
+    GlobalShader->SetFloatValue("spotLight.outerCutoff", MainScene.FirstSpotLight()->outerCutoff);
+    GlobalShader->SetFloatValue("spotLight.constant", MainScene.FirstSpotLight()->constant);
+    GlobalShader->SetFloatValue("spotLight.linear", MainScene.FirstSpotLight()->linear);
+    GlobalShader->SetFloatValue("spotLight.quadratic", MainScene.FirstSpotLight()->quadratic);
 
 
     // printf("current background color: r: %f, g: %f, b: %f\n", BackgroundColor.x, BackgroundColor.y, BackgroundColor.z);
@@ -400,11 +387,9 @@ int main()
     {
         return EXIT_FAILURE;
     }
-
     
     InitializeScene();
-        
-
+    
     // Logic Loop
     GLWindowTick(OnTick, OnGUI);
 
