@@ -20,6 +20,8 @@ extern glm::vec4 BackgroundColor;
 
 using namespace physx;
 
+LearningCamera* GlobalCamera = nullptr;
+
 PxDefaultAllocator gAllocator;
 PxDefaultErrorCallback gErrorCallback;
 
@@ -134,14 +136,13 @@ void InitializePhysics()
 void InitializeScene()
 {
     InitializePhysics();
-    MainScene.MainCamera.get()->Position = glm::vec3(0.f, 0.f, 0.f);
-    MainScene.MainCamera.get()->Pitch = -45.f;
-    MainScene.MainCamera.get()->Zoom = 90.f;
+    
+    GlobalCamera = new LearningCamera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f,-0.2f,-0.7f));
 }
 
 void StepPhysics()
 {
-    gScene->simulate(1.f / 30.f);
+    gScene->simulate(1.f / 90.f);
     gScene->fetchResults(true);
 }
 
@@ -317,10 +318,34 @@ void OnGUI(float DeltaTime)
     ImGui::End();
 }
 
+void RenderCamera(const PxVec3& cameraEye, const PxVec3& cameraDir, physx::PxReal clipNear = 1.f, physx::PxReal clipFar = 10000.f)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Setup camera
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+    printf("hit here...1\n");
+	gluPerspective(60.0, GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT)), GLdouble(clipNear), GLdouble(clipFar));
+    printf("hit here...2\n");
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
+
+	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
+}
+
 void OnTick(float DeltaTime)
 {
+    StepPhysics();   
+
+    if (GlobalCamera)
+    {
+        RenderCamera(GlobalCamera->getEye(), GlobalCamera->getDir());
+    }
+
     RenderScene();
-    StepPhysics();
 }
 
 int main()

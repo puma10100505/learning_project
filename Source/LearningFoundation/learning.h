@@ -12,6 +12,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "LearningCamera.h"
+
 #include "LearningShader.h"
 #include "stb_image.h"
 
