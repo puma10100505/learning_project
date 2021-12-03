@@ -17,6 +17,7 @@
  - SOIL: 全称是Simple OpenGL Image Library，是用于加载纹理到OpenGL程序的开源库，它基于stb_image. https://github.com/SpartanJ/SOIL2
  - stb_image: 支持多种主流图像格式的加载与解码，可以从内存或文件加载图像数据。https://github.com/nothings/stb, 除了stb_image之外，stb这个开源库还有很多其它有意思的东西（音频、3D、工具等相关内容）
  - glut: OpenGL的工具函数库，用于快速创建基本形状
+ - freeglut: glut太老，使用freeglut代替，如果要快速使用物理库实验可以使用freeglut作为Windows以及Input库，因为它可以快速创建Geometry物件。SDL, GLFW都没有类似功能接口
 
 
 ## 工程结构介绍

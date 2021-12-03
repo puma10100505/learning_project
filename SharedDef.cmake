@@ -83,6 +83,7 @@ macro(link_extra_libs param_project_name)
             IrrXMLd.lib 
             zlibstaticd.lib
             assimp-vc142-mtd.lib
+            glew32.lib
             glfw3.lib
             LowLevel_static_64.lib
             LowLevelAABB_static_64.lib
@@ -97,13 +98,16 @@ macro(link_extra_libs param_project_name)
             PhysXFoundation_64.lib
             PhysXExtensions_static_64.lib
             PhysXCooking_64.lib
-            glut32.lib
+            freeglut_staticd.lib
+            freeglutd.lib
         )
 
         target_link_directories(${param_project_name}
             PRIVATE 
             ${SOLUTION_ROOT}/Libraries/Windows
             ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug
+            ${SOLUTION_ROOT}/Libraries/Windows/glew
+            ${SOLUTION_ROOT}/Libraries/Windows/freeglut
             ${SOLUTION_ROOT}/Libraries/Windows/glut
         )
     endif()
@@ -133,7 +137,8 @@ macro(deploy_files param_project_name)
             ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXFoundation_64.dll 
             ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXCooking_64.dll 
             ${SOLUTION_ROOT}/Libraries/Windows/assimp-vc142-mtd.dll
-            ${SOLUTION_ROOT}/Libraries/Windows/glut/glut32.dll
+            ${SOLUTION_ROOT}/Libraries/Windows/freeglut/freeglutd.dll
+            ${SOLUTION_ROOT}/Libraries/Windows/glew/glew32.dll
         )
 
         add_custom_command(TARGET ${param_project_name} 
