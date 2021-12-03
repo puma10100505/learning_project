@@ -363,10 +363,11 @@ void GLDestroyGUI() {
 
 int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI) 
 {
-    while (!glfwWindowShouldClose(__GlobalWindow)) {
-        
+    while (!glfwWindowShouldClose(__GlobalWindow)) 
+    {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(BackgroundColor.x, BackgroundColor.y, BackgroundColor.z, BackgroundColor.w);
+
         
         float currentFrameTime = glfwGetTime();
         DeltaTime = currentFrameTime - LastFrameTime;

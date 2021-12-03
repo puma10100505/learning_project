@@ -34,6 +34,7 @@ PxPvd* gPvd = nullptr;
 
 static float Shininess = 0.01f;
 GLScene MainScene(__back * 6.f);
+float FOV = 60.f;
 
 //std::unique_ptr<GLCubic> Cube = nullptr;
 //std::unique_ptr<Shader> GlobalShader = nullptr;
@@ -89,6 +90,7 @@ void InitializePhysics()
     gDispatcher = PxDefaultCpuDispatcherCreate(2);
     SceneDesc.cpuDispatcher = gDispatcher; //PxDefaultCpuDispatcherCreate(2);
     SceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    
     gScene = gPhysics->createScene(SceneDesc);
 
     PxPvdSceneClient* PvdClient = gScene->getScenePvdClient();
@@ -135,14 +137,12 @@ void InitializePhysics()
 
 void InitializeScene()
 {
-    InitializePhysics();
-    
-    GlobalCamera = new LearningCamera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f,-0.2f,-0.7f));
+    GlobalCamera = new LearningCamera(PxVec3(10.0f, 0.0f, 0.0f), PxVec3(-0.6f,-0.2f,-0.7f));
 }
 
 void StepPhysics()
 {
-    gScene->simulate(1.f / 90.f);
+    gScene->simulate(1.f / 30.f);
     gScene->fetchResults(true);
 }
 
@@ -224,8 +224,9 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
 
             glPushMatrix();
             glMultMatrixf(&ShapePose.column0.x);
-            printf("shape pose x: %f, y: %f, z: %f\n", ShapePose.column0.x , 
-                ShapePose.column0.y, ShapePose.column0.z);
+            
+            printf("shape pose x: %f, y: %f, z: %f\n", ShapePose.column0.x , ShapePose.column0.y, ShapePose.column0.z);
+
             if (bIsSleeping)
             {
                 const PxVec3 DarkColor = InColor * .25f;
@@ -240,7 +241,6 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
             
             glPopMatrix();
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
             if (bShadows)
             {
                 // TODO: Shadow process
@@ -257,8 +257,30 @@ void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows,
     }
 }
 
+void RenderCamera(const PxVec3& cameraEye, const PxVec3& cameraDir, physx::PxReal clipNear = 1.f, physx::PxReal clipFar = 10000.f)
+{
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Setup camera
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+    
+	gluPerspective(FOV, GLdouble(ScreenWidth) / GLdouble(ScreenHeight), GLdouble(clipNear), GLdouble(clipFar));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
+
+	// glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
+}
+
 void RenderScene()
 {
+    // if (GlobalCamera)
+    // {
+        RenderCamera(GlobalCamera->getEye(), GlobalCamera->getDir());
+    // }
+
     PxScene* CurrentScene;
     PxGetPhysics().getScenes(&CurrentScene, 1);
     PxU32 nbActors = CurrentScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
@@ -270,7 +292,7 @@ void RenderScene()
             reinterpret_cast<PxActor**>(&Actors[0]), nbActors);
 
         // TODO: Render Actors
-        RenderActors(&Actors[0], static_cast<PxU32>(Actors.size()), false, {0.f, 0.7f, 0.f});
+        RenderActors(&Actors[0], static_cast<PxU32>(Actors.size()), false, {0.f, 0.f, 0.f});
     }
 }
 
@@ -279,37 +301,38 @@ void OnGUI(float DeltaTime)
     // TODO:
     ImGui::Begin("Px Simple Demo"); 
     
-    ImGui::Text("Material:");               // Display some text (you can use a format strings too)
-    ImGui::SliderFloat("Shininess", &Shininess, 0.0f, 256.0f);
+    // ImGui::Text("Material:");               // Display some text (you can use a format strings too)
+    // ImGui::SliderFloat("Shininess", &Shininess, 0.0f, 256.0f);
 
-    ImGui::Text("Light - Phong:");
-    ImGui::DragFloat3("phong.ambient", reinterpret_cast<float*>(&(MainScene.phong_model.ambient)), .01f, 0.0f, 1.0f);
-    ImGui::DragFloat3("phong.diffuse", reinterpret_cast<float*>(&(MainScene.phong_model.diffuse)), .01f, 0.0f, 1.0f);
-    ImGui::DragFloat3("phong.specular", reinterpret_cast<float*>(&(MainScene.phong_model.specular)), .01f, 0.0f, 1.0f);
+    // ImGui::Text("Light - Phong:");
+    // ImGui::DragFloat3("phong.ambient", reinterpret_cast<float*>(&(MainScene.phong_model.ambient)), .01f, 0.0f, 1.0f);
+    // ImGui::DragFloat3("phong.diffuse", reinterpret_cast<float*>(&(MainScene.phong_model.diffuse)), .01f, 0.0f, 1.0f);
+    // ImGui::DragFloat3("phong.specular", reinterpret_cast<float*>(&(MainScene.phong_model.specular)), .01f, 0.0f, 1.0f);
 
-    ImGui::Text("Light - Direction:");
-    ImGui::DragFloat3("direction-light.direction", reinterpret_cast<float*>(&(MainScene.FirstDirectionLight()->direction)), .1f);
+    // ImGui::Text("Light - Direction:");
+    // ImGui::DragFloat3("direction-light.direction", reinterpret_cast<float*>(&(MainScene.FirstDirectionLight()->direction)), .1f);
 
-    ImGui::Text("Light - Point:");
-    ImGui::DragFloat3("point-light.position", reinterpret_cast<float*>(&(MainScene.FirstPointLight()->transform.position)), .1f);
-    ImGui::SliderFloat("point-light.constant", static_cast<float*>(&(MainScene.FirstPointLight()->constant)), 0.001f, 1.0f);
-    ImGui::SliderFloat("point-light.linear", static_cast<float*>(&(MainScene.FirstPointLight()->linear)), 0.001f, 1.0f);
-    ImGui::SliderFloat("point-light.quadratic", static_cast<float*>(&(MainScene.FirstPointLight()->quadratic)), 0.001f, 1.0f);
+    // ImGui::Text("Light - Point:");
+    // ImGui::DragFloat3("point-light.position", reinterpret_cast<float*>(&(MainScene.FirstPointLight()->transform.position)), .1f);
+    // ImGui::SliderFloat("point-light.constant", static_cast<float*>(&(MainScene.FirstPointLight()->constant)), 0.001f, 1.0f);
+    // ImGui::SliderFloat("point-light.linear", static_cast<float*>(&(MainScene.FirstPointLight()->linear)), 0.001f, 1.0f);
+    // ImGui::SliderFloat("point-light.quadratic", static_cast<float*>(&(MainScene.FirstPointLight()->quadratic)), 0.001f, 1.0f);
 
-    ImGui::Text("Light - Spot:");
-    ImGui::DragFloat3("spot-light.direction", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->direction)), .1f);
-    ImGui::DragFloat3("spot-light.position", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->transform.position)), .1f);
-    ImGui::SliderFloat("spot-light.cutoff", &(MainScene.FirstSpotLight()->cutoff), 0.0f, 179.0f);
-    ImGui::SliderFloat("spot-light.outerCutoff", &(MainScene.FirstSpotLight()->outerCutoff), 0.0f, 179.0f);
-    ImGui::SliderFloat("spot-light.constant", static_cast<float*>(&(MainScene.FirstSpotLight()->constant)), 0.001f, 1.0f);
-    ImGui::SliderFloat("spot-light.linear", static_cast<float*>(&(MainScene.FirstSpotLight()->linear)), 0.001f, 1.0f);
-    ImGui::SliderFloat("spot-light.quadratic", static_cast<float*>(&(MainScene.FirstSpotLight()->quadratic)), 0.001f, 1.0f);
+    // ImGui::Text("Light - Spot:");
+    // ImGui::DragFloat3("spot-light.direction", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->direction)), .1f);
+    // ImGui::DragFloat3("spot-light.position", reinterpret_cast<float*>(&(MainScene.FirstSpotLight()->transform.position)), .1f);
+    // ImGui::SliderFloat("spot-light.cutoff", &(MainScene.FirstSpotLight()->cutoff), 0.0f, 179.0f);
+    // ImGui::SliderFloat("spot-light.outerCutoff", &(MainScene.FirstSpotLight()->outerCutoff), 0.0f, 179.0f);
+    // ImGui::SliderFloat("spot-light.constant", static_cast<float*>(&(MainScene.FirstSpotLight()->constant)), 0.001f, 1.0f);
+    // ImGui::SliderFloat("spot-light.linear", static_cast<float*>(&(MainScene.FirstSpotLight()->linear)), 0.001f, 1.0f);
+    // ImGui::SliderFloat("spot-light.quadratic", static_cast<float*>(&(MainScene.FirstSpotLight()->quadratic)), 0.001f, 1.0f);
 
     ImGui::Text("Camera:");
-    ImGui::SliderFloat("FOV", &(MainScene.MainCamera.get()->Zoom), 0.0f, 170.0f);
-    ImGui::DragFloat3("camera.position", reinterpret_cast<float*>(&(MainScene.MainCamera.get()->Position)), .1f);
-    ImGui::SliderFloat("Camera.Yaw", static_cast<float*>(&MainScene.MainCamera->Yaw), 0.f, 360.f, "%.2f");
-    ImGui::SliderFloat("Camera.Pitch", static_cast<float*>(&MainScene.MainCamera->Pitch), 0.f, 360.f, "%.2f");
+    ImGui::SliderFloat("FOV", &FOV, 0.0f, 170.0f);
+    ImGui::DragFloat3("camera.eye", reinterpret_cast<float*>(&(GlobalCamera->mEye)), .1f);
+    ImGui::DragFloat3("camera.dir", reinterpret_cast<float*>(&(GlobalCamera->mDir)), .1f);
+    // ImGui::SliderFloat("Camera.Yaw", static_cast<float*>(&MainScene.MainCamera->Yaw), 0.f, 360.f, "%.2f");
+    // ImGui::SliderFloat("Camera.Pitch", static_cast<float*>(&MainScene.MainCamera->Pitch), 0.f, 360.f, "%.2f");
     
     ImGui::Text("Background Color:");
     ImGui::ColorEdit3("Background Color", reinterpret_cast<float*>(&BackgroundColor)); // Edit 3 floats representing a color
@@ -318,50 +341,56 @@ void OnGUI(float DeltaTime)
     ImGui::End();
 }
 
-void RenderCamera(const PxVec3& cameraEye, const PxVec3& cameraDir, physx::PxReal clipNear = 1.f, physx::PxReal clipFar = 10000.f)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Setup camera
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-    printf("hit here...1\n");
-	gluPerspective(60.0, GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT)), GLdouble(clipNear), GLdouble(clipFar));
-    printf("hit here...2\n");
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
-
-	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
-}
 
 void OnTick(float DeltaTime)
 {
     StepPhysics();   
-
-    if (GlobalCamera)
-    {
-        RenderCamera(GlobalCamera->getEye(), GlobalCamera->getDir());
-    }
-
     RenderScene();
 }
 
-int main()
+int main(int argc, char** argv)
 {
     // 创建窗口
     if (GLCreateWindow(FCreateWindowParameters::DefaultWindowParameters()) < 0)
     {
         return EXIT_FAILURE;
     }
+
+    glutInit(&argc, argv);
+
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitWindowSize(ScreenWidth, ScreenHeight);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL);
+
+    // Setup lighting
+    glEnable(GL_LIGHTING);
+    float ambientColor[]	= { 0.0f, 0.1f, 0.2f, 0.0f };
+    float diffuseColor[]	= { 1.0f, 1.0f, 1.0f, 0.0f };		
+    float specularColor[]	= { 0.0f, 0.0f, 0.0f, 0.0f };		
+    float position[]		= { 100.0f, 100.0f, 400.0f, 1.0f };		
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    glEnable(GL_LIGHT0);
+
+
     
+    
+    InitializePhysics();
     InitializeScene();
     
     // Logic Loop
     GLWindowTick(OnTick, OnGUI);
 
     GLDestroyWindow();
+
+    delete GlobalCamera;
+    CleanupPhysics();
 
     return EXIT_SUCCESS;
 }
