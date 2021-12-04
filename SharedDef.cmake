@@ -83,7 +83,7 @@ macro(link_extra_libs param_project_name)
             IrrXMLd.lib 
             zlibstaticd.lib
             assimp-vc142-mtd.lib
-            glew32.lib
+            #glew32.lib
             glfw3.lib
             LowLevel_static_64.lib
             LowLevelAABB_static_64.lib
@@ -138,7 +138,7 @@ macro(deploy_files param_project_name)
             ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug/PhysXCooking_64.dll 
             ${SOLUTION_ROOT}/Libraries/Windows/assimp-vc142-mtd.dll
             ${SOLUTION_ROOT}/Libraries/Windows/freeglut/freeglutd.dll
-            ${SOLUTION_ROOT}/Libraries/Windows/glew/glew32.dll
+            #${SOLUTION_ROOT}/Libraries/Windows/glew/glew32.dll
         )
 
         add_custom_command(TARGET ${param_project_name} 

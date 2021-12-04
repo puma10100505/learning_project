@@ -13,6 +13,27 @@
 extern glm::vec4 BackgroundColor;
 extern float DeltaTime;
 
+
+GLfloat vertices[] =
+{
+    -1, -1, -1,   -1, -1,  1,   -1,  1,  1,   -1,  1, -1,
+    1, -1, -1,    1, -1,  1,    1,  1,  1,    1,  1, -1,
+    -1, -1, -1,   -1, -1,  1,    1, -1,  1,    1, -1, -1,
+    -1,  1, -1,   -1,  1,  1,    1,  1,  1,    1,  1, -1,
+    -1, -1, -1,   -1,  1, -1,    1,  1, -1,    1, -1, -1,
+    -1, -1,  1,   -1,  1,  1,    1,  1,  1,    1, -1,  1
+};
+
+GLfloat colors[] =
+{
+    0, 0, 0,   0, 0, 1,   0, 1, 1,   0, 1, 0,
+    1, 0, 0,   1, 0, 1,   1, 1, 1,   1, 1, 0,
+    0, 0, 0,   0, 0, 1,   1, 0, 1,   1, 0, 0,
+    0, 1, 0,   0, 1, 1,   1, 1, 1,   1, 1, 0,
+    0, 0, 0,   0, 1, 0,   1, 1, 0,   1, 0, 0,
+    0, 0, 1,   0, 1, 1,   1, 1, 1,   1, 0, 1
+};
+
 static unsigned int VBO, VAO, EBO;
 
 std::unique_ptr<Shader> GlobalShader = nullptr;
@@ -74,6 +95,30 @@ static const unsigned int Indices[] = {
 
 uint32_t ContinueTranglesVBO, ContinueTranglesVAO;
 
+static void drawCube()
+{
+    static float alpha = 0;
+    glMatrixMode(GL_PROJECTION_MATRIX);
+    glLoadIdentity();
+    glTranslatef(0,0,-2);
+    glMatrixMode(GL_MODELVIEW_MATRIX);
+    //attempt to rotate cube
+    //glRotatef(alpha, 1, 0, 0);
+
+    /* We have a color array and a vertex array */
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glColorPointer(3, GL_FLOAT, 0, colors);
+
+    /* Send data : 24 vertices */
+    glDrawArrays(GL_QUADS, 0, 24);
+
+    /* Cleanup states */
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    alpha += 0.1;
+}
 
 static void OnTick(float DeltaTime)
 {
@@ -83,6 +128,7 @@ static void OnTick(float DeltaTime)
     //     //GlobalShader->setVec4("Color", glm::vec4(.5f, .5f, .6f, 1.f));
     //     GlobalShader->setVec4("Color", glm::vec4(0.5f, sin(glfwGetTime()) / 2.f + 0.5f, 0.5f, 1.f));
     // }
+
 
     if (Triangle1Shader.get())
     {

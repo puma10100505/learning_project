@@ -8,7 +8,8 @@
         "__functional_03": "cpp",
         "__nullptr": "cpp",
         "memory": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "string": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureOnOpen": true

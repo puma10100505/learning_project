@@ -113,14 +113,13 @@ void SampleKeyboard( unsigned char cChar, int nMouseX, int nMouseY )
 
 int main(int argc, char** argv)
 {
-    glutInitDisplayString("first freeglut demo window");
+    glutInit(&argc, argv);
+    //glutInitDisplayString("first freeglut demo window");
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowPosition(100, 100);
 
-    glutInit(&argc, argv);
-
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-
+    
     gMainWin = glutCreateWindow( "Hello world!" );
 
     glutIdleFunc( SampleIdle );
@@ -129,6 +128,7 @@ int main(int argc, char** argv)
     glutEntryFunc( SampleEntry );
     glutKeyboardFunc( SampleKeyboard );
 
+    
     glutMainLoop();
 
     return EXIT_SUCCESS;

@@ -378,9 +378,6 @@ int main(int argc, char** argv)
     glLightfv(GL_LIGHT0, GL_POSITION, position);
     glEnable(GL_LIGHT0);
 
-
-    
-    
     InitializePhysics();
     InitializeScene();
     
