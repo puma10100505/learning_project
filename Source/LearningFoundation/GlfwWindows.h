@@ -1,4 +1,6 @@
 #pragma once
+// 下面这行可以隐藏FreeGlut或Glfw的Console窗口
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
 #include <chrono>
 #include <thread>
