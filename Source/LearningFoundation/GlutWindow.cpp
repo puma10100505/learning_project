@@ -8,6 +8,7 @@ bool GlutWindow::bUseGUI = true;
 bool GlutWindow::bUseDarkStyle = true;
 int GlutWindow::LastUpdateTimeInMs = 0;
 float GlutWindow::DeltaTimeInSeconds = 0.f;
+int GlutWindow::FPS = 60;
 
 GlutWindowDrawCallbackFunc GlutWindow::OnDrawCallback = nullptr;
 GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
@@ -227,6 +228,8 @@ void GlutWindow::InternalUpdate()
     
     glutSwapBuffers();
     glutPostRedisplay();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
 }
 
 void GlutWindow::InternalMotion(int x, int y)

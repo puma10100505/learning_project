@@ -37,5 +37,3 @@
 #include "GLCubic.h"
 #include "GLQuad.h"
 
-
-

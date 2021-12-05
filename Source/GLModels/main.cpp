@@ -11,6 +11,7 @@
 
 #include "CommonDefines.h"
 #include "learning.h"
+#include "GlfwWindows.h"
 
 extern glm::vec4 BackgroundColor;
 

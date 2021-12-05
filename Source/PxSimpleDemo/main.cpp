@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include "GlfwWindows.h"
 #include "learning.h"
 #include "PxPhysicsAPI.h"
 #include "CommonDefines.h"

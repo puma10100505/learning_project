@@ -10,6 +10,7 @@
 #include "CommonDefines.h"
 #include "learning.h"
 #include "LearningStatics.h"
+#include "GlfwWindows.h"
 
 extern glm::vec4 BackgroundColor;
 extern float DeltaTime;

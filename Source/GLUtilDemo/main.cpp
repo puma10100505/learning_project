@@ -13,6 +13,7 @@
 #include "CommonDefines.h"
 #include "GL/glut.h"
 #include "gl/GLU.h"
+#include "GlfwWindows.h"
 
 extern glm::vec4 BackgroundColor;
 

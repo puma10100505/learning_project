@@ -31,8 +31,8 @@
 // static bool bIsFullScreen = false;
 // static int FullScreenWidth = 0;
 // static int FullScreenHeight = 0;
-static int ScreenWidth = 1280;
-static int ScreenHeight = 900;
+//static int ScreenWidth = 1280;
+//static int ScreenHeight = 900;
 static const int WINDOW_WIDTH = 1280;
 static const int WINDOW_HEIGHT = 900;
 // const std::string title = "Sample Window";

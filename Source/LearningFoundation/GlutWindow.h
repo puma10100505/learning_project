@@ -1,8 +1,11 @@
 #pragma once
+#pragma warning (disable:4819)
 
 #include <iostream>
 #include <memory>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glut.h"
@@ -69,4 +72,5 @@ public:
     static bool bUseDarkStyle;
     static bool bUseGUI;
     static ImVec4 WindowBackgroundColor;
+    static int FPS;
 };

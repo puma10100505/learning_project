@@ -45,6 +45,7 @@ static int WireSphereStack = 12;
 static int GeomType = 0;
 static int PhysXBoxSize = 3;
 static glm::vec3 PhysXBoxInitPos = {0.f, 0.f, -15.f};   // -Z is forward, +Y is up, +X is right
+static float PhysXFPS = 30.f;
 
 static void DrawStuffByGeomType()
 {
@@ -149,7 +150,7 @@ void InitializePhysics()
 
 void StepPhysics()
 {
-    gScene->simulate(1.f / 30.f);
+    gScene->simulate(1.f / PhysXFPS);
     gScene->fetchResults(true);
 }
 
@@ -314,53 +315,8 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::SetNextWindowSize(ImVec2(350, 480), ImGuiCond_FirstUseEver);
     ImGui::Begin("Choose Geometries");
     ImGui::NewLine();
-    
-    // if (ImGui::RadioButton("SolidCube: ", GeomType == 0))
-    // {
-    //     GeomType = 0;
-    // }
-    // ImGui::SliderInt("Cube Size: ", &CubeSize, 1, 50);
-    // ImGui::Separator();
-
-    // if (ImGui::RadioButton("WireCube: ", GeomType == 1))
-    // {
-    //     GeomType = 1;
-    // }
-    // ImGui::SliderInt("Wire Cube Size: ", &WireCubeSize, 1, 50);
-    // ImGui::Separator();
-
-    // if (ImGui::RadioButton("WireTeapot: ", GeomType == 2))
-    // {        
-    //     GeomType = 2;
-    // }
-    // ImGui::SliderInt("Wire Teapot Size: ", &WireTeapotSize, 1, 50);
-    // ImGui::Separator();
-
-    // if (ImGui::RadioButton("SolidTeapot: ", GeomType == 3))
-    // {        
-    //     GeomType = 3;
-    // }
-    // ImGui::SliderInt("Solid Teapot Size: ", &SolidTeapotSize, 1, 50);
-    // ImGui::Separator();
-
-    // if (ImGui::RadioButton("SolidSphere: ", GeomType == 4))
-    // {        
-    //     GeomType = 4;
-    // }
-    // ImGui::SliderInt("Solid Sphere Size: ", &SolidSphereRadius, 1, 50);
-    // ImGui::SliderInt("Solid Sphere Slice: ", &SolidSphereSlice, 12, 64);
-    // ImGui::SliderInt("Solid Sphere Stack: ", &SolidSphereStack, 12, 64);
-    // ImGui::Separator();
-
-    // if (ImGui::RadioButton("WireSphere: ", GeomType == 5))
-    // {        
-    //     GeomType = 5;
-    // }
-    // ImGui::SliderInt("Wire Sphere Size: ", &WireSphereRadius, 1, 50);
-    // ImGui::SliderInt("Wire Sphere Slice: ", &WireSphereSlice, 12, 64);
-    // ImGui::SliderInt("Wire Sphere Stack: ", &WireSphereStack, 12, 64);
-    // ImGui::Separator();
-
+    ImGui::SliderInt("Render FPS", &GlutWindow::FPS, 15, 120);
+    ImGui::SliderFloat("PhysX FPS", &PhysXFPS, 15.f, 120.f);
     ImGui::SliderInt("PhysX Box Size: ", &PhysXBoxSize, 1, 10);
     ImGui::DragFloat3("PhysX Box Init Position: ", (float*)&PhysXBoxInitPos, 0.1f);
     if (ImGui::Button("Add PhysX Box"))
@@ -385,6 +341,7 @@ int main(int argc, char** argv)
 {
     GlutWindow::bUseGUI = true;
     GlutWindow::bUseDarkStyle = false;
+    GlutWindow::FPS = 30;
 
     GlutWindow::OnDrawCallback = OnCustomTick;
     GlutWindow::OnGUICallback = OnCustomGUI;

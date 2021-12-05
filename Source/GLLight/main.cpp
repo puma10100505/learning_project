@@ -7,7 +7,7 @@
 #include <thread>
 #include "learning.h"
 #include "CommonDefines.h"
-
+#include "GlfwWindows.h"
 
 
 /////////////////////
@@ -181,8 +181,8 @@ void Init()
     ObjectShader->SetFloatValue("light.cutoff", light_parameters.cutoff);
     ObjectShader->SetFloatValue("light.outerCutoff", light_parameters.outerCutoff);
 
-    unsigned int texture_conainer2 = load_texture(DefaultTextureDirectory + "container2.png");
-    unsigned int texture_container2_spec = load_texture(DefaultTextureDirectory + "container2_specular.png");
+    unsigned int texture_conainer2 = load_texture((DefaultTextureDirectory + "container2.png").c_str());
+    unsigned int texture_container2_spec = load_texture((DefaultTextureDirectory + "container2_specular.png").c_str());
     
     ObjectShader->Activate();
     // set the texture unit
