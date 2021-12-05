@@ -4,16 +4,36 @@
 GlutWindow* GlutWindow::Inst = nullptr;
 ImVec4 GlutWindow::WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
 FGlutWindowHandle GlutWindow::WinHandle = 0;
+bool GlutWindow::bUseGUI = true;
+bool GlutWindow::bUseDarkStyle = true;
+int GlutWindow::LastUpdateTimeInMs = 0;
+float GlutWindow::DeltaTimeInSeconds = 0.f;
 
-GlutWindowCallbackFunc GlutWindow::OnDrawCallback = nullptr;
-GlutWindowCallbackFunc GlutWindow::OnGUICallback = nullptr;
+GlutWindowDrawCallbackFunc GlutWindow::OnDrawCallback = nullptr;
+GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
 GlutWindowInputCallbackFunc GlutWindow::OnInputCallback = nullptr;
 GlutWindowResizeCallbackFunc GlutWindow::OnResizeCallback = nullptr;
 
 
+GlutWindow* GlutWindow::GetInstance(int InArgc, char** InArgv, const char* InTitle, 
+        int InWidth, int InHeight, bool InShowGUI)
+{
+    if (Inst == nullptr)
+    {
+        Inst = new GlutWindow(InArgc, InArgv, InTitle, InWidth, InHeight, InShowGUI);
+    }
+
+    return Inst;
+} 
+
+GlutWindow* GlutWindow::GetInstance() 
+{
+    return Inst;
+}
+
 GlutWindow::GlutWindow(int InArgc, char** InArgv, const char* InTitle, 
     int InWidth, int InHeight, bool InShowGUI)
-    : WindowTitle(InTitle), WindowWidth(InWidth), WindowHeight(InHeight), bShowGUI(InShowGUI)
+    : WindowTitle(InTitle), WindowWidth(InWidth), WindowHeight(InHeight)
 {
     WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
     Initialize(InArgc, InArgv);
@@ -25,6 +45,11 @@ void GlutWindow::Initialize(int InArgc, char** InArgv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE);
     glutInitWindowSize(WindowWidth, WindowHeight);
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+}
+
+void GlutWindow::UseGUI(bool InShow)
+{
+    bUseGUI = InShow;
 }
 
 void GlutWindow::InternalIdle()
@@ -48,6 +73,11 @@ void GlutWindow::InternalInput(unsigned char cChar, int nMouseX, int nMouseY)
 
 void GlutWindow::InternalResize(int nWidth, int nHeight)
 {
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_ReshapeFunc(nWidth, nHeight);
+    }
+
     GLfloat fAspect = (GLfloat) nHeight / (GLfloat) nWidth;
     GLfloat fPos[ 4 ] = { 0.0f, 0.0f, 10.0f, 0.0f };
     GLfloat fCol[ 4 ] = { 0.5f, 1.0f,  0.0f, 1.0f };
@@ -91,6 +121,11 @@ void GlutWindow::InternalResize(int nWidth, int nHeight)
     glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, fCol );
 }
 
+float GlutWindow::ElpsedTimeInSeconds()
+{
+    return glutGet(GLUT_ELAPSED_TIME) / 1000.f;
+}
+
 int GlutWindow::Show()
 {
     WinHandle = glutCreateWindow(WindowTitle.c_str());
@@ -106,24 +141,40 @@ int GlutWindow::Show()
     glutEntryFunc(&GlutWindow::InternalEntry);
     glutKeyboardFunc(&GlutWindow::InternalInput);
 
-    if (bShowGUI)
+    glutMotionFunc(&GlutWindow::InternalMotion);
+    glutPassiveMotionFunc(&GlutWindow::InternalPassiveMotion);
+    glutMouseFunc(&GlutWindow::InternalMouse);
+#ifdef __FREEGLUT_EXT_H__
+    glutMouseWheelFunc(&GlutWindow::InternalWheel);
+#endif
+    glutKeyboardUpFunc(&GlutWindow::InternalKeyboardUp);
+    glutSpecialFunc(&GlutWindow::InternalSpecial);
+    glutSpecialUpFunc(&GlutWindow::InternalSpecialUp);
+
+
+    if (bUseGUI)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
         // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
+        if (bUseDarkStyle)
+        {
+            ImGui::StyleColorsDark();
+        }
+        else
+        {
+            ImGui::StyleColorsClassic();
+        }
 
         ImGui_ImplGLUT_Init();
-        ImGui_ImplGLUT_InstallFuncs();
         ImGui_ImplOpenGL2_Init();
     }
 
     glutMainLoop();
 
-    if (ImGui::GetCurrentContext())
+    if (bUseGUI && ImGui::GetCurrentContext())
     {
         ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplGLUT_Shutdown();
@@ -133,30 +184,103 @@ int GlutWindow::Show()
     return 0;
 }
 
+void GlutWindow::UpdateDeltaTime()
+{
+    int CurrentTimeMs = glutGet(GLUT_ELAPSED_TIME);
+    int DeltaTimeMs = (glutGet(GLUT_ELAPSED_TIME) - LastUpdateTimeInMs);
+    if (DeltaTimeMs <= 0)
+    {
+        DeltaTimeMs = 1;
+    }
+
+    DeltaTimeInSeconds = DeltaTimeMs / 1000.0f;
+    LastUpdateTimeInMs = CurrentTimeMs;
+}
+
 void GlutWindow::InternalUpdate()
 {
-    ImGui_ImplOpenGL2_NewFrame();
-    ImGui_ImplGLUT_NewFrame();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(WindowBackgroundColor.x, WindowBackgroundColor.y, WindowBackgroundColor.z, WindowBackgroundColor.w);
 
+    UpdateDeltaTime(); 
+
+    // 先绘制图形
     if (OnDrawCallback)
     {
-        OnDrawCallback();
+        OnDrawCallback(DeltaTimeInSeconds);
     }
 
-    if (OnGUICallback)
+    // 再绘制GUI
+    if (bUseGUI && OnGUICallback)
     {
-        OnGUICallback();
-    }
+        ImGui_ImplOpenGL2_NewFrame();
+        ImGui_ImplGLUT_NewFrame();
 
-    ImGui::Render();
-    ImGuiIO& io = ImGui::GetIO();
-    glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
-    glClearColor(WindowBackgroundColor.x, WindowBackgroundColor.y, WindowBackgroundColor.z, WindowBackgroundColor.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+        OnGUICallback(DeltaTimeInSeconds);
+
+        ImGui::Render();
+        // ImGuiIO& io = ImGui::GetIO();
+        // glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
     
-    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
-
+        ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    }
+    
     glutSwapBuffers();
     glutPostRedisplay();
-    //glutPostWindowRedisplay(WinHandle);
+}
+
+void GlutWindow::InternalMotion(int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_MotionFunc(x, y);
+    }
+}
+
+void GlutWindow::InternalPassiveMotion(int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_MotionFunc(x, y);
+    }
+}
+
+void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_MouseFunc(glut_button, state, x, y);
+    }
+}
+
+void GlutWindow::InternalWheel(int button, int dir, int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_MouseWheelFunc(button, dir, x, y);
+    }
+}
+
+void GlutWindow::InternalKeyboardUp(unsigned char c, int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_KeyboardUpFunc(c, x, y);
+    }
+}
+
+void GlutWindow::InternalSpecial(int key, int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_SpecialFunc(key, x, y);
+    }
+}
+
+void GlutWindow::InternalSpecialUp(int key, int x, int y)
+{
+    if (bUseGUI)
+    {
+        ImGui_ImplGLUT_SpecialUpFunc(key, x, y);
+    }
 }

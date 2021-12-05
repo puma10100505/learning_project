@@ -16,6 +16,6 @@ add_subdirectory(LearningFoundation)
 # add_subdirectory(GLLight)
 # add_subdirectory(GLUtilDemo)
 # add_subdirectory(GLFreeglutDemo)
- add_subdirectory(TempTest)
+ add_subdirectory(GlutWindowWithImGui)
 # add_subdirectory(ImGuiWithFreeglutDemo)
  

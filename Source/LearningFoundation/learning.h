@@ -1,20 +1,21 @@
 #pragma once
 # pragma warning (disable:4819)
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+// #ifndef USE_GLUT
+//     #include <glad/glad.h>
+//     #include <GLFW/glfw3.h>
+// #else 
+//     #include <gl/GL.h>
+// #endif
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
 
 #include "LearningCamera.h"
-
 #include "LearningShader.h"
+
 #include "stb_image.h"
 
 #include "utility.h"

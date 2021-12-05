@@ -9,7 +9,8 @@
 #include "imgui/imgui_impl_opengl2.h"
 
 typedef int FGlutWindowHandle;
-typedef void(*GlutWindowCallbackFunc)();
+typedef void(*GlutWindowDrawCallbackFunc)(float);
+typedef void(*GlutWindowGUICallbackFunc)(float);
 typedef void(*GlutWindowInputCallbackFunc)(unsigned char cChar, int nMouseX, int nMouseY);
 typedef void(*GlutWindowResizeCallbackFunc)(int Width, int Height);
 
@@ -21,17 +22,15 @@ private:
 
 public:
     static GlutWindow* GetInstance(int InArgc, char** InArgv, const char* InTitle, 
-        int InWidth, int InHeight, bool InShowGUI)
-    {
-        if (Inst == nullptr)
-        {
-            Inst = new GlutWindow(InArgc, InArgv, InTitle, InWidth, InHeight, InShowGUI);
-        }
+        int InWidth, int InHeight, bool InShowGUI);
 
-        return Inst;
-    } 
+    static GlutWindow* GetInstance();
 
     int Show();
+
+    float ElpsedTimeInSeconds();
+    
+    static void UseGUI(bool InShow);
 
 protected:
     void Initialize(int InArgc, char** InArgv);
@@ -41,19 +40,33 @@ protected:
     static void InternalEntry(int State);
     static void InternalResize(int nWidth, int nHeight);
     static void InternalInput(unsigned char cChar, int nMouseX, int nMouseY);
+    static void InternalMotion(int x, int y);
+    static void InternalPassiveMotion(int x, int y);
+    static void InternalMouse(int glut_button, int state, int x, int y);
+    static void InternalWheel(int button, int dir, int x, int y);
+    static void InternalKeyboardUp(unsigned char c, int x, int y);
+    static void InternalSpecial(int key, int x, int y);
+    static void InternalSpecialUp(int key, int x, int y);
+
+    static void UpdateDeltaTime();
+
     
 private:
     static FGlutWindowHandle WinHandle;
     int WindowWidth;
     int WindowHeight;
-    std::string WindowTitle;
-    bool bShowGUI;
-    static ImVec4 WindowBackgroundColor;
-    static GlutWindow* Inst; 
+    std::string WindowTitle;    
+    static GlutWindow* Inst;
+    static int LastUpdateTimeInMs;
+    static float DeltaTimeInSeconds;
 
 public:
-    static GlutWindowCallbackFunc OnDrawCallback;
-    static GlutWindowCallbackFunc OnGUICallback;
+    static GlutWindowDrawCallbackFunc OnDrawCallback;
+    static GlutWindowGUICallbackFunc OnGUICallback;
     static GlutWindowInputCallbackFunc OnInputCallback;
     static GlutWindowResizeCallbackFunc OnResizeCallback;
+
+    static bool bUseDarkStyle;
+    static bool bUseGUI;
+    static ImVec4 WindowBackgroundColor;
 };

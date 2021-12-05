@@ -41,6 +41,7 @@
 - 根据https://learnopengl-cn.github.io/01%20Getting%20started/09%20Camera/#_3的方法实现简单的摄像机控制。摄像机控制完成后可以更方便地实现基于物理的场景渲染，更容易跟踪场景物体。
 - 渲染的时候如果设置了uniform但是没有在程序中设置它们，可能会导致渲染结果出现奇怪的错误，如果通过uniform设置MVP矩阵变换，但是在程序中没有设置MVP矩阵的值，可能会导致图形不能正常显示。
 - OPENGL中VBO, VAO, EBO的概念以及关系，学习使用GL的基础API指令绘制图形
+- 集成Freeglut以及基于Glut的ImGUI, GlutWindowWithImGui目录下的代码可作为其DEMO, 此DEMO可用于物理引擎试验，因为Freeglut有方便的接口用于绘制基础几何形状。下一步可在此基础上引入物理计算。
 
 ## TODO
 * 重构场景相关对象集中管理渲染对象
@@ -49,3 +50,5 @@
 * Linux环境下的工程配置以及构建脚本
 * 渲染与逻辑分离，多线程实现*
 * 物理引擎的序列化和反序列化功能研究
+* 在GlutWindowWithImGui这个DEMO的基础上引入物理计算
+* 集成导航库
