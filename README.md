@@ -18,6 +18,7 @@
  - stb_image: 支持多种主流图像格式的加载与解码，可以从内存或文件加载图像数据。https://github.com/nothings/stb, 除了stb_image之外，stb这个开源库还有很多其它有意思的东西（音频、3D、工具等相关内容）
  - glut: OpenGL的工具函数库，用于快速创建基本形状
  - freeglut: glut太老，使用freeglut代替，如果要快速使用物理库实验可以使用freeglut作为Windows以及Input库，因为它可以快速创建Geometry物件。SDL, GLFW都没有类似功能接口
+ - recastnavigation: 开源导航信息生成以及寻路库，可用于AI移动
 
 
 ## 工程结构介绍
@@ -51,4 +52,3 @@
 * 渲染与逻辑分离，多线程实现*
 * 物理引擎的序列化和反序列化功能研究
 * 在GlutWindowWithImGui这个DEMO的基础上引入物理计算
-* 集成导航库
