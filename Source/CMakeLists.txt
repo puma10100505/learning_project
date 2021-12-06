@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 3.0...3.21)
 add_subdirectory(LearningFoundation)
 
 ### Optional Projects Below:
-# add_subdirectory(GLModels)
-# add_subdirectory(GLCameraSystem)
-# add_subdirectory(GLPrimitives)
+ add_subdirectory(GLModels)
+ add_subdirectory(GLCameraSystem)
+ add_subdirectory(GLPrimitives)
  add_subdirectory(GLTransform)
-# add_subdirectory(GLShaders)
-# add_subdirectory(GLFreeglutDemo)
+ add_subdirectory(GLShaders)
+ add_subdirectory(GLFreeglutDemo)
  add_subdirectory(PxLearningDemo_CreateBox)
-# add_subdirectory(ImGuiWithFreeglutDemo)
+ add_subdirectory(ImGuiWithFreeglutDemo)
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 # add_subdirectory(GLBasic)

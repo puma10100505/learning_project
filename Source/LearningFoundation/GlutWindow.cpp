@@ -1,5 +1,8 @@
 #include "GlutWindow.h"
 #include "GL/freeglut.h"
+#include "PxPhysicsAPI.h"
+
+using namespace physx;
 
 GlutWindow* GlutWindow::Inst = nullptr;
 ImVec4 GlutWindow::WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
@@ -9,6 +12,9 @@ bool GlutWindow::bUseDarkStyle = true;
 int GlutWindow::LastUpdateTimeInMs = 0;
 float GlutWindow::DeltaTimeInSeconds = 0.f;
 int GlutWindow::FPS = 60;
+int GlutWindow::WindowWidth = 1280;
+int GlutWindow::WindowHeight = 720;
+LearningCamera GlutWindow::Camera(PxVec3(0.f, 0.f, 0.f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 GlutWindowDrawCallbackFunc GlutWindow::OnDrawCallback = nullptr;
 GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
@@ -34,7 +40,7 @@ GlutWindow* GlutWindow::GetInstance()
 
 GlutWindow::GlutWindow(int InArgc, char** InArgv, const char* InTitle, 
     int InWidth, int InHeight, bool InShowGUI)
-    : WindowTitle(InTitle), WindowWidth(InWidth), WindowHeight(InHeight)
+    : WindowTitle(InTitle)
 {
     WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
     Initialize(InArgc, InArgv);
@@ -55,7 +61,7 @@ void GlutWindow::UseGUI(bool InShow)
 
 void GlutWindow::InternalIdle()
 {
-    glutPostWindowRedisplay(WinHandle);
+    glutPostRedisplay();
 }
 
 void GlutWindow::InternalEntry(int State)
@@ -70,6 +76,8 @@ void GlutWindow::InternalInput(unsigned char cChar, int nMouseX, int nMouseY)
     {
         OnInputCallback(cChar, nMouseX, nMouseY);
     }
+
+    Camera.handleKey(cChar, nMouseX, nMouseY);
 }
 
 void GlutWindow::InternalResize(int nWidth, int nHeight)
@@ -225,6 +233,8 @@ void GlutWindow::InternalUpdate()
     
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     }
+
+    RenderCamera();
     
     glutSwapBuffers();
     glutPostRedisplay();
@@ -238,6 +248,8 @@ void GlutWindow::InternalMotion(int x, int y)
     {
         ImGui_ImplGLUT_MotionFunc(x, y);
     }
+
+    Camera.handleMotion(x, y);
 }
 
 void GlutWindow::InternalPassiveMotion(int x, int y)
@@ -254,6 +266,8 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
     {
         ImGui_ImplGLUT_MouseFunc(glut_button, state, x, y);
     }
+
+    Camera.handleMouse(glut_button, state, x, y);
 }
 
 void GlutWindow::InternalWheel(int button, int dir, int x, int y)
@@ -286,4 +300,20 @@ void GlutWindow::InternalSpecialUp(int key, int x, int y)
     {
         ImGui_ImplGLUT_SpecialUpFunc(key, x, y);
     }
+}
+
+void GlutWindow::RenderCamera()
+{
+    glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(Camera.mFOV, GLdouble(WindowWidth) / GLdouble(WindowHeight), GLdouble(Camera.mClipNear), GLdouble(Camera.mClipFar));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(GLdouble(Camera.getEye().x), GLdouble(Camera.getEye().y), GLdouble(Camera.getEye().z), 
+        GLdouble(Camera.getEye().x + Camera.getDir().x), GLdouble(Camera.getEye().y + Camera.getDir().y), 
+        GLdouble(Camera.getEye().z + Camera.getDir().z), 0.0, 1.0, 0.0);
+
+    printf("after render camera...eye: (%f, %f, %f), dir: (%f, %f, %f)\n", Camera.mEye.x, Camera.mEye.y, Camera.mEye.z, 
+        Camera.mDir.x, Camera.mDir.y, Camera.mDir.z);
 }

@@ -20,4 +20,7 @@ public:
 	physx::PxVec3	mDir;
 	int				mMouseX;
 	int				mMouseY;
+	float mClipNear;
+	float mClipFar;
+	int mFOV;
 };

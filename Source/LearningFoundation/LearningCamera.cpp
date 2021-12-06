@@ -1,5 +1,6 @@
 #include "LearningCamera.h"
 
+#include <cstdio>
 #include <ctype.h>
 #include "foundation/PxMat33.h"
 
@@ -11,6 +12,7 @@ LearningCamera::LearningCamera(const PxVec3& eye, const PxVec3& dir)
 	mDir = dir.getNormalized();
 	mMouseX = 0;
 	mMouseY = 0;
+	mFOV = 60;
 }
 
 void LearningCamera::handleMouse(int button, int state, int x, int y)
@@ -19,6 +21,7 @@ void LearningCamera::handleMouse(int button, int state, int x, int y)
 	PX_UNUSED(button);
 	mMouseX = x;
 	mMouseY = y;
+	mFOV = 60;
 }
 
 bool LearningCamera::handleKey(unsigned char key, int x, int y, float speed)
@@ -35,6 +38,8 @@ bool LearningCamera::handleKey(unsigned char key, int x, int y, float speed)
 	case 'D':	mEye += viewY*2.0f*speed;		break;
 	default:							return false;
 	}
+
+	printf("after key input, eye: (%f, %f, %f)\n", mEye.x, mEye.y, mEye.z);
 	return true;
 }
 
@@ -61,6 +66,8 @@ void LearningCamera::handleMotion(int x, int y)
 
 	mMouseX = x;
 	mMouseY = y;
+
+	printf("after motion, x: %d, y: %d\n", x, y);
 }
 
 PxTransform LearningCamera::getTransform() const

@@ -17,6 +17,7 @@
 #include "CommonDefines.h"
 #include "GlutWindow.h"
 #include "glm/glm.hpp"
+#include "LearningCamera.h"
 
 #include "PxPhysicsAPI.h"
 
@@ -293,6 +294,7 @@ static void OnCustomGUI(float DeltaTime)
         return;
     }
 
+    // Window 1
     ImGui::SetNextWindowSize(ImVec2(450, 480), ImGuiCond_FirstUseEver);
     ImGui::Begin("Appearence");
     ImGui::NewLine();    
@@ -311,9 +313,14 @@ static void OnCustomGUI(float DeltaTime)
     }
 
     ImGui::NewLine();
-    ImGui::ColorPicker4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
+    ImGui::ColorEdit4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
+
+    ImGui::DragFloat3("Camera Position", (float*)&GlutWindow::GetInstance()->Camera.mEye, 0.1f);
+    ImGui::DragFloat3("Camera Direction", (float*)&GlutWindow::GetInstance()->Camera.mDir, 0.1f);
+
     ImGui::End();
 
+    // Window 2
     ImGui::SetNextWindowSize(ImVec2(350, 480), ImGuiCond_FirstUseEver);
     ImGui::Begin("Choose Geometries");
     ImGui::NewLine();
@@ -323,7 +330,9 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::DragFloat3("PhysX Box Init Position: ", (float*)&PhysXBoxInitPos, 0.1f);
     if (ImGui::Button("Add PhysX Box"))
     {
-        CreatePhysXBoxGeometry("Box", PhysXBoxSize, PhysXBoxInitPos);
+        PxVec3 Tmp = GlutWindow::GetInstance()->Camera.mEye + GlutWindow::GetInstance()->Camera.mDir * 10.f;
+        printf("create a new box at: (%f, %f, %f)", Tmp.x, Tmp.y, Tmp.z);
+        CreatePhysXBoxGeometry("Box", PhysXBoxSize, {Tmp.x, Tmp.y, Tmp.z});
     }
 
     ImGui::End();

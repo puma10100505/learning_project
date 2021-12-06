@@ -1,13 +1,16 @@
 #pragma once
 #pragma warning (disable:4819)
-// 下面这行可以隐藏FreeGlut或Glfw的Console窗口
-#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+// 下面这行可以隐藏FreeGlut或Glfw的Console窗口, 需要的时候去掉注释
+// #pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <chrono>
 #include <thread>
+
+#include "glm/glm.hpp"
+#include "LearningCamera.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glut.h"
@@ -39,7 +42,7 @@ public:
 
 protected:
     void Initialize(int InArgc, char** InArgv);
-    
+        
     static void InternalUpdate();
     static void InternalIdle();
     static void InternalEntry(int State);
@@ -54,16 +57,17 @@ protected:
     static void InternalSpecialUp(int key, int x, int y);
 
     static void UpdateDeltaTime();
+    static void RenderCamera();
 
     
 private:
     static FGlutWindowHandle WinHandle;
-    int WindowWidth;
-    int WindowHeight;
+    static int WindowWidth;
+    static int WindowHeight;
     std::string WindowTitle;    
     static GlutWindow* Inst;
     static int LastUpdateTimeInMs;
-    static float DeltaTimeInSeconds;
+    static float DeltaTimeInSeconds;    
 
 public:
     static GlutWindowDrawCallbackFunc OnDrawCallback;
@@ -75,4 +79,5 @@ public:
     static bool bUseGUI;
     static ImVec4 WindowBackgroundColor;
     static int FPS;
+    static LearningCamera Camera;
 };
