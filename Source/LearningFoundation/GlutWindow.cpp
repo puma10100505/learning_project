@@ -160,6 +160,7 @@ int GlutWindow::Show()
     glutSpecialFunc(&GlutWindow::InternalSpecial);
     glutSpecialUpFunc(&GlutWindow::InternalSpecialUp);
 
+    Camera.handleMotion(0, 0);
 
     if (bUseGUI)
     {
@@ -213,6 +214,8 @@ void GlutWindow::InternalUpdate()
 
     UpdateDeltaTime(); 
 
+    RenderCamera();
+
     // 先绘制图形
     if (OnDrawCallback)
     {
@@ -234,7 +237,7 @@ void GlutWindow::InternalUpdate()
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     }
 
-    RenderCamera();
+    
     
     glutSwapBuffers();
     glutPostRedisplay();
@@ -314,6 +317,6 @@ void GlutWindow::RenderCamera()
         GLdouble(Camera.getEye().x + Camera.getDir().x), GLdouble(Camera.getEye().y + Camera.getDir().y), 
         GLdouble(Camera.getEye().z + Camera.getDir().z), 0.0, 1.0, 0.0);
 
-    printf("after render camera...eye: (%f, %f, %f), dir: (%f, %f, %f)\n", Camera.mEye.x, Camera.mEye.y, Camera.mEye.z, 
-        Camera.mDir.x, Camera.mDir.y, Camera.mDir.z);
+    // printf("after render camera...eye: (%f, %f, %f), dir: (%f, %f, %f)\n", Camera.mEye.x, Camera.mEye.y, Camera.mEye.z, 
+    //     Camera.mDir.x, Camera.mDir.y, Camera.mDir.z);
 }

@@ -69,7 +69,7 @@ static void DrawStuffByGeomType()
     glPopMatrix();
 }
 
-void CreatePhysXBoxGeometry(const std::string& Name, float InSize, const glm::vec3& InPosition)
+void CreatePhysXBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel = {0.f, 0.f, 1.f})
 {
     PxShape* Shape = gPhysics->createShape(PxBoxGeometry(InSize / 2, InSize / 2, InSize / 2), *gMaterial);
     if (!Shape)
@@ -78,13 +78,16 @@ void CreatePhysXBoxGeometry(const std::string& Name, float InSize, const glm::ve
         return;
     }
 
-    PxRigidDynamic* Body = gPhysics->createRigidDynamic(PxTransform(InPosition.x, InPosition.y, InPosition.z));
+    PxRigidDynamic* Body = gPhysics->createRigidDynamic(InTransform);
     if (!Body)
     {
         printf("Create body failed\n");
         return;
     }
     Body->setName(Name.c_str());
+
+    Body->setAngularDamping(0.5f);
+	Body->setLinearVelocity(InVel);
 
     Body->attachShape(*Shape);
     PxRigidBodyExt::updateMassAndInertia(*Body, 10.f);
@@ -120,7 +123,7 @@ void InitializePhysics()
     gMaterial = gPhysics->createMaterial(.5f, .5f, .5f);
 
     // 地面
-    PxRigidStatic* GroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 15), *gMaterial);
+    PxRigidStatic* GroundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
     //GroundPlane->setGlobalPose(PxTransform(0.f, 0.f, 0.f));
     GroundPlane->setName("Plane");
     gScene->addActor(*GroundPlane);
@@ -283,7 +286,7 @@ void RenderScene()
             reinterpret_cast<PxActor**>(&Actors[0]), nbActors);
 
         // TODO: Render Actors
-        RenderActors(&Actors[0], static_cast<PxU32>(Actors.size()), false, {0.f, 0.7f, 0.f});
+        RenderActors(&Actors[0], static_cast<PxU32>(Actors.size()), true, {0.f, 0.7f, 0.f});
     }
 }
 
@@ -330,20 +333,53 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::DragFloat3("PhysX Box Init Position: ", (float*)&PhysXBoxInitPos, 0.1f);
     if (ImGui::Button("Add PhysX Box"))
     {
-        PxVec3 Tmp = GlutWindow::GetInstance()->Camera.mEye + GlutWindow::GetInstance()->Camera.mDir * 10.f;
-        printf("create a new box at: (%f, %f, %f)", Tmp.x, Tmp.y, Tmp.z);
-        CreatePhysXBoxGeometry("Box", PhysXBoxSize, {Tmp.x, Tmp.y, Tmp.z});
+        // physx::PxVec3 PxPos = GlutWindow::GetInstance()->Camera.getTransform().p;
+        // glm::vec3 Pos = { PxPos.x, PxPos.y, PxPos.z };
+        // glm::vec3 Dir = { GlutWindow::GetInstance()->Camera.getDir().x, GlutWindow::GetInstance()->Camera.getDir().y, GlutWindow::GetInstance()->Camera.getDir().z };
+        // glm::vec3 NewPos = Pos + Dir * 10.f;
+        
+        CreatePhysXBoxGeometry("Box", PhysXBoxSize, GlutWindow::GetInstance()->Camera.getTransform(), 
+            GlutWindow::GetInstance()->Camera.getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200));
     }
 
     ImGui::End();
 }
 
+void DrawLine(const glm::vec3 InBegin, const glm::vec3 InEnd) {
+    //glClear(GL_COLOR_BUFFER_BIT);  
+    
+
+    glBegin(GL_LINES);
+    glVertex3d(InBegin.x, InBegin.y, InBegin.z);
+    glVertex3d(InEnd.x, InEnd.y, InEnd.z);
+    glEnd();
+} 
+
+void DrawGrid()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(0.1f,0.9f,0.2f); 
+    glPointSize(3.0);  
+    for (int x = -1000; x < 1000; x+=10)
+    {
+        glm::vec3 StartPt = {x, 0, -1000};
+        glm::vec3 EndPt = {x , 0, 1000};
+        DrawLine(StartPt, EndPt);
+    }
+
+    for (int z = -1000; z < 1000; z+=10)
+    {
+        glm::vec3 StartPt = {-1000, 0, z};
+        glm::vec3 EndPt = { 1000, 0, z};
+        DrawLine(StartPt, EndPt);
+    }
+}
 
 
 static void OnCustomTick(float DeltaTime)
 {
     //printf("DeltaTime: %f, %d\n", DeltaTime, glutGet(GLUT_ELAPSED_TIME));
-
+    DrawGrid();
     RenderScene();
     StepPhysics();
 }

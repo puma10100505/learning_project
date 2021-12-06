@@ -13,6 +13,8 @@ LearningCamera::LearningCamera(const PxVec3& eye, const PxVec3& dir)
 	mMouseX = 0;
 	mMouseY = 0;
 	mFOV = 60;
+	mClipNear = 1.f;
+	mClipFar = 10000.f;
 }
 
 void LearningCamera::handleMouse(int button, int state, int x, int y)
