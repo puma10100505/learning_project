@@ -222,6 +222,7 @@ void GlutWindow::InternalUpdate()
 
     UpdateDeltaTime(); 
 
+    DrawGrid();
     RenderCamera();
 
     // 先绘制图形
@@ -238,15 +239,10 @@ void GlutWindow::InternalUpdate()
 
         OnGUICallback(DeltaTimeInSeconds);
 
-        ImGui::Render();
-        // ImGuiIO& io = ImGui::GetIO();
-        // glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
-    
+        ImGui::Render();    
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     }
 
-    
-    
     glutSwapBuffers();
     glutPostRedisplay();
 
@@ -324,7 +320,32 @@ void GlutWindow::RenderCamera()
 	gluLookAt(GLdouble(Camera.getEye().x), GLdouble(Camera.getEye().y), GLdouble(Camera.getEye().z), 
         GLdouble(Camera.getEye().x + Camera.getDir().x), GLdouble(Camera.getEye().y + Camera.getDir().y), 
         GLdouble(Camera.getEye().z + Camera.getDir().z), 0.0, 1.0, 0.0);
+}
 
-    // printf("after render camera...eye: (%f, %f, %f), dir: (%f, %f, %f)\n", Camera.mEye.x, Camera.mEye.y, Camera.mEye.z, 
-    //     Camera.mDir.x, Camera.mDir.y, Camera.mDir.z);
+void GlutWindow::DrawLine(const glm::vec3 InBegin, const glm::vec3 InEnd) 
+{
+    glBegin(GL_LINES);
+    glVertex3d(InBegin.x, InBegin.y, InBegin.z);
+    glVertex3d(InEnd.x, InEnd.y, InEnd.z);
+    glEnd();
+} 
+
+void GlutWindow::DrawGrid()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(0.1f,0.9f,0.2f); 
+    glPointSize(3.0);  
+    for (int x = -1000; x < 1000; x+=10)
+    {
+        glm::vec3 StartPt = {x, 0, -1000};
+        glm::vec3 EndPt = {x , 0, 1000};
+        DrawLine(StartPt, EndPt);
+    }
+
+    for (int z = -1000; z < 1000; z+=10)
+    {
+        glm::vec3 StartPt = {-1000, 0, z};
+        glm::vec3 EndPt = { 1000, 0, z};
+        DrawLine(StartPt, EndPt);
+    }
 }

@@ -277,8 +277,7 @@ void RenderScene()
     PxScene* CurrentScene;
     PxGetPhysics().getScenes(&CurrentScene, 1);
     PxU32 nbActors = CurrentScene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-    //printf("there are %u actors in current scene\n", nbActors);
-    
+        
     if (nbActors > 0)
     {
         std::vector<PxRigidActor*> Actors(nbActors);
@@ -317,7 +316,6 @@ static void OnCustomGUI(float DeltaTime)
 
     ImGui::NewLine();
     ImGui::ColorEdit4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
-
     ImGui::DragFloat3("Camera Position", (float*)&GlutWindow::GetInstance()->Camera.mEye, 0.1f);
     ImGui::DragFloat3("Camera Direction", (float*)&GlutWindow::GetInstance()->Camera.mDir, 0.1f);
 

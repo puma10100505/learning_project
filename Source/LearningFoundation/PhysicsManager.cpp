@@ -62,17 +62,50 @@ void PhysicsManager::Tick()
 }
 
 PhysicsManager::~PhysicsManager()
+{
+    PX_RELEASE(Scene);
+    PX_RELEASE(CpuDispatcher);
+    PX_RELEASE(PhysicsInterface);
+    if (bUsePvd && Pvd)
     {
-        PX_RELEASE(Scene);
-        PX_RELEASE(CpuDispatcher);
-        PX_RELEASE(PhysicsInterface);
-        if (bUsePvd && Pvd)
-        {
-            physx::PxPvdTransport* Transport = Pvd->getTransport();
-            Pvd->release();
-            Pvd = nullptr;
-            PX_RELEASE(Transport);
-        }
-
-        PX_RELEASE(Foundation);
+        physx::PxPvdTransport* Transport = Pvd->getTransport();
+        Pvd->release();
+        Pvd = nullptr;
+        PX_RELEASE(Transport);
     }
+
+    PX_RELEASE(Foundation);
+}
+
+physx::PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel)
+{
+    if (PhysicsInterface == nullptr)
+    {
+        return nullptr;
+    }
+
+    PxShape* Shape = PhysicsInterface->createShape(PxBoxGeometry(InSize / 2, InSize / 2, InSize / 2), *PhysicsMaterial);
+    if (Shape == nullptr)
+    {
+        printf("Create shape failed\n");
+        return nullptr;
+    }
+
+    PxRigidDynamic* Body = PhysicsInterface->createRigidDynamic(InTransform);
+    if (Body == nullptr)
+    {
+        printf("Create body failed\n");
+        return nullptr;
+    }
+
+    Body->setName(Name.c_str());
+    Body->setAngularDamping(0.5f);
+	Body->setLinearVelocity(InVel);
+    Body->attachShape(*Shape);
+
+    PxRigidBodyExt::updateMassAndInertia(*Body, 10.f);
+    Scene->addActor(*Body);
+
+    // 因为Shape通过值引用复制到了Body中，所以这里可以先销毁
+    Shape->release();
+}

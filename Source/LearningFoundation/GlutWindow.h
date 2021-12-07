@@ -58,6 +58,8 @@ protected:
 
     static void UpdateDeltaTime();
     static void RenderCamera();
+    static void DrawLine(const glm::vec3 InBegin, const glm::vec3 InEnd);
+    static void DrawGrid();
 
     
 private:

@@ -33,10 +33,9 @@ public:
     class physx::PxRigidStatic* CreateWorldPlane(float distance);
     class physx::PxRigidStatic* CreateWorldPlane(float normx, float normy, float normz, float distance);
     class physx::PxRigidStatic* CreateWorldPlane(const glm::vec3& normal, float distance);
-    class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize, const glm::vec3& InPosition);
+    class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel);
 
-    void Tick();
-    
+    void Tick();    
 
 protected:
     class physx::PxPhysics* PhysicsInterface = nullptr;
