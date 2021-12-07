@@ -175,12 +175,20 @@ int GlutWindow::Show()
         }
         else
         {
-            ImGui::StyleColorsClassic();
+            ImGui::StyleColorsLight();
         }
 
         ImGui_ImplGLUT_Init();
         ImGui_ImplOpenGL2_Init();
     }
+
+    // Fog.
+	// float fogColor[4] = { 0.32f, 0.31f, 0.30f, 1.0f };
+	// glEnable(GL_FOG);
+	// glFogi(GL_FOG_MODE, GL_LINEAR);
+	// glFogf(GL_FOG_START, 1000 * 0.1f);
+	// glFogf(GL_FOG_END, 1000 * 1.25f);
+	// glFogfv(GL_FOG_COLOR, fogColor);
 
     glutMainLoop();
 

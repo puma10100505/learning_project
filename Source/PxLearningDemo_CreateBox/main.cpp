@@ -299,7 +299,7 @@ static void OnCustomGUI(float DeltaTime)
 
     // Window 1
     ImGui::SetNextWindowSize(ImVec2(450, 480), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Appearence");
+    ImGui::Begin("Appearence", nullptr);
     ImGui::NewLine();    
     if (ImGui::Button("Switch GUI Style"))
     {
@@ -325,7 +325,7 @@ static void OnCustomGUI(float DeltaTime)
 
     // Window 2
     ImGui::SetNextWindowSize(ImVec2(350, 480), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Choose Geometries");
+    ImGui::Begin("Choose Geometries", nullptr);
     ImGui::NewLine();
     ImGui::SliderInt("Render FPS", &GlutWindow::FPS, 15, 120);
     ImGui::SliderFloat("PhysX FPS", &PhysXFPS, 15.f, 120.f);
@@ -333,11 +333,6 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::DragFloat3("PhysX Box Init Position: ", (float*)&PhysXBoxInitPos, 0.1f);
     if (ImGui::Button("Add PhysX Box"))
     {
-        // physx::PxVec3 PxPos = GlutWindow::GetInstance()->Camera.getTransform().p;
-        // glm::vec3 Pos = { PxPos.x, PxPos.y, PxPos.z };
-        // glm::vec3 Dir = { GlutWindow::GetInstance()->Camera.getDir().x, GlutWindow::GetInstance()->Camera.getDir().y, GlutWindow::GetInstance()->Camera.getDir().z };
-        // glm::vec3 NewPos = Pos + Dir * 10.f;
-        
         CreatePhysXBoxGeometry("Box", PhysXBoxSize, GlutWindow::GetInstance()->Camera.getTransform(), 
             GlutWindow::GetInstance()->Camera.getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200));
     }
@@ -378,10 +373,13 @@ void DrawGrid()
 
 static void OnCustomTick(float DeltaTime)
 {
-    //printf("DeltaTime: %f, %d\n", DeltaTime, glutGet(GLUT_ELAPSED_TIME));
+    // glEnable(GL_FOG);
     DrawGrid();
     RenderScene();
     StepPhysics();
+    // glDisable(GL_FOG);
+
+     
 }
 
 int main(int argc, char** argv)
