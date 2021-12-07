@@ -5,6 +5,8 @@
 
 #define PX_RELEASE(x)	if(x)	{ x->release(); x = NULL;	}
 
+using namespace physx;
+
 class PhysicsManager 
 {
 public:
@@ -35,7 +37,9 @@ public:
     class physx::PxRigidStatic* CreateWorldPlane(const glm::vec3& normal, float distance);
     class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel);
 
-    void Tick();    
+    void Tick();
+
+    void SetPhysicsFPS(int InVal) { FPS = InVal; } 
 
 protected:
     class physx::PxPhysics* PhysicsInterface = nullptr;

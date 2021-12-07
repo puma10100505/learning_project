@@ -84,7 +84,8 @@ physx::PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name
         return nullptr;
     }
 
-    PxShape* Shape = PhysicsInterface->createShape(PxBoxGeometry(InSize / 2, InSize / 2, InSize / 2), *PhysicsMaterial);
+    PxShape* Shape = PhysicsInterface->createShape(
+        PxBoxGeometry(InSize / 2, InSize / 2, InSize / 2), *PhysicsMaterial);
     if (Shape == nullptr)
     {
         printf("Create shape failed\n");
@@ -108,4 +109,6 @@ physx::PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name
 
     // 因为Shape通过值引用复制到了Body中，所以这里可以先销毁
     Shape->release();
+
+    return Body;
 }

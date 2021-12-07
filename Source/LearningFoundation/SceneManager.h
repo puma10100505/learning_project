@@ -1,7 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "glm/glm.hpp"
+#include "PxPhysicsAPI.h"
+#include "PhysicsManager.h"
 
 using namespace std;
 
@@ -15,32 +18,44 @@ typedef struct _stActorInfo
     //     glm::vec3 Scale;
     // } Transform;
 
+    std::string Name;
     class physx::PxActor* BodyInstance;
 } ActorInfo;
 
 class SceneManager
 {
-protected:
-    SceneManager() {}
+private:
+    SceneManager(int InWidth, int InHeight, bool InEnableShadow = false);
 
 public:
     static SceneManager* GetInstance();
-    ~SceneManager(){}
+    static SceneManager* GetInstance(int InWidth, int InHeight, bool InEnableShadow = false);
+    ~SceneManager();
 
     void Update(float DeltaTime);
-    void SetPhysicsManager(class PhysicsManager* InMgr) { PhysMgr = InMgr; }
+    void SetEnableShadow(bool InEnableShadow) { bEnableShadow = InEnableShadow; }
 
-    const ActorInfo* CreateCubeActor(float InSize, const glm::vec3& InLoc, const glm::vec3& InRot);
+    ActorInfo* CreateCubeActor(const std::string& Name, float InSize, const glm::vec3& InLoc, 
+        const glm::vec3& InRot, const glm::vec3& InVel = {0.f, 0.f, 0.f});
 
-protected:
-    void DrawLine(const glm::vec3& StartPt, const glm::vec3& StopPt);
-    void DrawGrid();
-    void RenderGeometryHolder(const PxGeometry& Geom);
-    void RenderActors(PxRigidActor** InActors, const PxU32 NumActors, bool bShadows, const PxVec3& InColor);
-    void RenderScene();
+    class LearningCamera* GetCamera() { return Camera; }
 
 protected:
-    SceneManager* Inst = nullptr;
+    void RenderLine(const glm::vec3& InBegin, const glm::vec3& InEnd);
+    void RenderGrid();
+    void RenderGeometryHolder(const physx::PxGeometry& Geom);
+    void RenderSceneActors();
+    void RenderBodyInstance(physx::PxRigidActor* InActor, const physx::PxVec3& InColor);
+    void RenderCamera();
+    void RenderShape(const physx::PxShape& InShape, const physx::PxRigidActor& InActor, physx::PxVec3& InColor);
+
+protected:
+    static SceneManager* Inst;
     class PhysicsManager* PhysMgr = nullptr;
     std::vector<ActorInfo> AllActors;
+    physx::PxVec3 ShadowDir;
+    bool bEnableShadow = false;
+    class LearningCamera* Camera = nullptr;
+    int SceneWidth = 0;
+    int SceneHeight = 0;
 };

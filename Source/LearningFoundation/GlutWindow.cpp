@@ -1,6 +1,7 @@
 #include "GlutWindow.h"
 #include "GL/freeglut.h"
 #include "PxPhysicsAPI.h"
+#include "SceneManager.h"
 
 using namespace physx;
 
@@ -14,7 +15,9 @@ float GlutWindow::DeltaTimeInSeconds = 0.f;
 int GlutWindow::FPS = 60;
 int GlutWindow::WindowWidth = 1280;
 int GlutWindow::WindowHeight = 720;
-LearningCamera GlutWindow::Camera(PxVec3(0.f, 0.f, 0.f), PxVec3(-0.6f, -0.2f, -0.7f));
+
+SceneManager* GlutWindow::SceneManagerPtr = SceneManager::GetInstance(
+    GlutWindow::WindowWidth, GlutWindow::WindowHeight);
 
 GlutWindowDrawCallbackFunc GlutWindow::OnDrawCallback = nullptr;
 GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
@@ -77,7 +80,10 @@ void GlutWindow::InternalInput(unsigned char cChar, int nMouseX, int nMouseY)
         OnInputCallback(cChar, nMouseX, nMouseY);
     }
 
-    Camera.handleKey(cChar, nMouseX, nMouseY);
+    if (SceneManagerPtr != nullptr && SceneManagerPtr->GetCamera())
+    {
+        SceneManagerPtr->GetCamera()->handleKey(cChar, nMouseX, nMouseY);
+    }
 }
 
 void GlutWindow::InternalResize(int nWidth, int nHeight)
@@ -160,7 +166,10 @@ int GlutWindow::Show()
     glutSpecialFunc(&GlutWindow::InternalSpecial);
     glutSpecialUpFunc(&GlutWindow::InternalSpecialUp);
 
-    Camera.handleMotion(0, 0);
+    if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+    {
+        SceneManagerPtr->GetCamera()->handleMotion(0, 0);
+    }
 
     if (bUseGUI)
     {
@@ -182,24 +191,27 @@ int GlutWindow::Show()
         ImGui_ImplOpenGL2_Init();
     }
 
-    // Fog.
-	// float fogColor[4] = { 0.32f, 0.31f, 0.30f, 1.0f };
-	// glEnable(GL_FOG);
-	// glFogi(GL_FOG_MODE, GL_LINEAR);
-	// glFogf(GL_FOG_START, 1000 * 0.1f);
-	// glFogf(GL_FOG_END, 1000 * 1.25f);
-	// glFogfv(GL_FOG_COLOR, fogColor);
-
     glutMainLoop();
 
+    Destroy();
+
+    return 0;
+}
+
+void GlutWindow::Destroy() 
+{
     if (bUseGUI && ImGui::GetCurrentContext())
     {
         ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplGLUT_Shutdown();
         ImGui::DestroyContext();
     }
-
-    return 0;
+    
+    if (SceneManagerPtr)
+    {
+        delete SceneManagerPtr;
+        SceneManagerPtr = nullptr;
+    }
 }
 
 void GlutWindow::UpdateDeltaTime()
@@ -222,8 +234,10 @@ void GlutWindow::InternalUpdate()
 
     UpdateDeltaTime(); 
 
-    DrawGrid();
-    RenderCamera();
+    if (SceneManagerPtr) 
+    {
+        SceneManagerPtr->Update(DeltaTimeInSeconds);
+    }
 
     // 先绘制图形
     if (OnDrawCallback)
@@ -256,7 +270,10 @@ void GlutWindow::InternalMotion(int x, int y)
         ImGui_ImplGLUT_MotionFunc(x, y);
     }
 
-    Camera.handleMotion(x, y);
+    if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+    {
+        SceneManagerPtr->GetCamera()->handleMotion(x, y);
+    }
 }
 
 void GlutWindow::InternalPassiveMotion(int x, int y)
@@ -274,7 +291,10 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
         ImGui_ImplGLUT_MouseFunc(glut_button, state, x, y);
     }
 
-    Camera.handleMouse(glut_button, state, x, y);
+    if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+    {
+        SceneManagerPtr->GetCamera()->handleMouse(glut_button, state, x, y);
+    }
 }
 
 void GlutWindow::InternalWheel(int button, int dir, int x, int y)
@@ -306,46 +326,5 @@ void GlutWindow::InternalSpecialUp(int key, int x, int y)
     if (bUseGUI)
     {
         ImGui_ImplGLUT_SpecialUpFunc(key, x, y);
-    }
-}
-
-void GlutWindow::RenderCamera()
-{
-    glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(Camera.mFOV, GLdouble(WindowWidth) / GLdouble(WindowHeight), GLdouble(Camera.mClipNear), GLdouble(Camera.mClipFar));
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(GLdouble(Camera.getEye().x), GLdouble(Camera.getEye().y), GLdouble(Camera.getEye().z), 
-        GLdouble(Camera.getEye().x + Camera.getDir().x), GLdouble(Camera.getEye().y + Camera.getDir().y), 
-        GLdouble(Camera.getEye().z + Camera.getDir().z), 0.0, 1.0, 0.0);
-}
-
-void GlutWindow::DrawLine(const glm::vec3 InBegin, const glm::vec3 InEnd) 
-{
-    glBegin(GL_LINES);
-    glVertex3d(InBegin.x, InBegin.y, InBegin.z);
-    glVertex3d(InEnd.x, InEnd.y, InEnd.z);
-    glEnd();
-} 
-
-void GlutWindow::DrawGrid()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(0.1f,0.9f,0.2f); 
-    glPointSize(3.0);  
-    for (int x = -1000; x < 1000; x+=10)
-    {
-        glm::vec3 StartPt = {x, 0, -1000};
-        glm::vec3 EndPt = {x , 0, 1000};
-        DrawLine(StartPt, EndPt);
-    }
-
-    for (int z = -1000; z < 1000; z+=10)
-    {
-        glm::vec3 StartPt = {-1000, 0, z};
-        glm::vec3 EndPt = { 1000, 0, z};
-        DrawLine(StartPt, EndPt);
     }
 }

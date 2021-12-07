@@ -16,6 +16,8 @@
 #include "imgui/imgui_impl_glut.h"
 #include "imgui/imgui_impl_opengl2.h"
 
+#include "SceneManager.h"
+
 typedef int FGlutWindowHandle;
 typedef void(*GlutWindowDrawCallbackFunc)(float);
 typedef void(*GlutWindowGUICallbackFunc)(float);
@@ -34,11 +36,12 @@ public:
 
     static GlutWindow* GetInstance();
 
-    int Show();
+    void Destroy();
 
+    int Show();
     float ElpsedTimeInSeconds();
-    
     static void UseGUI(bool InShow);
+    static SceneManager* GetScene() { return SceneManagerPtr; }
 
 protected:
     void Initialize(int InArgc, char** InArgv);
@@ -57,19 +60,15 @@ protected:
     static void InternalSpecialUp(int key, int x, int y);
 
     static void UpdateDeltaTime();
-    static void RenderCamera();
-    static void DrawLine(const glm::vec3 InBegin, const glm::vec3 InEnd);
-    static void DrawGrid();
-
     
 private:
     static FGlutWindowHandle WinHandle;
-    static int WindowWidth;
-    static int WindowHeight;
+    
     std::string WindowTitle;    
     static GlutWindow* Inst;
     static int LastUpdateTimeInMs;
-    static float DeltaTimeInSeconds;    
+    static float DeltaTimeInSeconds;
+    static class SceneManager* SceneManagerPtr;
 
 public:
     static GlutWindowDrawCallbackFunc OnDrawCallback;
@@ -81,5 +80,7 @@ public:
     static bool bUseGUI;
     static ImVec4 WindowBackgroundColor;
     static int FPS;
-    static LearningCamera Camera;
+    static int WindowWidth;
+    static int WindowHeight;
+    //static LearningCamera Camera;
 };
