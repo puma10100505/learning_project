@@ -183,7 +183,16 @@ void PhysicsManager::RenderGeometryHolder(const PxGeometry& Geom, const PxRigidA
         {
             const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
             glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-            glutSolidCube(BoxGeom.halfExtents.x * 2);            
+            if (Geom.getType() & PxShapeFlag::eTRIGGER_SHAPE)
+            {
+                glutWireCube(BoxGeom.halfExtents.x * 2);
+                
+            }
+            else
+            {
+                glutSolidCube(BoxGeom.halfExtents.x * 2);            
+            }
+            
             break;
         }
 
@@ -193,7 +202,14 @@ void PhysicsManager::RenderGeometryHolder(const PxGeometry& Geom, const PxRigidA
             if (Info)
             {
                 const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);                
-                glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
+                if (SphereGeom.getType() & PxShapeFlag::eTRIGGER_SHAPE)
+                {
+                    glutWireSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
+                }
+                else
+                {
+                    glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
+                }                
             }
             break;
         }
