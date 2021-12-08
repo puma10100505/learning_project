@@ -17,9 +17,14 @@ typedef struct _stActorInfo
     //     glm::vec3 Rotation;
     //     glm::vec3 Scale;
     // } Transform;
-
+public:
     std::string Name;
     class physx::PxActor* BodyInstance;
+    int Slices;
+    int Stacks;
+
+    _stActorInfo(const std::string& InName, class physx::PxActor* BodyInst)
+        : Name(InName), BodyInstance(BodyInst) { }
 } ActorInfo;
 
 class SceneManager
@@ -36,18 +41,28 @@ public:
     void SetEnableShadow(bool InEnableShadow) { bEnableShadow = InEnableShadow; }
 
     ActorInfo* CreateCubeActor(const std::string& Name, float InSize, const glm::vec3& InLoc, 
-        const glm::vec3& InRot, const glm::vec3& InVel = {0.f, 0.f, 0.f});
+        const glm::vec3& InRot, const bool InIsTrigger = false, const glm::vec3& InVel = {0.f, 0.f, 0.f});
+
+    ActorInfo* CreateSphereActor(const std::string& Name, float InRadius, const glm::vec3& InLoc, const int InSlices = 12,
+        const int InStacks = 12, const bool InIsTrigger = false, const glm::vec3& InVel = {0.f, 0.f, 0.f});
+
+    ActorInfo* CreateTorusActor(const std::string& Name, const float InInnerRadius, const float InOuterRadius,
+        int InSides, int InRings, const bool InIsTrigger = false, const glm::vec3& InVel = {0.f, 0.f, 0.f});
+
+    ActorInfo* CreateCylinderActor(const std::string& Name, const float InRadius, const float InHeight,
+        const int InSlices, const int InStacks, const bool InIsTrigger = false, const glm::vec3& InVel = {0.f, 0.f, 0.f});
+
+    ActorInfo* CreateConeActor(const std::string& Name, const float InBase, const float InHeight,
+        const int InSlices, const int InStacks, const bool InIsTrigger = false, const glm::vec3& InVel = {0.f, 0.f, 0.f});
 
     class LearningCamera* GetCamera() { return Camera; }
 
 protected:
     void RenderLine(const glm::vec3& InBegin, const glm::vec3& InEnd);
-    void RenderGrid();
-    void RenderGeometryHolder(const physx::PxGeometry& Geom);
+    void RenderGrid();    
     void RenderSceneActors();
-    void RenderBodyInstance(physx::PxRigidActor* InActor, const physx::PxVec3& InColor);
     void RenderCamera();
-    void RenderShape(const physx::PxShape& InShape, const physx::PxRigidActor& InActor, physx::PxVec3& InColor);
+    
 
 protected:
     static SceneManager* Inst;

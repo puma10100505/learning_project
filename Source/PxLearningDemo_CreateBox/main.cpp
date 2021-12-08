@@ -26,19 +26,9 @@
 
 using namespace physx;
 
-
-static int CubeSize = 5;
-static int WireCubeSize = 5;
-static int WireTeapotSize = 5;
-static int SolidTeapotSize = 5;
-static int SolidSphereRadius = 5;
-static int SolidSphereSlice = 12;
-static int SolidSphereStack = 12;
-static int WireSphereRadius = 5;
-static int WireSphereSlice = 12;
-static int WireSphereStack = 12;
-static int GeomType = 0;
 static int PhysXBoxSize = 3;
+static int PhysXSphereSize = 3;
+static glm::vec3 InitVelocity = glm::vec3{0.f, 0.f, 0.f};
 static glm::vec3 PhysXBoxInitPos = {0.f, 0.f, -15.f};   // -Z is forward, +Y is up, +X is right
 static float PhysXFPS = 30.f;
 
@@ -70,8 +60,6 @@ static void OnCustomGUI(float DeltaTime)
 
     ImGui::NewLine();
     ImGui::ColorEdit4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
-    //ImGui::DragFloat3("Camera Position", (float*)&GlutWindow::GetInstance()->Camera.mEye, 0.1f);
-    //ImGui::DragFloat3("Camera Direction", (float*)&GlutWindow::GetInstance()->Camera.mDir, 0.1f);
 
     ImGui::End();
 
@@ -82,21 +70,28 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::SliderInt("Render FPS", &GlutWindow::FPS, 15, 120);
     ImGui::SliderFloat("PhysX FPS", &PhysXFPS, 15.f, 120.f);
     ImGui::SliderInt("PhysX Box Size: ", &PhysXBoxSize, 1, 10);
-    ImGui::DragFloat3("PhysX Box Init Position: ", (float*)&PhysXBoxInitPos, 0.1f);
+    ImGui::DragFloat3("PhysX Box Init Position: ", reinterpret_cast<float*>(&PhysXBoxInitPos), 0.1f);
+    ImGui::DragFloat3("Init Velocity", reinterpret_cast<float*>(&InitVelocity), 0.1f);
 
+    glm::vec3 CameraDir = {GlutWindow::GetScene()->GetCamera()->getDir().x, GlutWindow::GetScene()->GetCamera()->getDir().y, GlutWindow::GetScene()->GetCamera()->getDir().z};
     if (ImGui::Button("Add PhysX Box"))
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;
         physx::PxVec3 PxRot = GlutWindow::GetScene()->GetCamera()->getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200);
         
         GlutWindow::GetScene()->CreateCubeActor("Box", PhysXBoxSize * 1.f, 
-            {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z});
+            {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z}, false, 100.f * CameraDir);
+    }
+
+    if (ImGui::Button("Add PhysX Sphere"))
+    {
+        physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;                
+        GlutWindow::GetScene()->CreateSphereActor("Sphere", PhysXSphereSize * 1.f,
+            {PxPos.x, PxPos.y, PxPos.z}, 24, 24, true, 100.f * CameraDir);
     }
 
     ImGui::End();
 }
-
-
 
 int main(int argc, char** argv)
 {

@@ -91,103 +91,23 @@ void SceneManager::RenderGrid()
     }
 }
 
-void SceneManager::RenderGeometryHolder(const PxGeometry& Geom)
-{
-    switch (Geom.getType())
-    {
-        case PxGeometryType::eBOX:
-            {
-                const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
-                glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-                glutSolidCube(BoxGeom.halfExtents.x * 2);            
-                break;
-            }
-
-        case PxGeometryType::eSPHERE:
-        {
-            const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);
-            glutSolidSphere(GLdouble(SphereGeom.radius), 10, 10);
-            break;
-        }
-
-        case PxGeometryType::eCAPSULE:
-        {
-            break;
-        }
-    default: ;
-    }
-}
-
-void SceneManager::RenderShape(const physx::PxShape& InShape, const physx::PxRigidActor& InActor, PxVec3& InColor)
-{
-    const PxTransform ShapeTrans = PxShapeExt::getGlobalPose(InShape, InActor);
-    const PxMat44 ShapePose(ShapeTrans);
-    const PxGeometryHolder Holder = InShape.getGeometry();
-    const bool bIsTrigger = InShape.getFlags() & PxShapeFlag::eTRIGGER_SHAPE;
-    const PxReal ShadowMat[] = {1, 0, 0, 0, -ShadowDir.x/ShadowDir.y, 0, -ShadowDir.z/ShadowDir.y, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-
-    if (bIsTrigger)
-    {
-        // 如果Shape是Trigger区域，则只渲染外框
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    glPushMatrix();
-    glMultMatrixf(&ShapePose.column0.x);
-    glColor4f(InColor.x, InColor.y, InColor.z, 1.f);
-
-    RenderGeometryHolder(Holder.any());
-    
-    glPopMatrix();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    if (bEnableShadow)
-    {
-        glPushMatrix();
-        glMultMatrixf(ShadowMat);
-        glMultMatrixf(&ShapePose.column0.x);
-        glDisable(GL_LIGHTING);
-        glColor4f(0.1f, 0.2f, 0.3f, 1.f);
-
-        RenderGeometryHolder(Holder.any());
-
-        glEnable(GL_LIGHTING);
-        glPopMatrix();
-    }
-}
-
-void SceneManager::RenderBodyInstance(PxRigidActor* InActor, const PxVec3& InColor)
-{
-    PxShape* Shapes[128];
-    const PxU32 NbShapes = InActor->getNbShapes();
-    
-    PX_ASSERT(NbShapes <= 128);
-    InActor->getShapes(Shapes, NbShapes);
-
-    const bool bIsSleeping = InActor->is<PxRigidDynamic>() ? InActor->is<PxRigidDynamic>()->isSleeping() : false;
-
-    PxVec3 ActorColor = InColor;
-    if (bIsSleeping)
-    {
-        ActorColor = ActorColor * .25f;
-    }
-
-    for (PxU32 ShapeIndex = 0; ShapeIndex < NbShapes; ++ShapeIndex)
-    {
-        RenderShape(*Shapes[ShapeIndex], *InActor, ActorColor);
-    }
-}
 
 void SceneManager::RenderSceneActors()
 {
-    for (ActorInfo& Actor: AllActors)
+    if (PhysMgr == nullptr)
     {
-        RenderBodyInstance(reinterpret_cast<PxRigidActor*>(Actor.BodyInstance), physx::PxVec3{0.4f, 0.5f, 0.1f});
+        return ;
+    }
+    
+    for (const ActorInfo& Actor: AllActors)
+    {
+        PhysMgr->RenderBodyInstance(reinterpret_cast<PxRigidActor*>(Actor.BodyInstance),
+            PxVec3{0.4f, 0.5f, 0.1f}, bEnableShadow, ShadowDir);
     }
 }
 
 ActorInfo* SceneManager::CreateCubeActor(const std::string& Name, float InSize, const glm::vec3& InLoc, 
-    const glm::vec3& InRot, const glm::vec3& InVel)
+    const glm::vec3& InRot, const bool InIsTrigger, const glm::vec3& InVel)
 {
     if (PhysMgr == nullptr) 
     {
@@ -196,7 +116,7 @@ ActorInfo* SceneManager::CreateCubeActor(const std::string& Name, float InSize, 
 
     PxRigidDynamic* Body = PhysMgr->CreateBoxGeometry(Name, InSize, 
         physx::PxTransform(physx::PxVec3{InLoc.x, InLoc.y, InLoc.z}, physx::PxQuat{PxIDENTITY::PxIdentity}), 
-        PxVec3{InVel.x, InVel.y, InVel.z});
+        PxVec3{InVel.x, InVel.y, InVel.z}, InIsTrigger);
 
     if (Body == nullptr)
     {
@@ -204,8 +124,37 @@ ActorInfo* SceneManager::CreateCubeActor(const std::string& Name, float InSize, 
     }
 
     AllActors.push_back({ Name, Body });
+    ActorInfo* NewActor = &AllActors[AllActors.size() - 1];
+    
+    Body->userData = NewActor;
 
-    return &AllActors[AllActors.size() - 1];
+    return NewActor;
+}
+
+ActorInfo* SceneManager::CreateSphereActor(const std::string& Name, float InRadius, const glm::vec3& InLoc, const int InSlices,
+        const int InStacks, const bool InIsTrigger, const glm::vec3& InVel)
+{
+    if (PhysMgr == nullptr) 
+    {
+        return nullptr;
+    }
+
+    PxRigidDynamic* Body = PhysMgr->CreateSphereGeometry(Name, InRadius, 
+        physx::PxTransform(physx::PxVec3{InLoc.x, InLoc.y, InLoc.z}, physx::PxQuat{PxIDENTITY::PxIdentity}), 
+        PxVec3{InVel.x, InVel.y, InVel.z}, InIsTrigger);
+
+    if (Body == nullptr)
+    {
+        return nullptr;
+    }
+
+    AllActors.push_back({ Name, Body });
+    ActorInfo* NewActor = &AllActors[AllActors.size() - 1];
+    NewActor->Slices = InSlices;
+    NewActor->Stacks = InStacks;
+    Body->userData = NewActor;
+
+    return NewActor;
 }
 
 void SceneManager::RenderCamera()

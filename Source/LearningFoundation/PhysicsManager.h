@@ -16,15 +16,17 @@ public:
         StaticFriction = PhyMat.x;
         DynamicFriction = PhyMat.y;
         Restitution = PhyMat.z;
+
+        Initialize();
     }
 
-    PhysicsManager(const glm::vec3& InGravity): Gravity(InGravity) { }
+    PhysicsManager(const glm::vec3& InGravity): Gravity(InGravity) { Initialize(); }
 
     PhysicsManager(const glm::vec3& InGravity, bool HasWorldPlane)
-        : Gravity(InGravity), bUseWorldPlane(HasWorldPlane) { }
+        : Gravity(InGravity), bUseWorldPlane(HasWorldPlane) { Initialize(); }
 
     PhysicsManager(const glm::vec3& InGravity, bool HasWorldPlane, bool UsePvd)
-        : Gravity(InGravity), bUseWorldPlane(HasWorldPlane), bUsePvd(UsePvd) { }
+        : Gravity(InGravity), bUseWorldPlane(HasWorldPlane), bUsePvd(UsePvd) { Initialize(); }
 
     ~PhysicsManager();
 
@@ -35,11 +37,18 @@ public:
     class physx::PxRigidStatic* CreateWorldPlane(float distance);
     class physx::PxRigidStatic* CreateWorldPlane(float normx, float normy, float normz, float distance);
     class physx::PxRigidStatic* CreateWorldPlane(const glm::vec3& normal, float distance);
-    class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel);
+    
+    class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize,
+        const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const;
+    class physx::PxRigidDynamic* CreateSphereGeometry(const std::string& Name, float InRadius,
+        const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const;
 
     void Tick();
 
-    void SetPhysicsFPS(int InVal) { FPS = InVal; } 
+    void SetPhysicsFPS(int InVal) { FPS = InVal; }
+    void RenderGeometryHolder(const physx::PxGeometry& Geom, const PxRigidActor& InActor);
+    void RenderBodyInstance(PxRigidActor* InActor, const PxVec3& InColor, const bool InEnableShadow, const PxVec3& InShadowDir);
+    void RenderShape(const physx::PxShape& InShape, const physx::PxRigidActor& InActor, PxVec3& InColor, bool bEnableShadow, physx::PxVec3 InShadowDir);
 
 protected:
     class physx::PxPhysics* PhysicsInterface = nullptr;
