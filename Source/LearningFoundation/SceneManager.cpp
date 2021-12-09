@@ -125,6 +125,7 @@ ActorInfo* SceneManager::CreateCubeActor(const std::string& Name, float InSize, 
 
     AllActors.push_back({ Name, Body });
     ActorInfo* NewActor = &AllActors[AllActors.size() - 1];
+    NewActor->ActorIndex = AllActors.size() - 1;
     
     Body->userData = NewActor;
 
@@ -150,6 +151,7 @@ ActorInfo* SceneManager::CreateSphereActor(const std::string& Name, float InRadi
 
     AllActors.push_back({ Name, Body });
     ActorInfo* NewActor = &AllActors[AllActors.size() - 1];
+    NewActor->ActorIndex = AllActors.size() - 1;
     NewActor->Slices = InSlices;
     NewActor->Stacks = InStacks;
     Body->userData = NewActor;

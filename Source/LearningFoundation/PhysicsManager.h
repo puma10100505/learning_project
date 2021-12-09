@@ -50,6 +50,9 @@ public:
     void RenderBodyInstance(PxRigidActor* InActor, const PxVec3& InColor, const bool InEnableShadow, const PxVec3& InShadowDir);
     void RenderShape(const physx::PxShape& InShape, const physx::PxRigidActor& InActor, PxVec3& InColor, bool bEnableShadow, physx::PxVec3 InShadowDir);
 
+    class physx::PxPhysics* GetPhysicsInterface() const { return PhysicsInterface; }
+    class physx::PxScene* GetPhysicsScene() const { return Scene; }
+
 protected:
     class physx::PxPhysics* PhysicsInterface = nullptr;
     class physx::PxFoundation* Foundation = nullptr;

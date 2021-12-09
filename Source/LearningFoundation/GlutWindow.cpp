@@ -17,6 +17,7 @@ float GlutWindow::DeltaTimeInSeconds = 0.f;
 int GlutWindow::FPS = 60;
 int GlutWindow::WindowWidth = 1280;
 int GlutWindow::WindowHeight = 720;
+std::vector<int> GlutWindow::SelectedActorIndices;
 
 SceneManager* GlutWindow::SceneManagerPtr = SceneManager::GetInstance(
     GlutWindow::WindowWidth, GlutWindow::WindowHeight);
@@ -307,6 +308,26 @@ void GlutWindow::InternalPassiveMotion(int x, int y)
     }
 }
 
+glm::vec3 GlutWindow::ScreenToWorldLocation(int x, int y)
+{
+    GLint Viewport[4];
+    GLdouble ModelView[16];
+    GLdouble Projection[16];
+    GLfloat WinX, WinY, WinZ;
+    GLdouble PosX, PosY, PosZ;
+
+    glGetDoublev(GL_MODELVIEW_MATRIX, ModelView);
+    glGetDoublev(GL_PROJECTION_MATRIX, Projection);
+    glGetIntegerv(GL_VIEWPORT, Viewport);
+
+    WinX = (float)x;
+    WinY = (float)Viewport[3] - (float)y;
+    glReadPixels(WinX, WinY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &WinZ);
+    gluUnProject(WinX, WinY, WinZ, ModelView, Projection, Viewport, &PosX, &PosY, &PosZ);
+
+    return { (float)PosX, (float)PosY, (float)PosZ };
+}
+
 void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
 {
     if (bUseGUI)
@@ -317,6 +338,55 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
     if (SceneManagerPtr && SceneManagerPtr->GetCamera())
     {
         SceneManagerPtr->GetCamera()->handleMouse(glut_button, state, x, y);
+    }
+
+    if (state == 0)
+    {
+        // Press
+    }
+    else if (state == 1)
+    {
+        // Release
+        glm::vec3 WorldPos = ScreenToWorldLocation(x, y);
+        printf("mouse clicked, button: %d, x: %d, y: %d -> (%f, %f, %f)\n", 
+            glut_button, x, y, WorldPos.x, WorldPos.y, WorldPos.z);
+
+        PxVec3 EndPt = { WorldPos.x, WorldPos.y, WorldPos.z};
+        PxVec3 BeginPt = GetScene()->GetCamera()->getEye();
+
+        physx::PxHitBuffer<PxRaycastHit> HitBuff;
+        bool bIsBlocked = GetScene()->GetPhysics()->GetPhysicsScene()->raycast(BeginPt, (EndPt - BeginPt).getNormalized(), 10000.f, HitBuff);
+        printf("bIsBlocked: %d, nbTouches: %u, hasBlock: %d\n", 
+            bIsBlocked, HitBuff.nbTouches, HitBuff.hasBlock);
+
+        if (bIsBlocked)
+        {
+            if (HitBuff.block.actor)
+            {
+                ActorInfo* Info = static_cast<ActorInfo*>(HitBuff.block.actor->userData);
+                if (Info)
+                {
+                    printf("Block something named: %s, index: %d\n", Info->Name.c_str(), Info->ActorIndex);
+                    GlutWindow::SelectedActorIndices.push_back(Info->ActorIndex);
+                }
+            }
+
+            for (int i = 0; i < HitBuff.nbTouches; i++)
+            {
+                const PxRaycastHit& HitItem = HitBuff.getTouch(i);
+                printf("hit item, dist: %f, pos: (%f, %f, %f)\n", HitItem.distance, HitItem.position.x, 
+                    HitItem.position.y, HitItem.position.z);
+                ActorInfo* Info = static_cast<ActorInfo*>(HitItem.actor->userData);
+                if (Info)
+                {
+                    printf("Hit something named: %s\n", Info->Name.c_str());
+                }
+                else
+                {
+                    printf("can not convert to actorinfo\n");
+                }
+            }
+        }
     }
 }
 

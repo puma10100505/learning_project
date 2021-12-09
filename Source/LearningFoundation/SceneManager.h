@@ -22,6 +22,7 @@ public:
     class physx::PxActor* BodyInstance;
     int Slices;
     int Stacks;
+    int ActorIndex;
 
     _stActorInfo(const std::string& InName, class physx::PxActor* BodyInst)
         : Name(InName), BodyInstance(BodyInst) { }
@@ -57,8 +58,23 @@ public:
 
     class LearningCamera* GetCamera() { return Camera; }
 
-protected:
+    class PhysicsManager* GetPhysics() const { return PhysMgr; }
+
+    uint32_t GetActorCount() { return AllActors.size(); }
+
+    const ActorInfo* GetActorByIndex(int Idx) 
+    {
+        if (Idx < 0 || Idx >= AllActors.size())
+        {
+            return nullptr;
+        }
+
+        return &AllActors[Idx]; 
+    }
+
     void RenderLine(const glm::vec3& InBegin, const glm::vec3& InEnd);
+
+protected:    
     void RenderGrid();    
     void RenderSceneActors();
     void RenderCamera();

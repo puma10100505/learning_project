@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <vector>
 #include <thread>
 
 #include "glm/glm.hpp"
@@ -60,6 +61,7 @@ protected:
     static void InternalSpecialUp(int key, int x, int y);
 
     static void UpdateDeltaTime();
+    static glm::vec3 ScreenToWorldLocation(int x, int y);
     
 private:
     static FGlutWindowHandle WinHandle;
@@ -82,5 +84,5 @@ public:
     static int FPS;
     static int WindowWidth;
     static int WindowHeight;
-    //static LearningCamera Camera;
+    static std::vector<int> SelectedActorIndices;
 };

@@ -211,7 +211,7 @@ void PhysicsManager::RenderGeometryHolder(const PxGeometry& Geom, const PxRigidA
                 else
                 {
                     glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
-                }                
+                }
             }
             break;
         }

@@ -26,6 +26,7 @@
 
 using namespace physx;
 
+static char Name[128];
 static int PhysXBoxSize = 3;
 static int PhysXSphereSize = 3;
 static int SphereSlices = 12;
@@ -71,12 +72,13 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::DragFloat3("Init Velocity", reinterpret_cast<float*>(&InitVelocity), 0.1f);
 
     glm::vec3 CameraDir = {GlutWindow::GetScene()->GetCamera()->getDir().x, GlutWindow::GetScene()->GetCamera()->getDir().y, GlutWindow::GetScene()->GetCamera()->getDir().z};
+    ImGui::InputText("Object Name", Name, 128);
     if (ImGui::Button("Add PhysX Box"))
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;
         physx::PxVec3 PxRot = GlutWindow::GetScene()->GetCamera()->getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200);
         
-        GlutWindow::GetScene()->CreateCubeActor("Box", PhysXBoxSize * 1.f, 
+        GlutWindow::GetScene()->CreateCubeActor("Box...xx", PhysXBoxSize * 1.f, 
             {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z}, false, 100.f * CameraDir);
     }
 
@@ -87,11 +89,22 @@ static void OnCustomGUI(float DeltaTime)
     if (ImGui::Button("Add PhysX Sphere"))
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;                
-        GlutWindow::GetScene()->CreateSphereActor("Sphere", PhysXSphereSize * 1.f,
-            {PxPos.x, PxPos.y, PxPos.z}, SphereSlices, SphereStacks, true, 100.f * CameraDir);
+        GlutWindow::GetScene()->CreateSphereActor("Sphere...zz", PhysXSphereSize * 1.f,
+            {PxPos.x, PxPos.y, PxPos.z}, SphereSlices, SphereStacks, false, 100.f * CameraDir);
     }
 
     ImGui::End();
+
+    for (const int Idx: GlutWindow::SelectedActorIndices)
+    {
+        const ActorInfo* Info = GlutWindow::GetScene()->GetActorByIndex(Idx);
+        if (Info)
+        {
+            ImGui::Begin(Info->Name.c_str());
+            ImGui::TextColored({0.3f, 0.4f, 0.8f, 1.f}, "%s", Info->Name.c_str());
+            ImGui::End();
+        }
+    }
 }
 
 int main(int argc, char** argv)
