@@ -62,7 +62,7 @@ static void OnCustomGUI(float DeltaTime)
     }
 
     ImGui::NewLine();
-    ImGui::ColorEdit4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
+    ImGui::ColorEdit4("BackgroundColor: ", reinterpret_cast<float*>(&GlutWindow::GetInstance()->WindowBackgroundColor));
 
     ImGui::NewLine();
     ImGui::SliderInt("Render FPS", &GlutWindow::FPS, 15, 120);
@@ -78,7 +78,7 @@ static void OnCustomGUI(float DeltaTime)
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;
         physx::PxVec3 PxRot = GlutWindow::GetScene()->GetCamera()->getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200);
         
-        GlutWindow::GetScene()->CreateCubeActor("Box...xx", PhysXBoxSize * 1.f, 
+        GlutWindow::GetScene()->CreateCubeActor("Box...xx-" + GlutWindow::GetScene()->GetActorCount(), PhysXBoxSize * 1.f, 
             {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z}, false, 100.f * CameraDir);
     }
 
@@ -89,7 +89,7 @@ static void OnCustomGUI(float DeltaTime)
     if (ImGui::Button("Add PhysX Sphere"))
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;                
-        GlutWindow::GetScene()->CreateSphereActor("Sphere...zz", PhysXSphereSize * 1.f,
+        GlutWindow::GetScene()->CreateSphereActor("Sphere...zz-" + GlutWindow::GetScene()->GetActorCount(), PhysXSphereSize * 1.f,
             {PxPos.x, PxPos.y, PxPos.z}, SphereSlices, SphereStacks, false, 100.f * CameraDir);
     }
 
@@ -101,7 +101,7 @@ static void OnCustomGUI(float DeltaTime)
         if (Info)
         {
             ImGui::Begin(Info->Name.c_str());
-            ImGui::TextColored({0.3f, 0.4f, 0.8f, 1.f}, "%s", Info->Name.c_str());
+            ImGui::TextColored({0.3f, 0.4f, 0.2f, 1.f}, "%s", Info->Name.c_str());
             ImGui::End();
         }
     }
