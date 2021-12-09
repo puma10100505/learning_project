@@ -32,12 +32,15 @@ bool LearningCamera::handleKey(unsigned char key, int x, int y, float speed)
 	PX_UNUSED(y);
 
 	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
+	//PxVec3 viewX = viewY.cross(PxVec3())
 	switch(toupper(key))
 	{
-	case 'W':	mEye += mDir*2.0f*speed;		break;
-	case 'S':	mEye -= mDir*2.0f*speed;		break;
-	case 'A':	mEye -= viewY*2.0f*speed;		break;
-	case 'D':	mEye += viewY*2.0f*speed;		break;
+	case 'W':	mEye += mDir * 2.0f * speed;		break;
+	case 'S':	mEye -= mDir * 2.0f * speed;		break;
+	case 'A':	mEye -= viewY * 2.0f * speed;		break;
+	case 'D':	mEye += viewY * 2.0f * speed;		break;
+	case 'Q':   mEye += PxVec3{0.f, 1.f, 0.f} * 2.f * speed; break;
+	case 'E':   mEye -= PxVec3{0.f, 1.f, 0.f} * 2.f * speed; break;
 	default:							return false;
 	}
 

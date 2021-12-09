@@ -37,7 +37,7 @@ void PhysicsManager::Initialize()
 
     if (bUseWorldPlane)
     {
-        CreateWorldPlane(10.f);
+        CreateWorldPlane(0.f);
     }
 }
 
@@ -109,6 +109,7 @@ PxRigidDynamic* PhysicsManager::CreateSphereGeometry(const std::string& Name, fl
         return nullptr;
     }
 
+    Shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !IsTrigger);
     Shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, IsTrigger);
 
     PxRigidDynamic* Body = PhysicsInterface->createRigidDynamic(InTransform);
@@ -152,6 +153,7 @@ PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name, float
         return nullptr;
     }
 
+    Shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !IsTrigger);
     Shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, IsTrigger);
     
     PxRigidDynamic* Body = PhysicsInterface->createRigidDynamic(InTransform);

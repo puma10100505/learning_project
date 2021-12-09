@@ -28,6 +28,8 @@ using namespace physx;
 
 static int PhysXBoxSize = 3;
 static int PhysXSphereSize = 3;
+static int SphereSlices = 12;
+static int SphereStacks = 12;
 static glm::vec3 InitVelocity = glm::vec3{0.f, 0.f, 0.f};
 static glm::vec3 PhysXBoxInitPos = {0.f, 0.f, -15.f};   // -Z is forward, +Y is up, +X is right
 static float PhysXFPS = 30.f;
@@ -41,31 +43,26 @@ static void OnCustomGUI(float DeltaTime)
     }
 
     // Window 1
-    ImGui::SetNextWindowSize(ImVec2(450, 480), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Appearence", nullptr);
+    ImGui::SetNextWindowSize(ImVec2(350, 480));
+    ImGui::Begin("Options", nullptr);
     ImGui::NewLine();    
     if (ImGui::Button("Switch GUI Style"))
     {
         if (GlutWindow::GetInstance()->bUseDarkStyle)
         {
             GlutWindow::GetInstance()->bUseDarkStyle = false;
-            ImGui::StyleColorsClassic();
+            ImGui::StyleColorsDark();
         }
         else
         {
             GlutWindow::GetInstance()->bUseDarkStyle = true;
-            ImGui::StyleColorsDark();
+            ImGui::StyleColorsLight();
         }
     }
 
     ImGui::NewLine();
     ImGui::ColorEdit4("BackgroundColor: ", (float*)&GlutWindow::GetInstance()->WindowBackgroundColor);
 
-    ImGui::End();
-
-    // Window 2
-    ImGui::SetNextWindowSize(ImVec2(350, 480), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Choose Geometries", nullptr);
     ImGui::NewLine();
     ImGui::SliderInt("Render FPS", &GlutWindow::FPS, 15, 120);
     ImGui::SliderFloat("PhysX FPS", &PhysXFPS, 15.f, 120.f);
@@ -83,11 +80,15 @@ static void OnCustomGUI(float DeltaTime)
             {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z}, false, 100.f * CameraDir);
     }
 
+    ImGui::SliderInt("PhysX Sphere Radius: ", &PhysXSphereSize, 1, 30);
+    ImGui::SliderInt("PhysX Sphere Slices: ", &SphereSlices, 1, 32);
+    ImGui::SliderInt("PhysX Sphere Stacks: ", &SphereStacks, 1, 32);
+
     if (ImGui::Button("Add PhysX Sphere"))
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;                
         GlutWindow::GetScene()->CreateSphereActor("Sphere", PhysXSphereSize * 1.f,
-            {PxPos.x, PxPos.y, PxPos.z}, 24, 24, true, 100.f * CameraDir);
+            {PxPos.x, PxPos.y, PxPos.z}, SphereSlices, SphereStacks, true, 100.f * CameraDir);
     }
 
     ImGui::End();

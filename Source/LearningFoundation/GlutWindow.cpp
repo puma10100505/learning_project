@@ -3,6 +3,8 @@
 #include "PxPhysicsAPI.h"
 #include "SceneManager.h"
 
+#include "imgui/imgui_internal.h"
+
 using namespace physx;
 
 GlutWindow* GlutWindow::Inst = nullptr;
@@ -265,14 +267,35 @@ void GlutWindow::InternalUpdate()
 
 void GlutWindow::InternalMotion(int x, int y)
 {
+    bool IsInAnyWindowArea = false;
+
     if (bUseGUI)
     {
-        ImGui_ImplGLUT_MotionFunc(x, y);
+        if (GImGui)
+        {
+            ImGuiContext& g = *GImGui;
+        
+            for (int i = 0; i < g.Windows.size(); i++)
+            {
+                if (const ImGuiWindow* WinPtr = g.Windows[i]) 
+                {
+                    IsInAnyWindowArea = (x > WinPtr->Pos.x && x < WinPtr->Pos.x + WinPtr->Size.x) && 
+                        (y > WinPtr->Pos.y && y < WinPtr->Pos.y + WinPtr->Size.y);
+                }
+
+                if (IsInAnyWindowArea) break;
+            }
+        
+            ImGui_ImplGLUT_MotionFunc(x, y);
+        }
     }
 
-    if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+    if (!IsInAnyWindowArea)
     {
-        SceneManagerPtr->GetCamera()->handleMotion(x, y);
+        if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+        {
+            SceneManagerPtr->GetCamera()->handleMotion(x, y);
+        }
     }
 }
 
