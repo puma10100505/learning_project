@@ -52,12 +52,12 @@ static void OnCustomGUI(float DeltaTime)
         if (GlutWindow::GetInstance()->bUseDarkStyle)
         {
             GlutWindow::GetInstance()->bUseDarkStyle = false;
-            ImGui::StyleColorsDark();
+            ImGui::StyleColorsLight();
         }
         else
         {
             GlutWindow::GetInstance()->bUseDarkStyle = true;
-            ImGui::StyleColorsLight();
+            ImGui::StyleColorsDark();
         }
     }
 
@@ -69,7 +69,6 @@ static void OnCustomGUI(float DeltaTime)
     ImGui::SliderFloat("PhysX FPS", &PhysXFPS, 15.f, 120.f);
     ImGui::SliderInt("PhysX Box Size: ", &PhysXBoxSize, 1, 10);
     ImGui::DragFloat3("PhysX Box Init Position: ", reinterpret_cast<float*>(&PhysXBoxInitPos), 0.1f);
-    ImGui::DragFloat3("Init Velocity", reinterpret_cast<float*>(&InitVelocity), 0.1f);
 
     glm::vec3 CameraDir = {GlutWindow::GetScene()->GetCamera()->getDir().x, GlutWindow::GetScene()->GetCamera()->getDir().y, GlutWindow::GetScene()->GetCamera()->getDir().z};
     ImGui::InputText("Object Name", Name, 128);
@@ -77,9 +76,10 @@ static void OnCustomGUI(float DeltaTime)
     {
         physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;
         physx::PxVec3 PxRot = GlutWindow::GetScene()->GetCamera()->getTransform().rotate(PxVec3(0.f, 0.f, -1.f)*200);
+        PxVec3 NewPos = PxPos + GlutWindow::GetScene()->GetCamera()->getDir() * 100.f;
         
-        GlutWindow::GetScene()->CreateCubeActor("Box...xx-" + GlutWindow::GetScene()->GetActorCount(), PhysXBoxSize * 1.f, 
-            {PxPos.x, PxPos.y, PxPos.z}, {PxRot.x, PxRot.y, PxRot.z}, false, 100.f * CameraDir);
+        GlutWindow::GetScene()->CreateCubeActor("Box...xx-", PhysXBoxSize * 1.f, 
+            {NewPos.x, NewPos.y, NewPos.z}, false, true);
     }
 
     ImGui::SliderInt("PhysX Sphere Radius: ", &PhysXSphereSize, 1, 30);
@@ -88,16 +88,34 @@ static void OnCustomGUI(float DeltaTime)
 
     if (ImGui::Button("Add PhysX Sphere"))
     {
-        physx::PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;                
-        GlutWindow::GetScene()->CreateSphereActor("Sphere...zz-" + GlutWindow::GetScene()->GetActorCount(), PhysXSphereSize * 1.f,
-            {PxPos.x, PxPos.y, PxPos.z}, SphereSlices, SphereStacks, false, 100.f * CameraDir);
+        PxVec3 PxPos = GlutWindow::GetScene()->GetCamera()->getTransform().p;
+        PxVec3 NewPos = PxPos + GlutWindow::GetScene()->GetCamera()->getDir() * 100.f;
+        GlutWindow::GetScene()->CreateSphereActor("Sphere...zz-", PhysXSphereSize * 1.f,
+            {NewPos.x, NewPos.y, NewPos.z}, SphereSlices, SphereStacks, false, false);
+    }
+
+    if (ImGui::Button("Play"))
+    {
+        GlutWindow::GetInstance()->GetScene()->SetPhysicsEnabled(true);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Stop"))
+    {
+        GlutWindow::GetInstance()->GetScene()->SetPhysicsEnabled(false);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(("Reset Camera")))
+    {
+        GlutWindow::GetInstance()->GetScene()->GetCamera()->mEye = PxVec3{0.f, 100.f, 0.f};
     }
 
     ImGui::End();
 
+
+    
     for (const int Idx: GlutWindow::SelectedActorIndices)
     {
-        const ActorInfo* Info = GlutWindow::GetScene()->GetActorByIndex(Idx);
+        const GameObject* Info = GlutWindow::GetScene()->GetActorByIndex(Idx);
         if (Info)
         {
             ImGui::Begin(Info->Name.c_str());
@@ -105,6 +123,12 @@ static void OnCustomGUI(float DeltaTime)
             ImGui::End();
         }
     }
+
+    ImGui::Begin("Global Info:");
+    ImGui::LabelText("Total Object Count", "GameObject Count: %d", GlutWindow::GetInstance()->GetScene()->GetActorCount());
+    ImGui::End();
+
+    
 }
 
 int main(int argc, char** argv)

@@ -38,10 +38,10 @@ public:
     class physx::PxRigidStatic* CreateWorldPlane(float normx, float normy, float normz, float distance);
     class physx::PxRigidStatic* CreateWorldPlane(const glm::vec3& normal, float distance);
     
-    class physx::PxRigidDynamic* CreateBoxGeometry(const std::string& Name, float InSize,
-        const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const;
-    class physx::PxRigidDynamic* CreateSphereGeometry(const std::string& Name, float InRadius,
-        const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const;
+    class physx::PxRigidActor* CreateBoxGeometry(const std::string& Name, float InSize,
+        const PxTransform& InTransform, const bool IsTrigger, const bool IsStatic) const;
+    class physx::PxRigidActor* CreateSphereGeometry(const std::string& Name, float InRadius,
+        const PxTransform& InTransform, const bool IsTrigger, const bool IsStatic) const;
 
     void Tick();
 

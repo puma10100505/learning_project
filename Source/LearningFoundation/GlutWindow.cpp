@@ -363,7 +363,7 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
         {
             if (HitBuff.block.actor)
             {
-                ActorInfo* Info = static_cast<ActorInfo*>(HitBuff.block.actor->userData);
+                GameObject* Info = static_cast<GameObject*>(HitBuff.block.actor->userData);
                 if (Info)
                 {
                     printf("Block something named: %s, index: %d\n", Info->Name.c_str(), Info->ActorIndex);
@@ -376,14 +376,14 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
                 const PxRaycastHit& HitItem = HitBuff.getTouch(i);
                 printf("hit item, dist: %f, pos: (%f, %f, %f)\n", HitItem.distance, HitItem.position.x, 
                     HitItem.position.y, HitItem.position.z);
-                ActorInfo* Info = static_cast<ActorInfo*>(HitItem.actor->userData);
+                GameObject* Info = static_cast<GameObject*>(HitItem.actor->userData);
                 if (Info)
                 {
                     printf("Hit something named: %s\n", Info->Name.c_str());
                 }
                 else
                 {
-                    printf("can not convert to actorinfo\n");
+                    printf("can not convert to GameObject\n");
                 }
             }
         }

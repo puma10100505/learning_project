@@ -90,7 +90,8 @@ PhysicsManager::~PhysicsManager()
     PX_RELEASE(Foundation);
 }
 
-PxRigidDynamic* PhysicsManager::CreateSphereGeometry(const std::string& Name, float InRadius, const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const 
+PxRigidActor* PhysicsManager::CreateSphereGeometry(const std::string& Name, float InRadius,
+    const PxTransform& InTransform, const bool IsTrigger, const bool IsStatic) const 
 {
     if (PhysicsInterface == nullptr)
     {
@@ -111,20 +112,29 @@ PxRigidDynamic* PhysicsManager::CreateSphereGeometry(const std::string& Name, fl
 
     Shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !IsTrigger);
     Shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, IsTrigger);
+    Shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+    
 
-    PxRigidDynamic* Body = PhysicsInterface->createRigidDynamic(InTransform);
-    if (Body == nullptr)
+    PxRigidActor* Body = nullptr;
+    if (IsStatic)
     {
-        printf("Create body failed\n");
-        return nullptr;
+        Body = PhysicsInterface->createRigidStatic(InTransform);
     }
+    else
+    {
+        Body = PhysicsInterface->createRigidDynamic(InTransform);
+        if (Body == nullptr)
+        {
+            printf("Create body failed\n");
+            return nullptr;
+        }
 
-    Body->setName(Name.c_str());
-    Body->setAngularDamping(0.5f);
-    Body->setLinearVelocity(InVel);
-    Body->attachShape(*Shape);    
+        Body->setName(Name.c_str());
+        Body->attachShape(*Shape);    
 
-    PxRigidBodyExt::updateMassAndInertia(*Body, 10.f);
+        PxRigidBodyExt::updateMassAndInertia(*static_cast<PxRigidDynamic*>(Body), 10.f);
+    }
+    
     Scene->addActor(*Body);
 
     // 因为Shape通过值引用复制到了Body中，所以这里可以先销毁
@@ -133,7 +143,8 @@ PxRigidDynamic* PhysicsManager::CreateSphereGeometry(const std::string& Name, fl
     return Body;
 }
 
-PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name, float InSize, const PxTransform& InTransform, const PxVec3& InVel, const bool IsTrigger) const
+PxRigidActor* PhysicsManager::CreateBoxGeometry(const std::string& Name, float InSize,
+    const PxTransform& InTransform, const bool IsTrigger, const bool IsStatic) const
 {
     if (PhysicsInterface == nullptr)
     {
@@ -155,20 +166,35 @@ PxRigidDynamic* PhysicsManager::CreateBoxGeometry(const std::string& Name, float
 
     Shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, !IsTrigger);
     Shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, IsTrigger);
-    
-    PxRigidDynamic* Body = PhysicsInterface->createRigidDynamic(InTransform);
-    if (Body == nullptr)
+    Shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+
+    PxRigidActor* Body = nullptr;
+    if (IsStatic)
     {
-        printf("Create body failed\n");
-        return nullptr;
+        Body = PhysicsInterface->createRigidStatic(InTransform);
+
+        if (Body == nullptr)
+        {
+            printf("Create static body failed\n");
+            return nullptr;
+        }
     }
+    else
+    {
+        Body = PhysicsInterface->createRigidDynamic(InTransform);
+        
+        if (Body == nullptr)
+        {
+            printf("Create body failed\n");
+            return nullptr;
+        }
 
-    Body->setName(Name.c_str());
-    Body->setAngularDamping(0.5f);
-	Body->setLinearVelocity(InVel);
-    Body->attachShape(*Shape);
+        Body->setName(Name.c_str());
+        Body->attachShape(*Shape);
 
-    PxRigidBodyExt::updateMassAndInertia(*Body, 10.f);
+        PxRigidBodyExt::updateMassAndInertia(*static_cast<PxRigidDynamic*>(Body), 10.f);
+    }
+    
     Scene->addActor(*Body);
 
     // 因为Shape通过值引用复制到了Body中，所以这里可以先销毁
@@ -185,33 +211,18 @@ void PhysicsManager::RenderGeometryHolder(const PxGeometry& Geom, const PxRigidA
         {
             const PxBoxGeometry& BoxGeom = static_cast<const PxBoxGeometry&>(Geom);
             glScalef(BoxGeom.halfExtents.x, BoxGeom.halfExtents.y, BoxGeom.halfExtents.z);
-            if (Geom.getType() & PxShapeFlag::eTRIGGER_SHAPE)
-            {
-                glutWireCube(BoxGeom.halfExtents.x * 2);
-                
-            }
-            else
-            {
-                glutSolidCube(BoxGeom.halfExtents.x * 2);            
-            }
+            glutSolidCube(BoxGeom.halfExtents.x * 2);
             
             break;
         }
 
     case PxGeometryType::eSPHERE:
         {
-            ActorInfo* Info = static_cast<ActorInfo*>(InActor.userData);
+            GameObject* Info = static_cast<GameObject*>(InActor.userData);
             if (Info)
             {
                 const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);                
-                if (SphereGeom.getType() & PxShapeFlag::eTRIGGER_SHAPE)
-                {
-                    glutWireSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
-                }
-                else
-                {
-                    glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
-                }
+                glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
             }
             break;
         }
@@ -263,6 +274,7 @@ void PhysicsManager::RenderShape(const physx::PxShape& InShape, const PxRigidAct
     }
 }
 
+// TODO: 物理引擎不应该负责绘制，只要修改对象的Transform
 void PhysicsManager::RenderBodyInstance(PxRigidActor* InActor, const PxVec3& InColor, const bool InEnableShadow, const PxVec3& InShadowDir)
 {
     PxShape* Shapes[128];
