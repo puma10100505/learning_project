@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Private/NetImgui_Shared.h>
-#include <Private/NetImgui_Network.h>
+#include <NetImgui_Shared.h>
+#include <NetImgui_Network.h>
 
 namespace NetImguiServer { namespace RemoteClient { struct Client; } } // Forward declare
 

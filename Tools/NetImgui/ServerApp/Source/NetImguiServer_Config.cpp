@@ -3,7 +3,7 @@
 #include <fstream>
 #include "NetImguiServer_Config.h"
 #include "NetImguiServer_RemoteClient.h"
-#include <ThirdParty/nlohmann_json/json.hpp>
+#include <nlohmann_json/json.hpp>
 
 namespace NetImguiServer { namespace Config
 {

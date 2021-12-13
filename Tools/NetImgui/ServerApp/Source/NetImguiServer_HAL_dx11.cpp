@@ -4,7 +4,7 @@
 //=================================================================================================
 #include "NetImguiServer_App.h"
 #include "NetImguiServer_RemoteClient.h"
-#include <Private/NetImgui_Shared.h>
+#include <NetImgui_Shared.h>
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 

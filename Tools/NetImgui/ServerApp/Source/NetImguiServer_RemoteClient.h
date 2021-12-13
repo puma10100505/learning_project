@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <chrono>
-#include <Private/NetImgui_CmdPackets.h>
+#include <NetImgui_CmdPackets.h>
 #include "NetImguiServer_App.h"
 
 namespace NetImguiServer { namespace RemoteClient

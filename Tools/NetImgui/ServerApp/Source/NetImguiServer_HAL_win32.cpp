@@ -1,5 +1,5 @@
 #include "NetImguiServer_App.h"
-#include <Private/NetImgui_Shared.h>
+#include <NetImgui_Shared.h>
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN

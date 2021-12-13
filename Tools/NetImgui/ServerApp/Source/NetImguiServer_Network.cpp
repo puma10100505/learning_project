@@ -1,7 +1,7 @@
-#include "Private/NetImgui_WarningDisableStd.h"
+#include "NetImgui_WarningDisableStd.h"
 #include <thread>
-#include <Private/NetImgui_Network.h>
-#include <Private/NetImgui_CmdPackets.h>
+#include <NetImgui_Network.h>
+#include <NetImgui_CmdPackets.h>
 #include "NetImguiServer_App.h"
 #include "NetImguiServer_Network.h"
 #include "NetImguiServer_RemoteClient.h"

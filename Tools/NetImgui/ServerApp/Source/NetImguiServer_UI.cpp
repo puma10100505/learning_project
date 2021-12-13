@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <NetImgui_Api.h>
-#include <Private/NetImgui_CmdPackets.h>
+#include <NetImgui_CmdPackets.h>
 
 #include "NetImguiServer_App.h"
 #include "NetImguiServer_UI.h"
@@ -10,7 +10,7 @@
 #include "NetImguiServer_Network.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../ThirdParty/stb_image.h"
+#include "stb_image.h"
 #undef STB_IMAGE_IMPLEMENTATION
 
 namespace NetImguiServer { namespace UI
