@@ -16,4 +16,5 @@ set(SOLUTION_ROOT ${PROJECT_SOURCE_DIR})
 add_subdirectory(Include)
 add_subdirectory(Source)
 add_subdirectory(Thirdparty)
-add_subdirectory(Tools)
+
+#add_subdirectory(Tools)
