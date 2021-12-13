@@ -3,11 +3,16 @@
 #include "PxPhysicsAPI.h"
 #include "SceneManager.h"
 
-//#include "NetImgui_Api.h"
+#include "NetImgui_Api.h"
 
 #include "imgui/imgui_internal.h"
 
 using namespace physx;
+
+static int32_t sClientPort = 8889;
+static int32_t sServerPort = 8880;
+static std::string sServerHostname = "127.0.0.1";
+static bool sbShowDemoWindow = false;
 
 GlutWindow* GlutWindow::Inst = nullptr;
 ImVec4 GlutWindow::WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
@@ -29,6 +34,106 @@ GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
 GlutWindowInputCallbackFunc GlutWindow::OnInputCallback = nullptr;
 GlutWindowResizeCallbackFunc GlutWindow::OnResizeCallback = nullptr;
 
+static void ClientUtil_ImGuiContent_Common(const char* zAppName)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3,6) );
+	if( ImGui::BeginMainMenuBar() )
+	{
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextColored(ImVec4(0.1, 1, 0.1, 1), "%s", zAppName);
+		ImGui::SameLine(0,32);
+		
+		//-----------------------------------------------------------------------------------------
+		if( NetImgui::IsConnected() )
+		//-----------------------------------------------------------------------------------------
+		{
+			ImGui::TextUnformatted("Status: Connected");
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));		    
+			ImGui::SetCursorPosY(3);
+			if( ImGui::Button("Disconnect", ImVec2(120,0)) ) 
+			{
+				NetImgui::Disconnect();
+			}
+			ImGui::PopStyleVar();
+		}
+		
+		//-----------------------------------------------------------------------------------------
+		else if( NetImgui::IsConnectionPending() )
+		//-----------------------------------------------------------------------------------------
+		{
+			ImGui::TextUnformatted("Status: Waiting Server");
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));
+			ImGui::SetCursorPosY(3);
+			if (ImGui::Button("Cancel", ImVec2(120,0)))
+			{
+				NetImgui::Disconnect();
+			}
+			ImGui::PopStyleVar();
+		}
+
+		//-----------------------------------------------------------------------------------------
+		else // No connection
+		//-----------------------------------------------------------------------------------------
+		{
+			//-------------------------------------------------------------------------------------
+			if( ImGui::BeginMenu("[ Connect to ]") )
+			//-------------------------------------------------------------------------------------
+			{
+				ImGui::TextColored(ImVec4(0.1, 1, 0.1, 1), "Server Settings");
+				ImGui::InputText("Hostname", (char*)(sServerHostname.c_str()), sServerHostname.length());
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Address of PC running the netImgui server application. Can be an IP like 127.0.0.1");
+				ImGui::InputInt("Port", &sServerPort);
+				ImGui::NewLine();
+				ImGui::Separator();
+				if (ImGui::Button("Connect", ImVec2(ImGui::GetContentRegionAvailWidth(), 0)))
+				{
+					NetImgui::ConnectToApp(zAppName, sServerHostname.c_str(), sServerPort);
+				}
+				ImGui::EndMenu();
+			}
+
+			if( ImGui::IsItemHovered() )
+				ImGui::SetTooltip("Attempt a connection to a remote netImgui server at the provided address.");
+
+			//-------------------------------------------------------------------------------------
+			if (ImGui::BeginMenu("[  Wait For  ]"))
+			//-------------------------------------------------------------------------------------
+			{
+				ImGui::TextColored(ImVec4(0.1, 1, 0.1, 1), "Client Settings");				
+				ImGui::InputInt("Port", &sClientPort);
+				ImGui::NewLine();
+				ImGui::Separator();
+				if (ImGui::Button("Listen", ImVec2(ImGui::GetContentRegionAvailWidth(), 0)))
+				{
+					NetImgui::ConnectFromApp(zAppName, sClientPort);
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Start listening for a connection request by a remote netImgui server, on the provided Port.");
+		}
+		
+		ImGui::SameLine(0,40);	
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8,0.8,0.8,0.9) );
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));				
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, sbShowDemoWindow ? 1.f : 0.f);
+		ImGui::SetCursorPosY(3);
+	    if( ImGui::Button("Show ImGui Demo", ImVec2(120,0)) )
+	    {
+	        sbShowDemoWindow = !sbShowDemoWindow;
+	    }	
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar(2);
+		ImGui::EndMainMenuBar();
+	}
+	ImGui::PopStyleVar();
+
+    if( sbShowDemoWindow )
+    {
+        ImGui::ShowDemoWindow(&sbShowDemoWindow);
+    }
+}
 
 GlutWindow* GlutWindow::GetInstance(int InArgc, char** InArgv, const char* InTitle, 
         int InWidth, int InHeight, bool InShowGUI)
@@ -151,7 +256,7 @@ int GlutWindow::Show()
     WinHandle = glutCreateWindow(WindowTitle.c_str());
     if (WinHandle < 1) 
     {
-        printf("create window failed");
+        printf("create window failed\n");
         return EXIT_FAILURE;
     }
 
@@ -179,7 +284,7 @@ int GlutWindow::Show()
     if (bUseGUI)
     {
         IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
+        ImGui::SetCurrentContext( ImGui::CreateContext() );
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
         // Setup Dear ImGui style
@@ -195,7 +300,11 @@ int GlutWindow::Show()
         ImGui_ImplGLUT_Init();
         ImGui_ImplOpenGL2_Init();
 
-        //NetImgui::Startup();
+        if (!NetImgui::Startup())
+        {
+            printf("create net imgui failed\n");
+            return EXIT_FAILURE;
+        }
     }
 
     glutMainLoop();
@@ -212,6 +321,8 @@ void GlutWindow::Destroy()
         ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplGLUT_Shutdown();
         ImGui::DestroyContext();
+
+        NetImgui::Shutdown(true);
     }
     
     if (SceneManagerPtr)
@@ -257,19 +368,24 @@ void GlutWindow::InternalUpdate()
     {
         ImGui_ImplOpenGL2_NewFrame();
         ImGui_ImplGLUT_NewFrame();
-        //NetImgui::NewFrame();
+
+        ClientUtil_ImGuiContent_Common("Learning Project");
 
         OnGUICallback(DeltaTimeInSeconds);
 
-        ImGui::Render();   
-        //NetImGui::EndFrame();
-        ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+        ImGui::Render();
+
+        ImDrawData* Client_Draw_Content = (!NetImgui::IsConnected() ? ImGui::GetDrawData() : nullptr);
+
+        if (Client_Draw_Content)
+        {
+            ImGui_ImplOpenGL2_RenderDrawData(Client_Draw_Content);
+        }
     }
 
     glutSwapBuffers();
     glutPostRedisplay();
 
-    //NetImgui::Shutdown();
     std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
 }
 
