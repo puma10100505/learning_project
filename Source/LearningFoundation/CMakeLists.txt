@@ -12,4 +12,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${SOLUTION_ROOT}/Thirdparty/SOIL2
     ${SOLUTION_ROOT}/Include/pxshared/include
     ${SOLUTION_ROOT}/Include/PhysX/include
+    ${SOLUTION_ROOT}/Include/NetImGui
 )

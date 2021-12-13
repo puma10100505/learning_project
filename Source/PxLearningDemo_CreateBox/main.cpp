@@ -79,7 +79,7 @@ static void OnCustomGUI(float DeltaTime)
         PxVec3 NewPos = PxPos + GlutWindow::GetScene()->GetCamera()->getDir() * 100.f;
         
         GlutWindow::GetScene()->CreateCubeActor("Box...xx-", PhysXBoxSize * 1.f, 
-            {NewPos.x, NewPos.y, NewPos.z}, false, true);
+            {NewPos.x, NewPos.y, NewPos.z}, PxIDENTITY::PxIdentity, false, true);
     }
 
     ImGui::SliderInt("PhysX Sphere Radius: ", &PhysXSphereSize, 1, 30);

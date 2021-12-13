@@ -219,6 +219,7 @@ GameObject* SceneManager::CreateCubeActor(const std::string& Name, float InSize,
     NewActor->ActorIndex = AllActors.size() - 1;
     NewActor->Transform.Location = InLoc;
     NewActor->Transform.Rotation = InRot;
+    NewActor->IsStatic = IsStatic;
     
     Body->userData = NewActor;
 

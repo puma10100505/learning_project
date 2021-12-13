@@ -3,6 +3,8 @@
 #include "PxPhysicsAPI.h"
 #include "SceneManager.h"
 
+//#include "NetImgui_Api.h"
+
 #include "imgui/imgui_internal.h"
 
 using namespace physx;
@@ -192,6 +194,8 @@ int GlutWindow::Show()
 
         ImGui_ImplGLUT_Init();
         ImGui_ImplOpenGL2_Init();
+
+        //NetImgui::Startup();
     }
 
     glutMainLoop();
@@ -253,16 +257,19 @@ void GlutWindow::InternalUpdate()
     {
         ImGui_ImplOpenGL2_NewFrame();
         ImGui_ImplGLUT_NewFrame();
+        //NetImgui::NewFrame();
 
         OnGUICallback(DeltaTimeInSeconds);
 
-        ImGui::Render();    
+        ImGui::Render();   
+        //NetImGui::EndFrame();
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     }
 
     glutSwapBuffers();
     glutPostRedisplay();
 
+    //NetImgui::Shutdown();
     std::this_thread::sleep_for(std::chrono::milliseconds(1000 / FPS));
 }
 
