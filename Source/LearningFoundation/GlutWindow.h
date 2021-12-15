@@ -85,4 +85,7 @@ public:
     static int WindowWidth;
     static int WindowHeight;
     static std::vector<int> SelectedActorIndices;
+
+    static int LastMouseX;
+    static int LastMouseY;
 };

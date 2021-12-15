@@ -129,11 +129,11 @@ PxRigidActor* PhysicsManager::CreateSphereGeometry(const std::string& Name, floa
             return nullptr;
         }
 
-        Body->setName(Name.c_str());
-        Body->attachShape(*Shape);    
-
         PxRigidBodyExt::updateMassAndInertia(*static_cast<PxRigidDynamic*>(Body), 10.f);
     }
+
+    Body->setName(Name.c_str());
+    Body->attachShape(*Shape);
     
     Scene->addActor(*Body);
 
@@ -189,11 +189,11 @@ PxRigidActor* PhysicsManager::CreateBoxGeometry(const std::string& Name, float I
             return nullptr;
         }
 
-        Body->setName(Name.c_str());
-        Body->attachShape(*Shape);
-
         PxRigidBodyExt::updateMassAndInertia(*static_cast<PxRigidDynamic*>(Body), 10.f);
     }
+
+    Body->setName(Name.c_str());
+    Body->attachShape(*Shape);
     
     Scene->addActor(*Body);
 

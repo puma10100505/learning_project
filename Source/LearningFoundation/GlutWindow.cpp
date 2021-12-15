@@ -1,4 +1,7 @@
 #include "GlutWindow.h"
+
+#include <glm/ext/quaternion_common.hpp>
+
 #include "GL/freeglut.h"
 #include "PxPhysicsAPI.h"
 #include "SceneManager.h"
@@ -25,6 +28,8 @@ int GlutWindow::FPS = 60;
 int GlutWindow::WindowWidth = 1280;
 int GlutWindow::WindowHeight = 720;
 std::vector<int> GlutWindow::SelectedActorIndices;
+int GlutWindow::LastMouseX = 0;
+int GlutWindow::LastMouseY = 0;
 
 SceneManager* GlutWindow::SceneManagerPtr = SceneManager::GetInstance(
     GlutWindow::WindowWidth, GlutWindow::WindowHeight);
@@ -192,7 +197,7 @@ void GlutWindow::InternalInput(unsigned char cChar, int nMouseX, int nMouseY)
 
     if (SceneManagerPtr != nullptr && SceneManagerPtr->GetCamera())
     {
-        SceneManagerPtr->GetCamera()->handleKey(cChar, nMouseX, nMouseY);
+        SceneManagerPtr->GetCamera()->handleKey(cChar, CurrentMouseX, CurrentMouseY);
     }
 }
 
@@ -397,30 +402,33 @@ void GlutWindow::InternalMotion(int x, int y)
     {
         if (GImGui)
         {
-            ImGuiContext& g = *GImGui;
-        
-            for (int i = 0; i < g.Windows.size(); i++)
-            {
-                if (const ImGuiWindow* WinPtr = g.Windows[i]) 
-                {
-                    IsInAnyWindowArea = (x > WinPtr->Pos.x && x < WinPtr->Pos.x + WinPtr->Size.x) && 
-                        (y > WinPtr->Pos.y && y < WinPtr->Pos.y + WinPtr->Size.y);
-                }
+            // 在窗口范围内拖动事件传递到窗口的处理(可使用NetImGui避免)
+            // ImGuiContext& g = *GImGui;
+            //
+            // for (int i = 0; i < g.Windows.size(); i++)
+            // {
+            //     if (const ImGuiWindow* WinPtr = g.Windows[i]) 
+            //     {
+            //         IsInAnyWindowArea = (x > WinPtr->Pos.x && x < WinPtr->Pos.x + WinPtr->Size.x) && 
+            //             (y > WinPtr->Pos.y && y < WinPtr->Pos.y + WinPtr->Size.y);
+            //     }
+            //
+            //     if (IsInAnyWindowArea) break;
+            // }
 
-                if (IsInAnyWindowArea) break;
-            }
-        
             ImGui_ImplGLUT_MotionFunc(x, y);
         }
     }
 
-    if (!IsInAnyWindowArea)
-    {
-        if (SceneManagerPtr && SceneManagerPtr->GetCamera())
-        {
-            SceneManagerPtr->GetCamera()->handleMotion(x, y);
-        }
-    }
+    // if (!IsInAnyWindowArea)
+    // {
+    //     if (SceneManagerPtr && SceneManagerPtr->GetCamera())
+    //     {
+    //         SceneManagerPtr->GetCamera()->handleMotion(x, y);
+    //     }
+    // }
+
+    SceneManagerPtr->GetCamera()->handleMotion(CurrentMouseX, CurrentMouseY);
 }
 
 void GlutWindow::InternalPassiveMotion(int x, int y)
@@ -490,7 +498,7 @@ void GlutWindow::InternalMouse(int glut_button, int state, int x, int y)
                 if (Info)
                 {
                     printf("Block something named: %s, index: %d\n", Info->Name.c_str(), Info->ActorIndex);
-                    GlutWindow::SelectedActorIndices.push_back(Info->ActorIndex);
+                    //GlutWindow::SelectedActorIndices.push_back(Info->ActorIndex);
                 }
             }
 

@@ -111,18 +111,16 @@ static void OnCustomGUI(float DeltaTime)
 
     ImGui::End();
 
-
-    
-    for (const int Idx: GlutWindow::SelectedActorIndices)
-    {
-        const GameObject* Info = GlutWindow::GetScene()->GetActorByIndex(Idx);
-        if (Info)
-        {
-            ImGui::Begin(Info->Name.c_str());
-            ImGui::TextColored({0.3f, 0.4f, 0.2f, 1.f}, "%s", Info->Name.c_str());
-            ImGui::End();
-        }
-    }
+    // for (const int Idx: GlutWindow::SelectedActorIndices)
+    // {
+    //     const GameObject* Info = GlutWindow::GetScene()->GetActorByIndex(Idx);
+    //     if (Info)
+    //     {
+    //         ImGui::Begin(Info->Name.c_str());
+    //         ImGui::TextColored({0.3f, 0.4f, 0.2f, 1.f}, "%s", Info->Name.c_str());
+    //         ImGui::End();
+    //     }
+    // }
 
     ImGui::Begin("Global Info:");
     ImGui::LabelText("Total Object Count", "GameObject Count: %d", GlutWindow::GetInstance()->GetScene()->GetActorCount());

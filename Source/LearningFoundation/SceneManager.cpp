@@ -183,8 +183,11 @@ void SceneManager::RenderGeometryHolder(const PxGeometry& Geom, const PxRigidAct
             GameObject* Info = static_cast<GameObject*>(InActor.userData);
             if (Info)
             {
-                const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);                
-                glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
+                const PxSphereGeometry& SphereGeom = static_cast<const PxSphereGeometry&>(Geom);
+                if (Info->Slices < 32 && Info->Stacks < 32)
+                {
+                    glutSolidSphere(SphereGeom.radius, Info->Slices, Info->Stacks);
+                }
             }
             break;
         }
@@ -265,6 +268,7 @@ void SceneManager::RenderCamera()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    
     gluLookAt(GLdouble(Camera->getEye().x), GLdouble(Camera->getEye().y), GLdouble(Camera->getEye().z), 
         GLdouble(Camera->getEye().x + Camera->getDir().x), GLdouble(Camera->getEye().y + Camera->getDir().y), 
         GLdouble(Camera->getEye().z + Camera->getDir().z), 0.0, 1.0, 0.0);
