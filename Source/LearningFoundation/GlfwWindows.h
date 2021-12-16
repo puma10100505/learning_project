@@ -15,6 +15,12 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "imgui_node_editor.h"
+
+namespace ed = ax::NodeEditor;
+
+static ed::EditorContext* gNodeEditorContext = nullptr;
+
 extern glm::vec4 BackgroundColor;
 extern float DeltaTime;
 
@@ -41,6 +47,7 @@ public:
     const std::string& Title = "Sample Window";
     bool bHideCursor = false;
     bool bWithGUI = true;
+    bool bUseNodeEditor = false;
     int FrameInterval = 60;
     GLFWkeyfun KeyEventCallback;
     GLFWerrorfun GlfwErrCallback;
@@ -89,7 +96,7 @@ GLFWwindow* GetGlobalWindow();
 GLFWmonitor* GetPrimaryMonitor();
 void GLDestroyWindow();
 void GLDestroyGUI();
-int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI);
+int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI, std::function<void(float)> OnNodeEditor = nullptr);
 
 int GLCreateWindow(const FCreateWindowParameters& Params);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 

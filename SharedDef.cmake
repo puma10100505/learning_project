@@ -4,21 +4,23 @@ cmake_minimum_required(VERSION 3.0...3.21)
 macro(include_directories param_project_name)
     target_include_directories(${param_project_name} 
         PRIVATE 
-        ${SOLUTION_ROOT}/Source/LearningFoundation 
-        ${SOLUTION_ROOT}/Include/
-        ${SOLUTION_ROOT}/Include/imgui
-        ${SOLUTION_ROOT}/Include/NetImGui
+        ${SOLUTION_ROOT}/Include
+        ${SOLUTION_ROOT}/Thirdparty
+        ${SOLUTION_ROOT}/Source/LearningFoundation         
+        ${SOLUTION_ROOT}/Thirdparty/imgui
+        ${SOLUTION_ROOT}/Thirdparty/NetImGui
+        ${SOLUTION_ROOT}/Thirdparty/implot
+        ${SOLUTION_ROOT}/Thirdparty/imnodes
+        ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Include/PhysX/include
-        ${SOLUTION_ROOT}/Include/pxshared/include
-        ${SOLUTION_ROOT}/Include
+        ${SOLUTION_ROOT}/Include/pxshared/include        
     )
 endmacro(include_directories)
 
 # 构造库引用信息
 macro(link_extra_libs param_project_name)    
-    list(APPEND EXTRA_LIBS imgui NetImGui glad learning_foundation stb_image)
-    #list(APPEND EXTRA_LIBS SOIL2)
+    list(APPEND EXTRA_LIBS imgui NetImGui implot imnodes node-editor glad learning_foundation stb_image)
 
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)

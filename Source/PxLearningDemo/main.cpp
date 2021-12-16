@@ -134,10 +134,11 @@ int main(int argc, char** argv)
     GlutWindow::bUseGUI = true;
     GlutWindow::bUseDarkStyle = false;
     GlutWindow::FPS = 30;
+    GlutWindow::UseNodeEditor(false);
 
     GlutWindow::OnGUICallback = OnCustomGUI;
-
-    GlutWindow::GetInstance(argc, argv, "Window Title", 1280, 720, false)->Show();
+    
+    GlutWindow::GetInstance(argc, argv, "Window Title")->Show();
     
 
     return 0;

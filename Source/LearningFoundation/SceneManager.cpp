@@ -268,8 +268,10 @@ void SceneManager::RenderCamera()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     gluLookAt(GLdouble(Camera->getEye().x), GLdouble(Camera->getEye().y), GLdouble(Camera->getEye().z), 
         GLdouble(Camera->getEye().x + Camera->getDir().x), GLdouble(Camera->getEye().y + Camera->getDir().y), 
         GLdouble(Camera->getEye().z + Camera->getDir().z), 0.0, 1.0, 0.0);
+
+    
 }

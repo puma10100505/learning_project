@@ -17,24 +17,26 @@
 #include "imgui/imgui_impl_glut.h"
 #include "imgui/imgui_impl_opengl2.h"
 
+#include "imgui_node_editor.h"
+
 #include "SceneManager.h"
 
 typedef int FGlutWindowHandle;
 typedef void(*GlutWindowDrawCallbackFunc)(float);
 typedef void(*GlutWindowGUICallbackFunc)(float);
+typedef void(*GlutWindowNodeEditorCallbackFunc)(float);
 typedef void(*GlutWindowInputCallbackFunc)(unsigned char cChar, int nMouseX, int nMouseY);
 typedef void(*GlutWindowResizeCallbackFunc)(int Width, int Height);
+
+namespace ed = ax::NodeEditor;
 
 class GlutWindow
 {
 private:
-    GlutWindow(int InArgc, char** InArgv, const char* InTitle, 
-        int InWidth, int InHeight, bool InShowGUI);
+    GlutWindow(int InArgc, char** InArgv, const char* InTitle);
 
 public:
-    static GlutWindow* GetInstance(int InArgc, char** InArgv, const char* InTitle, 
-        int InWidth, int InHeight, bool InShowGUI);
-
+    static GlutWindow* GetInstance(int InArgc, char** InArgv, const char* InTitle);
     static GlutWindow* GetInstance();
 
     void Destroy();
@@ -42,6 +44,7 @@ public:
     int Show();
     float ElpsedTimeInSeconds();
     static void UseGUI(bool InShow);
+    static void UseNodeEditor(bool InUse);
     static SceneManager* GetScene() { return SceneManagerPtr; }
 
 protected:
@@ -71,10 +74,12 @@ private:
     static int LastUpdateTimeInMs;
     static float DeltaTimeInSeconds;
     static class SceneManager* SceneManagerPtr;
+    static ed::EditorContext* NodeEditorContext;
 
 public:
     static GlutWindowDrawCallbackFunc OnDrawCallback;
     static GlutWindowGUICallbackFunc OnGUICallback;
+    static GlutWindowNodeEditorCallbackFunc OnNodeEditorCallback;
     static GlutWindowInputCallbackFunc OnInputCallback;
     static GlutWindowResizeCallbackFunc OnResizeCallback;
 
@@ -88,4 +93,7 @@ public:
 
     static int LastMouseX;
     static int LastMouseY;
+
+    // 是否使用节点编辑器
+    static bool bUseNodeEditor;
 };

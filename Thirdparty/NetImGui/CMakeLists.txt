@@ -14,6 +14,6 @@ target_link_libraries(NetImGui PUBLIC imgui)
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/include/imgui
     ${SOLUTION_ROOT}/include
-    ${SOLUTION_ROOT}/include/NetImGui
+    ${SOLUTION_ROOT}/Thirdparty/NetImGui
 )
 

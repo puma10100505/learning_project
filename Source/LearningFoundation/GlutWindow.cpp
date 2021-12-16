@@ -9,6 +9,8 @@
 #include "NetImgui_Api.h"
 
 #include "imgui/imgui_internal.h"
+#include "implot.h"
+#include "imnodes.h"
 
 using namespace physx;
 
@@ -30,14 +32,17 @@ int GlutWindow::WindowHeight = 720;
 std::vector<int> GlutWindow::SelectedActorIndices;
 int GlutWindow::LastMouseX = 0;
 int GlutWindow::LastMouseY = 0;
+bool GlutWindow::bUseNodeEditor = false;
+ed::EditorContext* GlutWindow::NodeEditorContext = nullptr;
 
-SceneManager* GlutWindow::SceneManagerPtr = SceneManager::GetInstance(
-    GlutWindow::WindowWidth, GlutWindow::WindowHeight);
+SceneManager* GlutWindow::SceneManagerPtr = 
+    SceneManager::GetInstance(GlutWindow::WindowWidth, GlutWindow::WindowHeight);
 
 GlutWindowDrawCallbackFunc GlutWindow::OnDrawCallback = nullptr;
 GlutWindowGUICallbackFunc GlutWindow::OnGUICallback = nullptr;
 GlutWindowInputCallbackFunc GlutWindow::OnInputCallback = nullptr;
 GlutWindowResizeCallbackFunc GlutWindow::OnResizeCallback = nullptr;
+GlutWindowNodeEditorCallbackFunc GlutWindow::OnNodeEditorCallback = nullptr;
 
 static void ClientUtil_ImGuiContent_Common(const char* zAppName)
 {
@@ -140,12 +145,11 @@ static void ClientUtil_ImGuiContent_Common(const char* zAppName)
     }
 }
 
-GlutWindow* GlutWindow::GetInstance(int InArgc, char** InArgv, const char* InTitle, 
-        int InWidth, int InHeight, bool InShowGUI)
+GlutWindow* GlutWindow::GetInstance(int InArgc, char** InArgv, const char* InTitle)
 {
     if (Inst == nullptr)
     {
-        Inst = new GlutWindow(InArgc, InArgv, InTitle, InWidth, InHeight, InShowGUI);
+        Inst = new GlutWindow(InArgc, InArgv, InTitle);
     }
 
     return Inst;
@@ -156,8 +160,7 @@ GlutWindow* GlutWindow::GetInstance()
     return Inst;
 }
 
-GlutWindow::GlutWindow(int InArgc, char** InArgv, const char* InTitle, 
-    int InWidth, int InHeight, bool InShowGUI)
+GlutWindow::GlutWindow(int InArgc, char** InArgv, const char* InTitle)
     : WindowTitle(InTitle)
 {
     WindowBackgroundColor = {0.45f, 0.55f, 0.6f, 1.f};
@@ -175,6 +178,11 @@ void GlutWindow::Initialize(int InArgc, char** InArgv)
 void GlutWindow::UseGUI(bool InShow)
 {
     bUseGUI = InShow;
+}
+
+void GlutWindow::UseNodeEditor(bool InUse)
+{
+    bUseNodeEditor = InUse;
 }
 
 void GlutWindow::InternalIdle()
@@ -197,7 +205,7 @@ void GlutWindow::InternalInput(unsigned char cChar, int nMouseX, int nMouseY)
 
     if (SceneManagerPtr != nullptr && SceneManagerPtr->GetCamera())
     {
-        SceneManagerPtr->GetCamera()->handleKey(cChar, CurrentMouseX, CurrentMouseY);
+        SceneManagerPtr->GetCamera()->handleKey(cChar, nMouseX, nMouseY);
     }
 }
 
@@ -290,6 +298,14 @@ int GlutWindow::Show()
     {
         IMGUI_CHECKVERSION();
         ImGui::SetCurrentContext( ImGui::CreateContext() );
+        ImNodes::CreateContext();
+        ImPlot::CreateContext();
+
+        if (bUseNodeEditor)
+        {
+            NodeEditorContext = ed::CreateEditor();
+        }
+
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
         // Setup Dear ImGui style
@@ -323,6 +339,14 @@ void GlutWindow::Destroy()
 {
     if (bUseGUI && ImGui::GetCurrentContext())
     {
+        ImPlot::DestroyContext();
+        ImNodes::DestroyContext();
+
+        if (bUseNodeEditor)
+        {
+            ed::DestroyEditor(NodeEditorContext);
+        }
+
         ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplGLUT_Shutdown();
         ImGui::DestroyContext();
@@ -388,6 +412,13 @@ void GlutWindow::InternalUpdate()
         }
     }
 
+    // 节点编辑器
+    if (bUseGUI && bUseNodeEditor && OnNodeEditorCallback)
+    {
+        ed::SetCurrentEditor(NodeEditorContext);
+        OnNodeEditorCallback(DeltaTimeInSeconds);
+    }
+
     glutSwapBuffers();
     glutPostRedisplay();
 
@@ -428,7 +459,7 @@ void GlutWindow::InternalMotion(int x, int y)
     //     }
     // }
 
-    SceneManagerPtr->GetCamera()->handleMotion(CurrentMouseX, CurrentMouseY);
+    SceneManagerPtr->GetCamera()->handleMotion(x, y);
 }
 
 void GlutWindow::InternalPassiveMotion(int x, int y)

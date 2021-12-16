@@ -19,6 +19,9 @@
  - glut: OpenGL的工具函数库，用于快速创建基本形状
  - freeglut: glut太老，使用freeglut代替，如果要快速使用物理库实验可以使用freeglut作为Windows以及Input库，因为它可以快速创建Geometry物件。SDL, GLFW都没有类似功能接口
  - recastnavigation: 开源导航信息生成以及寻路库，可用于AI移动
+ - implot: 基于imgui的图表库，可用于数据分析应用(https://github.com/epezent/implot)
+ - imnodes: 基于imgui的节点编辑库，可用于类蓝图或状态机应用(https://github.com/Nelarius/imnodes)
+ - node-editor: 基于imgui的节点编辑器库，类似imnodes，但是比它更加全面和复杂(可以做出Unreal Engine蓝图的效果)(https://github.com/puma10100505/imgui-node-editor)
 
 
 ## 工程结构介绍
@@ -43,6 +46,7 @@
 - 渲染的时候如果设置了uniform但是没有在程序中设置它们，可能会导致渲染结果出现奇怪的错误，如果通过uniform设置MVP矩阵变换，但是在程序中没有设置MVP矩阵的值，可能会导致图形不能正常显示。
 - OPENGL中VBO, VAO, EBO的概念以及关系，学习使用GL的基础API指令绘制图形
 - 集成Freeglut以及基于Glut的ImGUI, GlutWindowWithImGui目录下的代码可作为其DEMO, 此DEMO可用于物理引擎试验，因为Freeglut有方便的接口用于绘制基础几何形状。下一步可在此基础上引入物理计算。
+- 将implot, imnodes以及node-editor集成到工程中，后续创建窗口的时候默认支持implot, imnodes和node-editor, 可以在应用中直接调用它们的API，不用考虑它们的初始化和销毁
 
 ## TODO
 * 重构场景相关对象集中管理渲染对象
