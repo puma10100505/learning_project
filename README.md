@@ -22,6 +22,9 @@
  - implot: 基于imgui的图表库，可用于数据分析应用(https://github.com/epezent/implot)
  - imnodes: 基于imgui的节点编辑库，可用于类蓝图或状态机应用(https://github.com/Nelarius/imnodes)
  - node-editor: 基于imgui的节点编辑器库，类似imnodes，但是比它更加全面和复杂(可以做出Unreal Engine蓝图的效果)(https://github.com/puma10100505/imgui-node-editor)
+ - csv.h: CSV文件解析库
+ - rapidjson: JSON处理库
+ - loguru: 日志库
 
 
 ## 工程结构介绍

@@ -310,6 +310,7 @@ FCreateWindowParameters FCreateWindowParameters::DefaultWindowParameters(
         true, 
         30
     };
+    
     Parameters.KeyEventCallback = OnKeyboardEventDefault;
 
     return Parameters;
