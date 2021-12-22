@@ -126,7 +126,7 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
+    
     __GlobalWindow = glfwCreateWindow(InitWidth, InitHeight, Title.c_str(), 
         bIsFullScreen ? GetPrimaryMonitor() : nullptr, nullptr);
     
@@ -139,6 +139,13 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 
     glfwMakeContextCurrent(__GlobalWindow);
     glfwSwapInterval(1);
+
+    if (bWithGUI && bUseNodeEditor)
+    {
+        ed::Config config;
+        config.SettingsFile = "BasicInteraction.json";
+        gNodeEditorContext = ed::CreateEditor(&config);
+    }
     
     if (FrameBufferSizeChanged)
     {
@@ -194,11 +201,6 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     {
         if ((iRet = GLInitGUI()) < 0) {
             printf("Init imgui failed, iRet: %d\n", iRet);
-        }
-
-        if (bUseNodeEditor)
-        {
-            gNodeEditorContext = ed::CreateEditor();
         }
     }
 

@@ -15,9 +15,25 @@
 #include "LearningStatics.h"
 #include "CommonDefines.h"
 #include "implot/implot.h"
+#include "loguru.hpp"
+#include "ImGuizmo.h"
 
 extern glm::vec4 BackgroundColor;
 extern float DeltaTime;
+
+float cameraView[16] =
+   { 1.f, 0.f, 0.f, 0.f,
+     0.f, 1.f, 0.f, 0.f,
+     0.f, 0.f, 1.f, 0.f,
+     0.f, 0.f, 0.f, 1.f };
+
+static const float identityMatrix[16] =
+{ 1.f, 0.f, 0.f, 0.f,
+    0.f, 1.f, 0.f, 0.f,
+    0.f, 0.f, 1.f, 0.f,
+    0.f, 0.f, 0.f, 1.f };
+
+static float cameraProjection[16];
 
 static float BarData[10] = {372.945, 383.463, 414.9, 11.25, 1101.63, 1055.4, 390.836, 1060.87, 1039.71, 5.836};
 
@@ -36,6 +52,8 @@ static void OnTick(float DeltaTime)
 
 static void OnGUI(float DeltaTime)
 {
+    ImGuizmo::BeginFrame();
+
     ImGui::Begin("My Window");
 
     if (ImPlot::BeginPlot("My Plot")) {
@@ -45,10 +63,18 @@ static void OnGUI(float DeltaTime)
     }
 
     ImGui::End();
+
+    ImGui::Begin("Gizmo");
+    ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
+    ImGui::End();
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    loguru::init(argc, argv);
+    loguru::add_file("ImPlotDemo.log", loguru::Append, loguru::Verbosity_MAX);
+    loguru::g_stderr_verbosity = 1;
+
     if (GLCreateWindow(FCreateWindowParameters::DefaultWindowParameters()) < 0)
     {
         return EXIT_FAILURE;

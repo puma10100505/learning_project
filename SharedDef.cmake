@@ -16,6 +16,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/loguru
         ${SOLUTION_ROOT}/Include/PhysX/include
         ${SOLUTION_ROOT}/Include/pxshared/include
+        ${SOLUTION_ROOT}/Include/ImGuizmo
     )
 endmacro(include_directories)
 
@@ -31,6 +32,7 @@ macro(link_extra_libs param_project_name)
         learning_foundation 
         stb_image
         loguru
+        ImGuizmo
     )
 
     if (APPLE)
