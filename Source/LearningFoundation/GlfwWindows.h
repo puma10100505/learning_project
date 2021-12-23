@@ -47,7 +47,6 @@ public:
     const std::string& Title = "Sample Window";
     bool bHideCursor = false;
     bool bWithGUI = true;
-    bool bUseNodeEditor = false;
     int FrameInterval = 60;
     GLFWkeyfun KeyEventCallback;
     GLFWerrorfun GlfwErrCallback;
@@ -91,12 +90,12 @@ static void WindowCloseCallback(GLFWwindow* InWindow);
 static void WindowResizedCallback(GLFWwindow* window, int width, int height);
 
 int InitGlfwWindow();
-int GLInitGUI(bool bUseNodeEditor);
+int GLInitGUI();
 GLFWwindow* GetGlobalWindow();
 GLFWmonitor* GetPrimaryMonitor();
 void GLDestroyWindow();
 void GLDestroyGUI();
-int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI, std::function<void(float)> OnNodeEditor = nullptr);
+int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI);
 
 int GLCreateWindow(const FCreateWindowParameters& Params);
 int GLCreateWindow(int InitWidth = ScreenWidth, int InitHeight = ScreenHeight, 

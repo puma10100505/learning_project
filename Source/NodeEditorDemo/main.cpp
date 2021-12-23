@@ -217,21 +217,15 @@ static void OnGUI(float DeltaTime)
     
 }
 
-static void OnNodeEditor(float DeltaTime)
-{    
-    Application_Frame();
-}
-
 int main()
 {
     FCreateWindowParameters Params = FCreateWindowParameters::DefaultWindowParameters();
-    Params.bUseNodeEditor = true;
     if (GLCreateWindow(Params) < 0)
     {
         return EXIT_FAILURE;
     }
 
-    GLWindowTick(OnTick, OnGUI, OnNodeEditor);
+    GLWindowTick(OnTick, OnGUI);
 
     GLDestroyWindow();
 

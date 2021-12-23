@@ -17,6 +17,7 @@
 #include "implot/implot.h"
 #include "loguru.hpp"
 #include "ImGuizmo.h"
+#include "csv.h"
 
 extern glm::vec4 BackgroundColor;
 extern float DeltaTime;
@@ -50,23 +51,27 @@ static void OnTick(float DeltaTime)
     
 }
 
+std::vector<float> FrameData;
+
+
 static void OnGUI(float DeltaTime)
 {
     ImGuizmo::BeginFrame();
 
     ImGui::Begin("My Window");
 
-    if (ImPlot::BeginPlot("My Plot")) {
-        
-         ImPlot::PlotBars("My Bar Plot", BarData, 10);
-         ImPlot::EndPlot();
+    if (ImPlot::BeginPlot("My Plot"))
+    {
+        ImPlot::PlotBars("My Bar Plot", FrameData.data(), FrameData.size());
+        ImPlot::PlotLine("My Line Chart", FrameData.data(), FrameData.size());       
+        ImPlot::EndPlot();
     }
 
     ImGui::End();
 
-    ImGui::Begin("Gizmo");
-    ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
-    ImGui::End();
+    //ImGui::Begin("Gizmo");
+    //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
+    //ImGui::End();
 }
 
 int main(int argc, char** argv)
@@ -74,6 +79,19 @@ int main(int argc, char** argv)
     loguru::init(argc, argv);
     loguru::add_file("ImPlotDemo.log", loguru::Append, loguru::Verbosity_MAX);
     loguru::g_stderr_verbosity = 1;
+
+    io::CSVReader<3> indata(DefaultDataDirectory + "bardata.csv");
+    
+    indata.read_header(io::ignore_extra_column, "time", "bytes", "frame");
+    std::string name;
+    float time;
+    int bytes;
+    int frame;
+
+    while(indata.read_row(time, bytes, frame))
+    {
+        FrameData.push_back(time);
+    }
 
     if (GLCreateWindow(FCreateWindowParameters::DefaultWindowParameters()) < 0)
     {

@@ -1,6 +1,11 @@
 #include "GlfwWindows.h"
 #include "implot.h"
 #include "imnodes.h"
+# include <imgui_internal.h>
+# include <imgui_node_editor.h>
+
+namespace ed = ax::NodeEditor;
+
 
 glm::vec4 BackgroundColor = glm::vec4(0.1f, 0.6f, 0.7f, 1.0f);
 float DeltaTime = 0.0f;
@@ -83,7 +88,7 @@ int InitGlfwWindow() {
 }
 
 
-int GLInitGUI(bool bUseNodeEditor) {
+int GLInitGUI() {
     IMGUI_CHECKVERSION();
     
     ImGui::CreateContext();
@@ -107,16 +112,11 @@ int GLInitGUI(bool bUseNodeEditor) {
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
 
-    if (bUseNodeEditor)
-    {        
-        gNodeEditorContext = ed::CreateEditor();
-    }
-
     return 0;
 }
 
 // create glfw window
-int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool bHideCursor, bool bWithGUI, bool bUseNodeEditor, 
+int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool bHideCursor, bool bWithGUI, 
     int32_t FrameInterval, GLFWerrorfun GlfwErrCallback, GLFWframebuffersizefun FrameBufferSizeChanged, 
     GLFWkeyfun KeyEventCallback, GLFWcursorposfun MouseMoveCallback, 
     GLFWscrollfun MouseScrollCallback, GLFWmousebuttonfun MouseButtonCallback) 
@@ -197,7 +197,7 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 
     if (bWithGUI)
     {
-        if ((iRet = GLInitGUI(bUseNodeEditor)) < 0) {
+        if ((iRet = GLInitGUI()) < 0) {
             printf("Init imgui failed, iRet: %d\n", iRet);
         }
     }
@@ -212,7 +212,7 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 int GLCreateWindow(const FCreateWindowParameters& Params)
 {
     return GLCreateWindow(Params.InitWidth, Params.InitHeight, Params.Title,
-        Params.bHideCursor, Params.bWithGUI, Params.bUseNodeEditor, Params.FrameInterval, 
+        Params.bHideCursor, Params.bWithGUI, Params.FrameInterval, 
         Params.GlfwErrCallback, 
         Params.FrameBufferSizeChanged == nullptr ? FramebufferChangedDefault : Params.FrameBufferSizeChanged, 
         Params.KeyEventCallback, 
@@ -233,11 +233,6 @@ void GLDestroyWindow() {
 
 void GLDestroyGUI() 
 {
-    if (gNodeEditorContext != nullptr)
-    {
-        ed::DestroyEditor(gNodeEditorContext);
-    }
-
     ImPlot::DestroyContext();
     ImNodes::DestroyContext();
     ImGui_ImplOpenGL3_Shutdown();
@@ -245,7 +240,7 @@ void GLDestroyGUI()
     ImGui::DestroyContext();
 }
 
-int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI, std::function<void(float)> OnNodeEditor)
+int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)> OnGUI)
 {
     while (!glfwWindowShouldClose(__GlobalWindow)) 
     {
@@ -268,14 +263,6 @@ int GLWindowTick(std::function<void (float)> OnTick, std::function<void (float)>
             ImGui::NewFrame();
 
             OnGUI(DeltaTime);
-
-            // 如果开启了节点编辑器则执行节点编辑器逻辑
-            // 使用节点编辑器的前提是要先开启GUI绘制
-            if (OnNodeEditor)
-            {
-                ed::SetCurrentEditor(gNodeEditorContext);
-                OnNodeEditor(DeltaTime);
-            }
 
             // Rendering
             ImGui::Render();
