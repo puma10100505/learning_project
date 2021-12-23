@@ -83,7 +83,7 @@ int InitGlfwWindow() {
 }
 
 
-int GLInitGUI() {
+int GLInitGUI(bool bUseNodeEditor) {
     IMGUI_CHECKVERSION();
     
     ImGui::CreateContext();
@@ -106,6 +106,11 @@ int GLInitGUI() {
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
+
+    if (bUseNodeEditor)
+    {        
+        gNodeEditorContext = ed::CreateEditor();
+    }
 
     return 0;
 }
@@ -140,18 +145,11 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
     glfwMakeContextCurrent(__GlobalWindow);
     glfwSwapInterval(1);
 
-    if (bWithGUI && bUseNodeEditor)
-    {
-        ed::Config config;
-        config.SettingsFile = "BasicInteraction.json";
-        gNodeEditorContext = ed::CreateEditor(&config);
-    }
-    
     if (FrameBufferSizeChanged)
     {
         glfwSetFramebufferSizeCallback(__GlobalWindow, FrameBufferSizeChanged);
     }
-
+        
     if (KeyEventCallback)
     {
         glfwSetKeyCallback(__GlobalWindow, KeyEventCallback);
@@ -199,7 +197,7 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
 
     if (bWithGUI)
     {
-        if ((iRet = GLInitGUI()) < 0) {
+        if ((iRet = GLInitGUI(bUseNodeEditor)) < 0) {
             printf("Init imgui failed, iRet: %d\n", iRet);
         }
     }

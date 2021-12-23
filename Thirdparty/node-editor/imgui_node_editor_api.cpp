@@ -45,7 +45,8 @@ static int BuildIdList(C& container, I* list, int listSize, F&& accept)
 //------------------------------------------------------------------------------
 ax::NodeEditor::EditorContext* ax::NodeEditor::CreateEditor(const Config* config)
 {
-    return reinterpret_cast<ax::NodeEditor::EditorContext*>(new ax::NodeEditor::Detail::EditorContext(config));
+    ax::NodeEditor::Detail::EditorContext* Ctx = new ax::NodeEditor::Detail::EditorContext(config);    
+    return reinterpret_cast<ax::NodeEditor::EditorContext*>(Ctx);
 }
 
 void ax::NodeEditor::DestroyEditor(EditorContext* ctx)

@@ -91,7 +91,7 @@ static void WindowCloseCallback(GLFWwindow* InWindow);
 static void WindowResizedCallback(GLFWwindow* window, int width, int height);
 
 int InitGlfwWindow();
-int GLInitGUI();
+int GLInitGUI(bool bUseNodeEditor);
 GLFWwindow* GetGlobalWindow();
 GLFWmonitor* GetPrimaryMonitor();
 void GLDestroyWindow();
