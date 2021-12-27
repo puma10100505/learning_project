@@ -30,10 +30,10 @@ macro(link_extra_libs param_project_name)
         imnodes 
         node-editor 
         glad 
-        learning_foundation 
         stb_image
         loguru
         ImGuizmo
+        learning_foundation
     )
 
     if (APPLE)

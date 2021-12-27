@@ -4,8 +4,9 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
 
+using namespace dx;
 
-bool Dx12Window_CreateDeviceD3D(HWND hWnd)
+bool dx::CreateDeviceD3D(HWND hWnd)
 {
     // Setup swap chain
     DXGI_SWAP_CHAIN_DESC1 sd;
@@ -115,13 +116,13 @@ bool Dx12Window_CreateDeviceD3D(HWND hWnd)
         g_hSwapChainWaitableObject = g_pSwapChain->GetFrameLatencyWaitableObject();
     }
 
-    Dx12Window_CreateRenderTarget();
+    dx::CreateRenderTarget();
     return true;
 }
 
-void Dx12Window_CleanupDeviceD3D()
+void dx::CleanupDeviceD3D()
 {
-    Dx12Window_CleanupRenderTarget();
+    dx::CleanupRenderTarget();
     if (g_pSwapChain) { g_pSwapChain->Release(); g_pSwapChain = NULL; }
     if (g_hSwapChainWaitableObject != NULL) { CloseHandle(g_hSwapChainWaitableObject); }
     for (UINT i = 0; i < NUM_FRAMES_IN_FLIGHT; i++)
@@ -144,7 +145,7 @@ void Dx12Window_CleanupDeviceD3D()
 #endif
 }
 
-void Dx12Window_CreateRenderTarget()
+void dx::CreateRenderTarget()
 {
     for (UINT i = 0; i < NUM_BACK_BUFFERS; i++)
     {
@@ -155,15 +156,15 @@ void Dx12Window_CreateRenderTarget()
     }
 }
 
-void Dx12Window_CleanupRenderTarget()
+void dx::CleanupRenderTarget()
 {
-    Dx12Window_WaitForLastSubmittedFrame();
+    dx::WaitForLastSubmittedFrame();
 
     for (UINT i = 0; i < NUM_BACK_BUFFERS; i++)
         if (g_mainRenderTargetResource[i]) { g_mainRenderTargetResource[i]->Release(); g_mainRenderTargetResource[i] = NULL; }
 }
 
-void Dx12Window_WaitForLastSubmittedFrame()
+void dx::WaitForLastSubmittedFrame()
 {
     FrameContext* frameCtx = &g_frameContext[g_frameIndex % NUM_FRAMES_IN_FLIGHT];
 
@@ -179,7 +180,7 @@ void Dx12Window_WaitForLastSubmittedFrame()
     WaitForSingleObject(g_fenceEvent, INFINITE);
 }
 
-FrameContext* Dx12Window_WaitForNextFrameResources()
+FrameContext* dx::WaitForNextFrameResources()
 {
     UINT nextFrameIndex = g_frameIndex + 1;
     g_frameIndex = nextFrameIndex;
@@ -202,7 +203,7 @@ FrameContext* Dx12Window_WaitForNextFrameResources()
     return frameCtx;
 }
 
-void Dx12Window_ResizeSwapChain(HWND hWnd, int width, int height)
+void dx::ResizeSwapChain(HWND hWnd, int width, int height)
 {
     DXGI_SWAP_CHAIN_DESC1 sd;
     g_pSwapChain->GetDesc1(&sd);
@@ -231,7 +232,7 @@ void Dx12Window_ResizeSwapChain(HWND hWnd, int width, int height)
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // Win32 message handler
-LRESULT WINAPI Dx12Window_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI dx::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;
@@ -241,11 +242,11 @@ LRESULT WINAPI Dx12Window_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
     case WM_SIZE:
         if (g_pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
         {
-            Dx12Window_WaitForLastSubmittedFrame();
+            dx::WaitForLastSubmittedFrame();
             ImGui_ImplDX12_InvalidateDeviceObjects();
-            Dx12Window_CleanupRenderTarget();
-            Dx12Window_ResizeSwapChain(hWnd, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
-            Dx12Window_CreateRenderTarget();
+            dx::CleanupRenderTarget();
+            dx::ResizeSwapChain(hWnd, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
+            dx::CreateRenderTarget();
             ImGui_ImplDX12_CreateDeviceObjects();
         }
         return 0;
@@ -263,21 +264,21 @@ LRESULT WINAPI Dx12Window_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-int Dx12Window_CreateInstance(
+int dx::CreateWindowInstance(const std::string& InWinTitle,
     int InWidth, int InHeight, int InPosX, int InPosY, 
     DxWindowTick OnTick, DxWindowGUI OnGUI)
 {
-    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Dx12Window_WndProc, 0L, 0L, GetModuleHandle(nullptr), 
+    WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, dx::WndProc, 0L, 0L, GetModuleHandle(nullptr), 
         nullptr, nullptr, nullptr, nullptr, _T("ImGui Example"), nullptr };
 
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, _T("Dear ImGui DirectX12 Example"), WS_OVERLAPPEDWINDOW, 
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, InWinTitle.c_str(), WS_OVERLAPPEDWINDOW, 
         InPosX, InPosY, InWidth, InHeight, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
-    if (!Dx12Window_CreateDeviceD3D(hwnd))
+    if (!dx::CreateDeviceD3D(hwnd))
     {
-        Dx12Window_CleanupDeviceD3D();
+        dx::CleanupDeviceD3D();
         ::UnregisterClass(wc.lpszClassName, wc.hInstance);
         return EXIT_FAILURE;
     }
@@ -329,7 +330,7 @@ int Dx12Window_CreateInstance(
 
         ImGui::Render();
         
-        FrameContext* frameCtx = Dx12Window_WaitForNextFrameResources();
+        FrameContext* frameCtx = dx::WaitForNextFrameResources();
 
         UINT backBufferIdx = g_pSwapChain->GetCurrentBackBufferIndex();
 
@@ -371,18 +372,17 @@ int Dx12Window_CreateInstance(
 
     /* Window destroying */
 
-    Dx12Window_WaitForLastSubmittedFrame();
+    dx::WaitForLastSubmittedFrame();
 
     // Cleanup
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
 
-    Dx12Window_CleanupDeviceD3D();
+    dx::CleanupDeviceD3D();
 
     ::DestroyWindow(hwnd);
     ::UnregisterClass(wc.lpszClassName, wc.hInstance);
+
+    return EXIT_SUCCESS;
 }
- 
-
-

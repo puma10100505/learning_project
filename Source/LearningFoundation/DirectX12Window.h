@@ -19,47 +19,51 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
-struct FrameContext
+namespace dx
 {
-    ID3D12CommandAllocator* CommandAllocator;
-    UINT64 FenceValue;
-};
+    typedef void (*DxWindowTick)(float DeltaTime);
+    typedef void (*DxWindowGUI)(float DeltaTime);
 
-LRESULT WINAPI Dx12Window_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    struct FrameContext
+    {
+        ID3D12CommandAllocator* CommandAllocator;
+        UINT64 FenceValue;
+    };
 
-int const NUM_FRAMES_IN_FLIGHT = 3;
+    static int const NUM_FRAMES_IN_FLIGHT = 3;
+    static FrameContext g_frameContext[NUM_FRAMES_IN_FLIGHT] = {};
+    static UINT g_frameIndex = 0;
+    static int Dx12WndFPS = 60;
+    static std::chrono::steady_clock::time_point LastFrameTimeSecond;
+    static const int NUM_BACK_BUFFERS = 3;
+    static ID3D12Device* g_pd3dDevice = nullptr;
+    static ID3D12DescriptorHeap* g_pd3dRtvDescHeap = nullptr;
+    static ID3D12DescriptorHeap* g_pd3dSrvDescHeap = nullptr;
+    static ID3D12CommandQueue* g_pd3dCommandQueue = nullptr;
+    static ID3D12GraphicsCommandList* g_pd3dCommandList = nullptr;
+    static ID3D12Fence* g_fence = nullptr;
+    static HANDLE g_fenceEvent = nullptr;
+    static UINT64 g_fenceLastSignaledValue = 0;
+    static IDXGISwapChain3* g_pSwapChain = nullptr;
+    static HANDLE g_hSwapChainWaitableObject = nullptr;
+    static ID3D12Resource* g_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
+    static D3D12_CPU_DESCRIPTOR_HANDLE g_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
 
-FrameContext g_frameContext[NUM_FRAMES_IN_FLIGHT] = {};
-UINT g_frameIndex = 0;
-int Dx12WndFPS = 60;
-std::chrono::steady_clock::time_point LastFrameTimeSecond;
-const int NUM_BACK_BUFFERS = 3;
-ID3D12Device* g_pd3dDevice = nullptr;
-ID3D12DescriptorHeap* g_pd3dRtvDescHeap = nullptr;
-ID3D12DescriptorHeap* g_pd3dSrvDescHeap = nullptr;
-ID3D12CommandQueue* g_pd3dCommandQueue = nullptr;
-ID3D12GraphicsCommandList* g_pd3dCommandList = nullptr;
-ID3D12Fence* g_fence = nullptr;
-HANDLE g_fenceEvent = nullptr;
-UINT64 g_fenceLastSignaledValue = 0;
-IDXGISwapChain3* g_pSwapChain = nullptr;
-HANDLE g_hSwapChainWaitableObject = nullptr;
-ID3D12Resource* g_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
-D3D12_CPU_DESCRIPTOR_HANDLE g_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
+    /* Forward declare of Methods */
+    LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-typedef void (*DxWindowTick)(float DeltaTime);
-typedef void (*DxWindowGUI)(float DeltaTime);
+    static bool CreateDeviceD3D(HWND hWnd);
+    static void CleanupDeviceD3D();
+    static void CreateRenderTarget();
+    static void CleanupRenderTarget();
+    static void WaitForLastSubmittedFrame();
+    static FrameContext* WaitForNextFrameResources();
+    static void ResizeSwapChain(HWND hWnd, int width, int height);    
 
-bool Dx12Window_CreateDeviceD3D(HWND hWnd);
-void Dx12Window_CleanupDeviceD3D();
-void Dx12Window_CreateRenderTarget();
-void Dx12Window_CleanupRenderTarget();
-void Dx12Window_WaitForLastSubmittedFrame();
-FrameContext* Dx12Window_WaitForNextFrameResources();
-void Dx12Window_ResizeSwapChain(HWND hWnd, int width, int height);    
-
-// Public
-int Dx12Window_CreateInstance( 
-    int InWidth, int InHeight, 
-    int InPosX, int InPosY, 
-    DxWindowTick OnTick, DxWindowGUI OnGUI);
+    // Public 
+    int CreateWindowInstance(const std::string& InWinTitle,
+            int InWidth, int InHeight, 
+            int InPosX, int InPosY, 
+            DxWindowTick OnTick, DxWindowGUI OnGUI); 
+    
+}
