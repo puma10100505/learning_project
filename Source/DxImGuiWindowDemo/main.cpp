@@ -26,7 +26,7 @@ void WinGUI(float Duration)
 
 int main(int argc, char** argv)
 {
-    Dx12Window_CreateInstance("", 900, 600, 0, 0, WinTick, WinGUI);
+    Dx12Window_CreateInstance(900, 600, 0, 0, WinTick, WinGUI);
 
     return EXIT_SUCCESS;
 }

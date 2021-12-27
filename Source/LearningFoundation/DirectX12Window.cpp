@@ -263,7 +263,8 @@ LRESULT WINAPI Dx12Window_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 
 /////////////////////////////////////////////////////////////////////////////
 
-int Dx12Window_CreateInstance(const std::string& InWinTitle, int InWidth, int InHeight, int InPosX, int InPosY, 
+int Dx12Window_CreateInstance(
+    int InWidth, int InHeight, int InPosX, int InPosY, 
     DxWindowTick OnTick, DxWindowGUI OnGUI)
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, Dx12Window_WndProc, 0L, 0L, GetModuleHandle(nullptr), 

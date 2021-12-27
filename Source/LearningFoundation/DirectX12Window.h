@@ -59,5 +59,7 @@ FrameContext* Dx12Window_WaitForNextFrameResources();
 void Dx12Window_ResizeSwapChain(HWND hWnd, int width, int height);    
 
 // Public
-static int Dx12Window_CreateInstance(const std::string& InWinTitle, int InWidth, int InHeight, 
-    int InPosX, int InPosY, DxWindowTick OnTick, DxWindowGUI OnGUI);
+int Dx12Window_CreateInstance( 
+    int InWidth, int InHeight, 
+    int InPosX, int InPosY, 
+    DxWindowTick OnTick, DxWindowGUI OnGUI);
