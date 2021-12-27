@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.0...3.21)
 macro(include_directories param_project_name)
     target_include_directories(${param_project_name} 
         PRIVATE 
+        ${SOLUTION_ROOT}/Source/${param_project_name}
         ${SOLUTION_ROOT}/Include
         ${SOLUTION_ROOT}/Thirdparty
         ${SOLUTION_ROOT}/Source/LearningFoundation         
@@ -115,6 +116,11 @@ macro(link_extra_libs param_project_name)
             PhysXCooking_64.lib
             freeglut_staticd.lib
             freeglutd.lib
+
+            # For DirectX12
+            d3d12.lib 
+            d3dcompiler.lib 
+            dxgi.lib
         )
 
         target_link_directories(${param_project_name}

@@ -15,6 +15,9 @@ add_subdirectory(LearningFoundation)
   add_subdirectory(ImPlotDemo)
   add_subdirectory(ImNodesDemo)
   add_subdirectory(NodeEditorDemo)
+  add_subdirectory(GizmoDemo)
+  add_subdirectory(GizmoExample)
+  add_subdirectory(DxImGuiWindowDemo)
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 # add_subdirectory(GLBasic)
