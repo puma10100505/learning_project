@@ -4,6 +4,11 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
 
+#include "implot.h"
+#include "imnodes.h"
+
+#include "CommonDefines.h"
+
 using namespace dx;
 
 bool dx::CreateDeviceD3D(HWND hWnd)
@@ -288,6 +293,9 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImNodes::CreateContext();
+    ImPlot::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ImGui::StyleColorsDark();
@@ -296,6 +304,13 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
     ImGui_ImplDX12_Init(g_pd3dDevice, NUM_FRAMES_IN_FLIGHT, DXGI_FORMAT_R8G8B8A8_UNORM, 
         g_pd3dSrvDescHeap, g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), 
         g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
+
+    // Load Founts
+    io.Fonts->AddFontDefault();
+    io.Fonts->AddFontFromFileTTF((DefaultFontDirectory + "Karla-Regular.ttf").c_str(), 16);
+    //io.Fonts->AddFontFromFileTTF(DefaultFontDirectory + "Roboto-Medium.ttf");
+    //io.Fonts->AddFontFromFileTTF(DefaultFontDirectory + "Karla-Regular.ttf");
+    
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -375,6 +390,8 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
     dx::WaitForLastSubmittedFrame();
 
     // Cleanup
+    ImPlot::DestroyContext();
+    ImNodes::DestroyContext();
     ImGui_ImplDX12_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();

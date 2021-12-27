@@ -139,7 +139,6 @@ int main(int argc, char** argv)
     GlutWindow::OnGUICallback = OnCustomGUI;
     
     GlutWindow::GetInstance(argc, argv, "Window Title")->Show();
-    
 
     return 0;
 }
