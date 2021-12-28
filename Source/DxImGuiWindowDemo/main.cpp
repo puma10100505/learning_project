@@ -38,8 +38,8 @@ static void WinGUI(float Duration)
         ImPlot::PlotLine("My Line Chart", FrameData.data(), FrameData.size());       
         ImPlot::EndPlot();
     }
-
     ImGui::End();
+
     
     ImGui::Begin("node editor");
 
@@ -50,8 +50,6 @@ static void WinGUI(float Duration)
 
     ImNodes::BeginNode(2);
     ImNodes::BeginOutputAttribute(2);
-    // in between Begin|EndAttribute calls, you can call ImGui
-    // UI functions
     ImGui::Text("output pin");
     ImNodes::EndOutputAttribute();
     ImNodes::EndNode();
@@ -62,8 +60,6 @@ static void WinGUI(float Duration)
     ImNodes::EndInputAttribute();
 
     ImNodes::BeginOutputAttribute(4);
-    // in between Begin|EndAttribute calls, you can call ImGui
-    // UI functions
     ImGui::Text("Output Pin");
     ImNodes::EndOutputAttribute();
     ImNodes::EndNode();
@@ -72,6 +68,18 @@ static void WinGUI(float Duration)
     ImNodes::BeginNodeTitleBar();
     ImGui::TextUnformatted("output node");
     ImNodes::EndNodeTitleBar();
+    ImNodes::EndNode();
+
+    ImNodes::BeginNode(5);
+    ImNodes::BeginNodeTitleBar();
+    ImGui::TextUnformatted("Filter");
+    ImNodes::EndNodeTitleBar();
+    ImNodes::BeginInputAttribute(6);
+    ImGui::Text("Input Filter Item");
+    ImNodes::EndInputAttribute();
+    ImNodes::BeginOutputAttribute(7);
+    ImGui::Text("Filter Result");
+    ImNodes::EndOutputAttribute();
     ImNodes::EndNode();
 
     ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_TopRight);
