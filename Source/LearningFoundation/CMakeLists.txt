@@ -10,6 +10,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${SOLUTION_ROOT}/Source/LearningFoundation
     ${SOLUTION_ROOT}/Include
     ${SOLUTION_ROOT}/Thirdparty
+    ${SOLUTION_ROOT}/Thirdparty/loguru
     ${SOLUTION_ROOT}/Thirdparty/imgui
     ${SOLUTION_ROOT}/Thirdparty/implot
     ${SOLUTION_ROOT}/Thirdparty/imnodes

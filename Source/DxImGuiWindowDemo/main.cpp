@@ -19,10 +19,11 @@
 #include "implot/implot.h"
 #include "ImGuizmo.h"
 #include "imnodes/imnodes.h"
+#include "BlueprintNodeManager.h"
 
 static std::vector<float> FrameData;
-
-static std::vector<std::pair<int, int>> Links;
+static bool open = true;
+std::unique_ptr<BlueprintNodeManager> BP;
 
 static void WinTick(float Duration)
 {
@@ -41,65 +42,15 @@ static void WinGUI(float Duration)
     ImGui::End();
 
     
-    ImGui::Begin("node editor");
-
-    ImNodes::BeginNodeEditor();
-    ImNodes::BeginNode(1);
-    ImGui::Dummy(ImVec2(80.0f, 45.0f));
-    ImNodes::EndNode();
-
-    ImNodes::BeginNode(2);
-    ImNodes::BeginOutputAttribute(2);
-    ImGui::Text("output pin");
-    ImNodes::EndOutputAttribute();
-    ImNodes::EndNode();
-
-    ImNodes::BeginNode(3);
-    ImNodes::BeginInputAttribute(3, ImNodesPinShape_Circle);
-    ImGui::Text("Input Pin");
-    ImNodes::EndInputAttribute();
-
-    ImNodes::BeginOutputAttribute(4);
-    ImGui::Text("Output Pin");
-    ImNodes::EndOutputAttribute();
-    ImNodes::EndNode();
-
-    ImNodes::BeginNode(4);
-    ImNodes::BeginNodeTitleBar();
-    ImGui::TextUnformatted("output node");
-    ImNodes::EndNodeTitleBar();
-    ImNodes::EndNode();
-
-    ImNodes::BeginNode(5);
-    ImNodes::BeginNodeTitleBar();
-    ImGui::TextUnformatted("Filter");
-    ImNodes::EndNodeTitleBar();
-    ImNodes::BeginInputAttribute(6);
-    ImGui::Text("Input Filter Item");
-    ImNodes::EndInputAttribute();
-    ImNodes::BeginOutputAttribute(7);
-    ImGui::Text("Filter Result");
-    ImNodes::EndOutputAttribute();
-    ImNodes::EndNode();
-
-    ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_TopRight);
-    
-    // IMPORTANT!!! 绘制连接要在EndNodeEditor之前
-    for (int i = 0; i < Links.size(); i++)
-    {
-        const std::pair<int, int> p = Links[i];
-        ImNodes::Link(i, p.first, p.second);
-    }
-
-    ImNodes::EndNodeEditor();
+    ImGui::Begin("node editor", &open);
+    BP->Draw();
     ImGui::End();
+}
 
+static void WinPostGUI(float Duration)
+{
     // IMPORTANT!!! 更新连接要在EndNodeEditor之后
-    int StartAttrId, EndAttrId;
-    if (ImNodes::IsLinkCreated(&StartAttrId, &EndAttrId))
-    {
-        Links.push_back(std::make_pair(StartAttrId, EndAttrId));
-    }
+    BP->UpdateLinks();
 }
 
 int main(int argc, char** argv)
@@ -123,5 +74,18 @@ int main(int argc, char** argv)
         FrameData.push_back(time);
     }
 
-    return dx::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, WinTick, WinGUI);
+    BP = std::make_unique<BlueprintNodeManager>();
+
+    BP->AddBPNode("Add")
+        ->AddPin("Param1", ENodePinType::INPUT_PIN)
+        ->AddPin("Param2", ENodePinType::INPUT_PIN)
+        ->AddPin("Result", ENodePinType::OUTPUT_PIN);
+
+    BP->AddBPNode("Multiple")
+        ->AddPin("Num1", ENodePinType::INPUT_PIN)
+        ->AddPin("Num2", ENodePinType::INPUT_PIN)
+        ->AddPin("Ret", ENodePinType::OUTPUT_PIN);
+
+    return dx::CreateWindowInstance("Hello dx window", 900, 600, 
+        0, 0, WinTick, WinGUI, WinPostGUI);
 }

@@ -64,6 +64,6 @@ namespace dx
     int CreateWindowInstance(const std::string& InWinTitle,
             int InWidth, int InHeight, 
             int InPosX, int InPosY, 
-            DxWindowTick OnTick, DxWindowGUI OnGUI); 
+            DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI); 
     
 }
