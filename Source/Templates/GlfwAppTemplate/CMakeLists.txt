@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.0...3.21)
 include(${SOLUTION_ROOT}/SharedDef.cmake)
 
 # After invoking project, the context will change to 'gl_model'
-project(TempldateGlfwWindowApp VERSION 1.0)
+project(GlfwAppTempldate VERSION 1.0)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)

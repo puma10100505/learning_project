@@ -21,13 +21,35 @@ BlueprintNodePin::BlueprintNodePin(const std::string& InName, const ENodePinType
     PinId = BlueprintNodeManager::GetNextSequenceId();
 }
 
+BlueprintNodePin::BlueprintNodePin(const std::string& InName, const ENodePinType InType, const ENodePinDataType InDataType)
+    : PinName(InName), PinType(InType), PinDataType(InDataType)
+{
+    PinId = BlueprintNodeManager::GetNextSequenceId();
+}
+
 void BlueprintNodePin::Draw()
 {
     if (PinType == ENodePinType::INPUT_PIN)
     {
-        ImNodes::BeginInputAttribute(GetId(), ImNodesPinShape_Circle);
-        ImGui::TextUnformatted(PinName.c_str());
-        ImNodes::EndInputAttribute();
+        //LOG_F(INFO, "pin type: %d, datatype: %d", PinType, PinDataType);
+        switch (PinDataType)
+        {
+            case ENodePinDataType::TEXT:
+            {
+                ImNodes::BeginInputAttribute(GetId(), ImNodesPinShape_Circle);
+                ImGui::SetNextItemWidth(120);
+                ImGui::InputInt(PinName.c_str(), (int*)&Value);                
+                ImNodes::EndInputAttribute();
+                break;
+            }
+            case ENodePinDataType::LABEL:
+            default:
+            {
+                ImNodes::BeginInputAttribute(GetId(), ImNodesPinShape_Circle);
+                ImGui::TextUnformatted(PinName.c_str());
+                ImNodes::EndInputAttribute();
+            }
+        }
     }
     else if (PinType == ENodePinType::OUTPUT_PIN)
     {
@@ -69,9 +91,18 @@ void BlueprintNode::Draw()
 
 BlueprintNode* BlueprintNode::AddPin(const std::string& InName, const ENodePinType InType)
 {
-    Pins.push_back({InName, InType});
+    Pins.push_back({InName, InType, ENodePinDataType::LABEL});
     BlueprintNodePin& LastPin = Pins[Pins.size() - 1];
     LOG_F(INFO, "Pin num: %d, Last Pin.Id: %d, Name: %s, Type: %d", Pins.size(), 
+        LastPin.GetId(), LastPin.GetName().c_str(), LastPin.GetPinType());
+    return this;
+}
+
+BlueprintNode* BlueprintNode::AddTextPin(const std::string& InName, const ENodePinType InType)
+{
+    Pins.push_back({InName, InType, ENodePinDataType::TEXT});
+    BlueprintNodePin& LastPin = Pins[Pins.size() - 1];
+    LOG_F(INFO, "AddTextPin Pin num: %d, Last Pin.Id: %d, Name: %s, Type: %d", Pins.size(), 
         LastPin.GetId(), LastPin.GetName().c_str(), LastPin.GetPinType());
     return this;
 }

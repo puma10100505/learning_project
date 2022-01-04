@@ -21,10 +21,18 @@ enum ENodePinType
     OUTPUT_PIN
 };
 
+enum ENodePinDataType
+{
+    LABEL,
+    TEXT,
+    FLOAT_VAL
+};
+
 class BlueprintNodePin
 {
 public:
     BlueprintNodePin(const std::string& InName, const ENodePinType InType);
+    BlueprintNodePin(const std::string& InName, const ENodePinType InType, const ENodePinDataType InDataType);
 
     ~BlueprintNodePin() {}
 
@@ -38,6 +46,8 @@ private:
     std::string PinName;
     int PinId;
     ENodePinType PinType;  
+    ENodePinDataType PinDataType; 
+    int Value = 0; 
 };
 
 class BlueprintNode
@@ -51,6 +61,7 @@ public:
     const int GetId() const;
 
     BlueprintNode* AddPin(const std::string& InName, const ENodePinType InType);
+    BlueprintNode* AddTextPin(const std::string& InName, const ENodePinType InType);
 
 private:
     std::string NodeTitle;

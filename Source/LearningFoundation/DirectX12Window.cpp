@@ -271,7 +271,7 @@ LRESULT WINAPI dx::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int dx::CreateWindowInstance(const std::string& InWinTitle,
     int InWidth, int InHeight, int InPosX, int InPosY, 
-    DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI)
+    DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI, DxWindowInput OnInput)
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, dx::WndProc, 0L, 0L, GetModuleHandle(nullptr), 
         nullptr, nullptr, nullptr, nullptr, _T("ImGui Example"), nullptr };
@@ -328,10 +328,15 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
             ::DispatchMessage(&msg);
             continue;
         }
-
+        
         ImGui_ImplDX12_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+
+        if (OnInput)
+        {
+            OnInput(DeltaTime.count());
+        }
 
         if (OnTick)
         {

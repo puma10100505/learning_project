@@ -23,6 +23,7 @@ namespace dx
 {
     typedef void (*DxWindowTick)(float DeltaTime);
     typedef void (*DxWindowGUI)(float DeltaTime);
+    typedef void (*DxWindowInput)(float DeltaTime);
 
     struct FrameContext
     {
@@ -64,6 +65,6 @@ namespace dx
     int CreateWindowInstance(const std::string& InWinTitle,
             int InWidth, int InHeight, 
             int InPosX, int InPosY, 
-            DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI); 
+            DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI, DxWindowInput OnInput); 
     
 }

@@ -166,6 +166,11 @@ static void WinTick(float Duration)
     
 }
 
+static void WinInput(float Duration)
+{
+    
+}
+
 static void WinGUI(float Duration)
 {
     /*
@@ -272,5 +277,5 @@ int main(int argc, char** argv)
         ->AddPin("Ret", ENodePinType::OUTPUT_PIN);
 
     return dx::CreateWindowInstance("Hello dx window", 900, 600, 
-        0, 0, WinTick, WinGUI, WinPostGUI);
+        0, 0, WinTick, WinGUI, WinPostGUI, WinInput);
 }
