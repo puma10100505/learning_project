@@ -10,7 +10,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOLUTION_ROOT ${PROJECT_SOURCE_DIR})
 
-
+if (WIN32)
+    add_definitions(-DUNICODE -D_UNICODE)
+    add_definitions(/wd"4819" /wd"4996" /wd"4800" /wd"4005")
+endif()
  
 # include directories
 add_subdirectory(Include)

@@ -270,11 +270,8 @@ int GLCreateWindow(int InitWidth, int InitHeight, const std::string& Title, bool
         printf("Finished register KeyEventCallback\n");
     }
 
-    if (WindowCloseCallback)
-    {
-        glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
-        printf("Finished register WindowCloseCallback\n");
-    }
+    glfwSetWindowCloseCallback(__GlobalWindow, WindowCloseCallback);
+    printf("Finished register WindowCloseCallback\n");
 
     if (MouseMoveCallback)
     {

@@ -277,7 +277,11 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
         nullptr, nullptr, nullptr, nullptr, _T("ImGui Example"), nullptr };
 
     ::RegisterClassEx(&wc);
-    HWND hwnd = ::CreateWindow(wc.lpszClassName, InWinTitle.c_str(), WS_OVERLAPPEDWINDOW, 
+    std::wstring wTitle;
+    int NeedLen = MultiByteToWideChar(CP_UTF8, 0, InWinTitle.c_str(), (int)InWinTitle.size(), nullptr, 0);
+    wTitle.resize(NeedLen + 10);
+    MultiByteToWideChar(CP_UTF8, 0, InWinTitle.c_str(), (int)InWinTitle.size(), &wTitle[0], (int)wTitle.size());
+    HWND hwnd = ::CreateWindow(wc.lpszClassName, wTitle.c_str(), WS_OVERLAPPEDWINDOW, 
         InPosX, InPosY, InWidth, InHeight, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
