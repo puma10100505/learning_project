@@ -3,11 +3,17 @@ cmake_minimum_required(VERSION 3.0...3.21)
 project(learning_foundation)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} LEARNING_SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/DirectX LEARNING_SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/OpenGL LEARNING_SRC)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Physics LEARNING_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${LEARNING_SRC})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/Source/LearningFoundation
+    ${SOLUTION_ROOT}/Source/LearningFoundation/DirectX
+    ${SOLUTION_ROOT}/Source/LearningFoundation/OpenGL
+    ${SOLUTION_ROOT}/Source/LearningFoundation/Physics
     ${SOLUTION_ROOT}/Include
     ${SOLUTION_ROOT}/Thirdparty
     ${SOLUTION_ROOT}/Thirdparty/loguru
