@@ -135,7 +135,8 @@ macro(link_extra_libs param_project_name)
 
     target_compile_options(${param_project_name} 
         PRIVATE 
-        $<$<PLATFORM_ID: Linux, Darwin>: -O2 -g>
+        -g
+        #$<$<PLATFORM_ID: Linux, Darwin>: -O2 -g>
     )  
     
     # Extra libraries

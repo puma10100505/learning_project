@@ -44,6 +44,10 @@
     - cmake --build cmake-build-debug
 3. 等待构建完成后在工程根目录可以看到Bin文件夹，里边就是构建的输出（可执行文件）
 
+## 调试代码
+1. 工程支持在VSCode环境下调试代码，工程已经有配置好的launch.json文件
+2. 要进行代码调试，在Source下的每个APP目录，其中的主入口代码文件名要与其所在的目录同名，如DxImGuiWindowDemo/DxImGuiWindowDemo.cpp就是DxImGuiWindowDemo这个目录下的主入口代码文件，main函数位于其中。这是方便在VSCode中调试的一个命名约定。
+
 ## DevLog:
 - 根据https://learnopengl-cn.github.io/01%20Getting%20started/09%20Camera/#_3的方法实现简单的摄像机控制。摄像机控制完成后可以更方便地实现基于物理的场景渲染，更容易跟踪场景物体。
 - 渲染的时候如果设置了uniform但是没有在程序中设置它们，可能会导致渲染结果出现奇怪的错误，如果通过uniform设置MVP矩阵变换，但是在程序中没有设置MVP矩阵的值，可能会导致图形不能正常显示。
