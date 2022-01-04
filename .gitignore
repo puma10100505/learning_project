@@ -34,8 +34,5 @@
 Bin
 cmake-build-debug
 build
-cmake-build-debug
-Bin
-Include/CommonDefines.h
 Include/CommonDefines.h
 *.log
