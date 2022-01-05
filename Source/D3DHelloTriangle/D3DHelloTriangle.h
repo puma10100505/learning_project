@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "DXSample.h"
 
 using namespace std;
 using namespace DirectX;
