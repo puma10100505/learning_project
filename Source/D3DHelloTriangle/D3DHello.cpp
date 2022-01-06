@@ -7,7 +7,6 @@
 #include "loguru.hpp"
 #include "D3DHelloTriangle.h"
 
-//int main(int argc, char** argv)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
     // loguru::init(argc, argv);
@@ -18,6 +17,4 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     D3D12HelloTriangle Sample(1280, 720, L"D3D12 Hello Win");
     return Win32Application::Run(&Sample, hInstance, nCmdShow);
-
-  //  return 0;
 }

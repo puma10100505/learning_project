@@ -1,12 +1,15 @@
 
 #include "D3DHelloTriangle.h"
+#include "CommonDefines.h"
 
 
 using namespace std;
 
 D3D12HelloTriangle::D3D12HelloTriangle(UINT width, UINT height, std::wstring name)
+    :DXSample(width, height, name), mFrameIndex(0), mViewport(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)), 
+    mScissorRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height)), mRtvDescriptorSize(0)
 {
-    //DXSample(width, height, name);
+    
 }
 
 void D3D12HelloTriangle::LoadPipeline()
@@ -114,9 +117,9 @@ void D3D12HelloTriangle::LoadAssets()
 #else 
         UINT CompileFlags = 0;
 #endif
-        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, 
+        ThrowIfFailed(D3DCompileFromFile((WideDefaultShaderDirectory + L"shaders.hlsl").c_str(), nullptr, nullptr, 
             "VSMain", "vs_5_0", CompileFlags, 0, &VertexShader, nullptr));
-        ThrowIfFailed(D3DCompileFromFile(GetAssetFullPath(L"shaders.hlsl").c_str(), nullptr, nullptr, 
+        ThrowIfFailed(D3DCompileFromFile((WideDefaultShaderDirectory + L"shaders.hlsl").c_str(), nullptr, nullptr, 
             "PSMain", "ps_5_0", CompileFlags, 0, &PixelShader, nullptr));
 
         // Define the vertex input layout

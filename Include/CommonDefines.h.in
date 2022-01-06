@@ -12,3 +12,12 @@ const std::string DefaultTextureDirectory = solution_base_path + "Assets/Texture
 const std::string DefaultFontDirectory = solution_base_path + "Assets/Fonts/";
 const std::string DefaultMeshDirectory = solution_base_path + "Assets/Meshes/";
 const std::string DefaultDataDirectory = solution_base_path + "Assets/Data/";
+
+
+const std::wstring wide_solution_base_path = L"@ASSETS_PATH_BASE@";
+const std::wstring WideDefaultAssetsDirectory = wide_solution_base_path + L"Assets/";
+const std::wstring WideDefaultShaderDirectory = wide_solution_base_path + L"Assets/Shaders/";
+const std::wstring WideDefaultTextureDirectory = wide_solution_base_path + L"Assets/Textures/";
+const std::wstring WideDefaultFontDirectory = wide_solution_base_path + L"Assets/Fonts/";
+const std::wstring WideDefaultMeshDirectory = wide_solution_base_path + L"Assets/Meshes/";
+const std::wstring WideDefaultDataDirectory = wide_solution_base_path + L"Assets/Data/";
