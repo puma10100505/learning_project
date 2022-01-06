@@ -1,0 +1,140 @@
+﻿<?xml version="1.0"?>
+<Root>
+    <!--
+    Provider. Here you should specify information about your provider (driver or
+              application)
+     GUID     : Event trace session  GUID,  it  is  hardcoded  for  every  provider 
+                developers should provide it. 
+                Example {C6206BEB-C4FA-B267-15AA-B3B2B4AC316D}
+     TMF      : directory where TMF files are located, TMF file(s), is also provided 
+                by developers, if parameter is emty - uses directiory where this XML
+                file is located
+     Level    : You can specify minimum trace level, here is list of values from
+                Evntrace.h:
+                 0 - NONE       : Tracing is not on
+                 1 - CRITICAL   : Abnormal exit or termination
+                 1 - FATAL      : Deprecated name for Abnormal exit or termination
+                 2 - ERROR      : Severe errors that need logging
+                 3 - WARNING    : Warnings such as allocation failure
+                 4 - INFORMATION: Includes non-error cases(e.g.,Entry-Exit)
+                 5 - VERBOSE    : Detailed traces from intermediate steps
+     Flags    : Bitmask of keywords that determine the category of events that you 
+                want the provider to write. The provider writes the event  if  any 
+                of the event's keyword bits match any of the bits set in this mask. 
+                64 bits value max, example Flags="0xFFFFFFFFFFFFFFFF"
+                64 bits flag available only for Vista, Windows 7 and future OS.
+                For old OS will be used only first 32 bits.
+     Filter   : The provider uses to filter data to prevent events that  match  the 
+                filter criteria from being written to  the  session;  the  provider 
+                determines the layout of the data and how it applies the filter  to 
+                the event's data. 
+                You should specify you binary filter data in hex mode, for  example
+                Filter="0x10BB56CAB2", Angara will deliver this 5 bytes to provider
+                And your provider should decide  how  it  will use  this  data  for 
+                filtering.
+                Angara use custom filter type equal to 0xAB1DE.
+     Platform : provider platform (X32 or X64), this flag take effect on pointers
+                printing
+     EtwBufLen    : Size in KB internal ETW buffer, min. reccomended value 512
+     EtwBufCntMin : Minimal amount of ETW buffers, min. reccomended value 16
+     EtwBufCntMax : Maximal amount of ETW buffers, min. reccomended value 32
+     SortQueueLen : Count of element to keep for on-line sorting, if lentgth of 
+                    the queue is too short sorting may failed, min. reccomended
+                    value is 1048576
+    -->
+
+    <Provider TMF="" 
+              GUID="{63423ADB-D156-48d5-B0BC-8ACAEDDBD810}"
+              Level="5"
+              Flags="0xFFFFFFFFFFFFFFFF"
+              Filter=""
+              Platform="X64"
+              EtwBufLen="1024"
+              EtwBufCntMin="32"
+              EtwBufCntMax="48"
+              SortQueueLen="1048576"
+    />
+
+    
+    <!--
+    P7Trace. Network engine to deliver traces form this PC to Baical server. 
+    Here are list of arguments:
+     Address   : Baical server address (IPv4/IPv6/Name)
+     Port      : Baical server port (usually 9009)
+     Packet    : Minimum transfer unit. We reccomend to use values 512..1472
+                 for all network interfaces, except loopback (127.0.0.1, ::1)
+                 For loopback you can use up to 65535, it will increase delivery
+                 speed.
+                 N.B.: Wrong value can cause delivery problem. Value 512 will work
+                       everytime, even with very old hardware, 1472 will work on
+                       MOST of all modern networks. Greater values than 1472
+                       usually will work only on loopback interfaces
+     Verbosity : If you specify this parameter - engine will dump all internal
+                 messages to log file. 
+                 0 : Debug
+                 1 : Info
+                 2 : Warnings
+                 3 : Errors
+                 4 : Critical
+                 If you do not specify this parameter = internal logging is off
+     Name      : trace channel name, max length is 64 characters. You will see 
+                 this name in Baical server
+     Sink      : logs direction, there are few options:
+                 Baical : over network to Baical server directly
+                 File   : to local file 
+                 Auto   : to Baical if connection is established, otherwise to file
+                          N.B.: connection timeout is 250 ms.
+                 Null   : all data will be dropped
+
+     Next options have sens only if [Sink="File"] or [Sink="Auto"]
+
+     Dir       : path to destination p7 file, by default "<angara dir>/P7logs" folder 
+                 is used for files storing
+     Rolling   : define files rolling type & value:
+                 Xmb : rolling every X megabytes, for example Rolling="10mb"
+                 Xhr : rolling every X hours, for example Rolling="24hr", max = 1000hr
+     Files     : define maximum P7 logs files in destination folder. If count of files 
+                 is larger than specified value - oldest files will be removed. Values: 
+                 default : off (0)
+                 min     : 1
+                 max     : 4096
+     MemPool   : Size limit of the memory pool in KB, min reccomended value 32768
+    -->
+    <P7Trace Address="localhost" 
+             Port="9009" 
+             Packet="1472"
+             Name="MyChannel"
+             Verbosity="0"
+             Sink="Baical"
+             Rolling="256mb"
+             Files="10"
+             MemPool="65535"
+    />
+
+    <!--
+    Here you can map EventTrace levels to P7Trace levels, some developers redefine
+    EventTrace levels - in this case you should redefine it here too, for example
+    replace TRACE_LEVEL_ERROR by your macro like ERROR
+    -->
+    <Levels>
+        <Trace>
+            <WPP Text="TRACE_LEVEL_VERBOSE"/>
+        </Trace>
+        <Debug> 
+            <WPP Text="TRACE_LEVEL_NONE"/>
+        </Debug>
+        <Info> 
+            <WPP Text="TRACE_LEVEL_INFORMATION"/>
+        </Info>
+        <Warning> 
+            <WPP Text="TRACE_LEVEL_WARNING"/>
+        </Warning>
+        <Error> 
+            <WPP Text="TRACE_LEVEL_ERROR"/>
+        </Error>
+        <Critical>
+            <WPP Text="TRACE_LEVEL_FATAL"/>
+            <WPP Text="TRACE_LEVEL_CRITICAL"/>
+        </Critical>
+    </Levels>
+</Root>

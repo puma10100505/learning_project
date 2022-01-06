@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+<!--  Single action per element!!!!
+<Merge target="1" current="2">
+    <Element>
+        <Path>
+            <Tag1>
+                <Tag2 Argument="Value">
+                    <Tag3>
+                    </Tag3>
+                </Tag2>
+            </Tag1>
+        </Path>
+        <Add>
+        
+        </Add>
+    </Element>
+    <Element>
+        <Path>
+            <Tag1>
+                <Tag2 Argument="Value">
+                    <Tag3>
+                    </Tag3>
+                </Tag2>
+            </Tag1>
+        </Path>
+        <Delete/>
+    </Element>
+</Merge>
+
+<Merge target="5" current="6">
+    <Element>
+        <Path>
+            <Root>
+                <Core>
+                    <PropGroup Name="User Interface">
+                    </PropGroup>
+                </Core>
+            </Root>
+        </Path>
+        <Add>
+            <Prop Name="Auto view" Desc="Open viewer automatically for next cases:&#13;&#10; - open files using grag &amp; drop&#13;&#10; - open files using windows explorer" Type="Enum" Flags="0" Index="0">
+                <Item Text="Disable" Value="0" />
+                <Item Text="Enable" Value="1" />
+            </Prop>
+        </Add>
+    </Element>
+    <Element>
+        <Path>
+            <Root>
+                <Core>
+                    <PropGroup Name="Logging"/>
+                </Core>
+            </Root>
+        </Path>
+        <Delete/>
+    </Element>
+    <Element>
+        <Path>
+            <Root>
+                <Core>
+                </Core>
+            </Root>
+        </Path>
+        <Add>
+            <PropGroup Name="Logging" Flags="0">
+                <Prop Name="Enable" Desc="Enable/disable internal logging&#13;&#10;Restart is required" Type="Enum" Flags="0" Index="1">
+                    <Item Text="Enabled" Value="1" />
+                    <Item Text="Disabled" Value="0" />
+                </Prop>
+                <Prop Name="Verbosity" Desc="logging verbosity level&#13;&#10;Restart is required" Type="Enum" Flags="0" Index="0">
+                    <Item Text="Trace" Value="0" />
+                    <Item Text="Debug" Value="1" />
+                    <Item Text="Info" Value="2" />
+                    <Item Text="Warning" Value="3" />
+                    <Item Text="Error" Value="4" />
+                    <Item Text="Critical" Value="5" />
+                </Prop>
+                <Prop Name="Sink" Desc="logs destination(sink)&#13;&#10;Restart is required" Type="Enum" Flags="0" Index="1">
+                    <Item Text="Baical" Value="0" />
+                    <Item Text="File" Value="1" />
+                    <Item Text="Auto" Value="2" />
+                    <Item Text="Null" Value="3" />
+                </Prop>
+                <Prop Name="Path" Desc="Path to P7 dump files if sink=File&#13;&#10;Restart is required" Type="Text" Flags="12" Value="C:/ProgramData/Baical/Logs/" />
+            </PropGroup>
+        </Add>
+    </Element>
+</Merge>
+-->
+
+<Merge target="17" current="18">
+    <Element>
+        <Path>
+            <Root>
+                <Element Name="Viewer: P7 Telemetry">
+                    <ShortCuts>
+                         <Action ID="21"/>
+                    </ShortCuts>
+                </Element>
+            </Root>
+        </Path>
+        <Delete/>
+    </Element>
+</Merge>
+
+<Merge target="18" current="19">
+  <Element>
+    <Path>
+      <Root>
+        <Core>
+          <PropGroup Name="User Interface">
+          </PropGroup>
+        </Core>
+      </Root>
+    </Path>
+    <Add>
+      <Prop Name="Convert stream time" Desc="Convert stream time&#13;&#10;to apply - restart server" Type="Enum" Flags="0" Index="1">
+        <Item Text="to local time" Value="0" />
+        <Item Text="to remote time" Value="1" />
+      </Prop>
+    </Add>
+  </Element>
+
+  <Element>
+    <Path>
+      <Root>
+        <Element GUID="{C5206AEB-D40A-BC07-65C6-2AB9FB8C992D}">
+        </Element>
+      </Root>
+    </Path>
+    <Add>
+      <Prop Name="Convert stream time" Desc="hidden parameter, driven by UI" Type="Enum" Flags="2" Index="1">
+        <Item Text="to local time" Value="0" />
+        <Item Text="to remote time" Value="1" />
+      </Prop>
+    </Add>
+  </Element>
+
+  <Element>
+    <Path>
+      <Root>
+        <Element GUID="{9f770104-081f-48cd-98f7-5a1006f1ad60}">
+        </Element>
+      </Root>
+    </Path>
+    <Add>
+      <Prop Name="Convert stream time" Desc="hidden parameter, driven by UI" Type="Enum" Flags="2" Index="1">
+        <Item Text="to local time" Value="0" />
+        <Item Text="to remote time" Value="1" />
+      </Prop>
+    </Add>
+  </Element>
+
+</Merge>
+
+<!--
+<Merge target="19" current="20">
+</Merge>
+-->
+

@@ -25,6 +25,8 @@
  - csv.h: CSV文件解析库
  - rapidjson: JSON处理库
  - loguru: 日志库
+ - glog: Google的日志库，loguru在Win32应用中无法使用，loguru初始化的时候需要argc, argv参数，这在WinMain中不提供
+ - p7: 日志库同时实现了基于网络的日志监控服务的开源项目
 
 
 ## 工程结构介绍
@@ -62,4 +64,3 @@
 * Linux环境下的工程配置以及构建脚本
 * 渲染与逻辑分离，多线程实现*
 * 物理引擎的序列化和反序列化功能研究
-* 在GlutWindowWithImGui这个DEMO的基础上引入物理计算

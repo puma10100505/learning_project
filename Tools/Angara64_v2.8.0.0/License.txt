@@ -1,0 +1,32 @@
+End User License Agreement
+
+Subject to your compliance with these terms and conditions, you have  a  royalty
+free, non-exclusive, non-transferable license to use the  Software,  solely  for
+your personal purposes. The author reserves  all  rights  in  the  Software  not
+expressly granted to you here.
+
+You may not use, copy, emulate, clone, rent,  lease,  sell,  modify,  decompile, 
+disassemble, otherwise reverse engineer, or transfer the  licensed  program,  or 
+any subset of the licensed program, except as provided for in this agreement. 
+
+You must not remove or alter any copyright notices on any and all copies of  the 
+SOFTWARE PRODUCT.
+
+Angara and related documentation is distributed  "as is". No  warranty  of   any 
+kind is expressed or implied. You use at your own risk. In no event shall Angara
+or anyone else who has been involved in the creation,  development,  production, 
+or  delivery  of  this  software  be  liable   for  any  direct,  incidental  or 
+consequential damages, such as, but not limited to, loss of anticipated profits,
+benefits, use, or data resulting from the use of this software, or  arising  out
+of any breach of warranty.
+
+Without prejudice to any other rights, the author may terminate this EULA if you 
+fail to comply with the terms and conditions of this EULA. In  such  event,  you 
+must destroy all copies of the Angara in your possession.
+
+If you do not agree with the terms of this license you must remove Angara  files 
+from your storage devices and cease to use the product. 
+
+Using Angara signifies acceptance of these terms and conditions of the license. 
+
+www.baical.net

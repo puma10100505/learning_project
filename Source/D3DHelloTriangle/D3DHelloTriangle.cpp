@@ -53,7 +53,7 @@ void D3D12HelloTriangle::LoadPipeline()
     SwapChainDesc.BufferCount = FrameCount;
     SwapChainDesc.Width = m_width;
     SwapChainDesc.Height = m_height;
-    SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;  
     SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     //SwapChainDesc.OutputWindow = Win32Application::GetHwnd();

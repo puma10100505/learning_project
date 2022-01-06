@@ -19,6 +19,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include/ImGuizmo
         ${SOLUTION_ROOT}/Include/DirectX
+        ${SOLUTION_ROOT}/Include/glog
     )
 endmacro(include_directories)
 
@@ -122,6 +123,9 @@ macro(link_extra_libs param_project_name)
             d3d12.lib 
             d3dcompiler.lib 
             dxgi.lib
+
+            # glog library
+            glogd.lib
         )
 
         target_link_directories(${param_project_name}
@@ -131,6 +135,7 @@ macro(link_extra_libs param_project_name)
             ${SOLUTION_ROOT}/Libraries/Windows/glew
             ${SOLUTION_ROOT}/Libraries/Windows/freeglut
             ${SOLUTION_ROOT}/Libraries/Windows/glut
+            ${SOLUTION_ROOT}/Libraries/Windows/glog
         )
     endif()
 
@@ -141,7 +146,6 @@ macro(link_extra_libs param_project_name)
     
     # Extra libraries
     target_link_libraries(${param_project_name} PUBLIC ${EXTRA_LIBS})
-
 endmacro(link_extra_libs )
 
 # 部署输出文件
