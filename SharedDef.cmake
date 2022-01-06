@@ -18,6 +18,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Include/PhysX/include
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include/ImGuizmo
+        ${SOLUTION_ROOT}/Include/DirectX
     )
 endmacro(include_directories)
 
@@ -136,7 +137,7 @@ macro(link_extra_libs param_project_name)
     target_compile_options(${param_project_name} 
         PRIVATE 
         $<$<PLATFORM_ID: Linux, Darwin>: -O2 -g>
-    )  
+    )
     
     # Extra libraries
     target_link_libraries(${param_project_name} PUBLIC ${EXTRA_LIBS})

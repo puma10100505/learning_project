@@ -17,6 +17,7 @@
 class DXSample
 {
 public:
+    DXSample(){}
     DXSample(UINT width, UINT height, std::wstring name);
     virtual ~DXSample();
 

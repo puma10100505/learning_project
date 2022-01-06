@@ -20,6 +20,7 @@ add_subdirectory(LearningFoundation)
    add_subdirectory(DxImGuiWindowDemo)
    add_subdirectory(NodeApp)
    add_subdirectory(Templates)
+   add_subdirectory(D3DHelloTriangle)
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 #  add_subdirectory(GLBasic)

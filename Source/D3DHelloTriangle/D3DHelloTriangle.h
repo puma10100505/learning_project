@@ -1,5 +1,6 @@
 #pragma once
 
+#include "d3dx12.h"
 #include "stdafx.h"
 #include "DXSample.h"
 
@@ -10,6 +11,7 @@ using namespace Microsoft::WRL;
 class D3D12HelloTriangle: public DXSample 
 {
 public:
+    D3D12HelloTriangle(){}
     D3D12HelloTriangle(UINT width, UINT height, std::wstring name);
 
     virtual void OnInit() override;
@@ -48,8 +50,9 @@ private:
     ComPtr<ID3D12Fence> mFence;
     UINT64 mFenceValue;
 
+private:
     void LoadPipeline();
     void LoadAssets();
     void PopulateCommandList();
     void WaitForPreviousFrame();
-}
+};
