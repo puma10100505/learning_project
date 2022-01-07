@@ -246,12 +246,22 @@ void D3D12HelloTriangle::OnInit()
     LoadAssets();
 }
 
-void D3D12HelloTriangle::OnUpdate()
+void D3D12HelloTriangle::OnUpdate(float DeltaTime)
+{
+
+}
+
+void D3D12HelloTriangle::OnPostGUI(float DeltaTime)
+{
+
+}
+
+void D3D12HelloTriangle::OnGUI(float DeltaTime)
 {
 
 }
     
-void D3D12HelloTriangle::OnRender()
+void D3D12HelloTriangle::OnRender(float DeltaTime)
 {
     PopulateCommandList();
 

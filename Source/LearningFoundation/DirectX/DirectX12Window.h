@@ -9,6 +9,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <tchar.h>
+#include <functional>
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -65,6 +66,9 @@ namespace dx
     int CreateWindowInstance(const std::string& InWinTitle,
             int InWidth, int InHeight, 
             int InPosX, int InPosY, 
-            DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI, DxWindowInput OnInput); 
+            std::function<void(float)> OnTick, 
+            std::function<void(float)> OnGUI, 
+            std::function<void(float)> OnPostGUI, 
+            std::function<void(float)> OnInput); 
     
 }

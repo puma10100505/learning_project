@@ -22,9 +22,11 @@ public:
     virtual ~DXSample();
 
     virtual void OnInit() = 0;
-    virtual void OnUpdate() = 0;
-    virtual void OnRender() = 0;
+    virtual void OnUpdate(float DeltaTime) = 0;
+    virtual void OnRender(float DeltaTime) = 0;
     virtual void OnDestroy() = 0;
+    virtual void OnGUI(float DeltaTime) = 0;
+    virtual void OnPostGUI(float DeltaTime) = 0;
 
     // Samples override the event handlers to handle specific messages.
     virtual void OnKeyDown(UINT8 /*key*/)   {}
@@ -36,6 +38,15 @@ public:
     const WCHAR* GetTitle() const   { return m_title.c_str(); }
 
     void ParseCommandLineArgs(_In_reads_(argc) WCHAR* argv[], int argc);
+
+    inline ID3D12Device* GetDirectXDevice() { return mDevice.Get(); }
+    inline ID3D12DescriptorHeap* GetDescriptorHeap() { return mRtvHeap.Get(); }
+    inline ID3D12GraphicsCommandList* GetCommandList() { return mCommandList.Get(); }
+
+protected:
+    ComPtr<ID3D12Device> mDevice;
+    ComPtr<ID3D12DescriptorHeap> mRtvHeap;
+    ComPtr<ID3D12GraphicsCommandList> mCommandList;
 
 protected:
     std::wstring GetAssetFullPath(LPCWSTR assetName);

@@ -11,8 +11,11 @@
 
 #include "stdafx.h"
 #include "Win32Application.h"
+#include "CommonDefines.h"
 
 HWND Win32Application::m_hwnd = nullptr;
+std::chrono::steady_clock::time_point Win32Application::LastFrameTimeSecond;
+std::chrono::duration<float> Win32Application::DeltaTime;
 
 int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
 {
@@ -53,17 +56,23 @@ int Win32Application::Run(DXSample* pSample, HINSTANCE hInstance, int nCmdShow)
     pSample->OnInit();
 
     ShowWindow(m_hwnd, nCmdShow);
-
+        
     // Main sample loop.
     MSG msg = {};
     while (msg.message != WM_QUIT)
     {
+        std::chrono::steady_clock::time_point CurrentFrameTimeSecond = std::chrono::steady_clock::now();
+        DeltaTime = CurrentFrameTimeSecond - LastFrameTimeSecond;
+
         // Process any messages in the queue.
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        LastFrameTimeSecond = CurrentFrameTimeSecond;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
     }
 
     pSample->OnDestroy();
@@ -104,8 +113,10 @@ LRESULT CALLBACK Win32Application::WindowProc(HWND hWnd, UINT message, WPARAM wP
     case WM_PAINT:
         if (pSample)
         {
-            pSample->OnUpdate();
-            pSample->OnRender();
+            pSample->OnGUI(DeltaTime.count());
+            pSample->OnPostGUI(DeltaTime.count());
+            pSample->OnUpdate(DeltaTime.count());
+            pSample->OnRender(DeltaTime.count());
         }
         return 0;
 

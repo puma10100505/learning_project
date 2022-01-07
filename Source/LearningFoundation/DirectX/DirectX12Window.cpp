@@ -271,7 +271,8 @@ LRESULT WINAPI dx::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int dx::CreateWindowInstance(const std::string& InWinTitle,
     int InWidth, int InHeight, int InPosX, int InPosY, 
-    DxWindowTick OnTick, DxWindowGUI OnGUI, DxWindowGUI OnPostGUI, DxWindowInput OnInput)
+    std::function<void(float)> OnTick, std::function<void(float)> OnGUI, 
+    std::function<void(float)> OnPostGUI, std::function<void(float)> OnInput)
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, dx::WndProc, 0L, 0L, GetModuleHandle(nullptr), 
         nullptr, nullptr, nullptr, nullptr, _T("ImGui Example"), nullptr };

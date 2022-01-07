@@ -12,6 +12,8 @@
 #pragma once
 
 #include "DXSample.h"
+#include <chrono>
+#include <thread>
 
 class DXSample;
 
@@ -23,6 +25,9 @@ public:
 
 protected:
     static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    static std::chrono::steady_clock::time_point LastFrameTimeSecond;
+    static std::chrono::duration<float> DeltaTime;
 
 private:
     static HWND m_hwnd;

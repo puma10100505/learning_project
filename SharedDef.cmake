@@ -19,7 +19,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include/ImGuizmo
         ${SOLUTION_ROOT}/Include/DirectX
-        ${SOLUTION_ROOT}/Include/glog
+        ${SOLUTION_ROOT}/Include/plog
     )
 endmacro(include_directories)
 
@@ -125,7 +125,7 @@ macro(link_extra_libs param_project_name)
             dxgi.lib
 
             # glog library
-            glogd.lib
+            # glogd.lib
         )
 
         target_link_directories(${param_project_name}

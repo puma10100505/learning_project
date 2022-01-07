@@ -3,20 +3,20 @@
 #include <memory>
 #include <vector>
 
-#define GLOG_NO_ABBREVIATED_SEVERITIES 1
-#include "logging.h"
-
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
+
+#include "plog/Log.h"
+#include "plog/Initializers/RollingFileInitializer.h"
 
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    google::InitGoogleLogging(__FILE__);
+    plog::init(plog::debug, __FILE__ ".log");
 
-    LOG(INFO) << "Entry of app, glog is started...";
+    PLOG_DEBUG << "Entry of DXMath";
 
     XMFLOAT3 Pos1 {200, 32, 455};
     XMFLOAT3 Pos2 {200, 28, 455};

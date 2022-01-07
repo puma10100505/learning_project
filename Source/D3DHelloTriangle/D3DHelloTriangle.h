@@ -15,8 +15,10 @@ public:
     D3D12HelloTriangle(UINT width, UINT height, std::wstring name);
 
     virtual void OnInit() override;
-    virtual void OnUpdate() override;
-    virtual void OnRender() override;
+    virtual void OnUpdate(float DeltaTime) override;
+    virtual void OnRender(float DeltaTime) override;
+    virtual void OnGUI(float DeltaTime) override;
+    virtual void OnPostGUI(float DeltaTime) override;
     virtual void OnDestroy() override;
 
 private:
@@ -30,15 +32,13 @@ private:
 
     D3D12_VIEWPORT mViewport;
     D3D12_RECT mScissorRect;
-    ComPtr<IDXGISwapChain3> mSwapChain;
-    ComPtr<ID3D12Device> mDevice;
+    ComPtr<IDXGISwapChain3> mSwapChain;    
     ComPtr<ID3D12Resource> mRenderTargets[FrameCount];
     ComPtr<ID3D12CommandAllocator> mCommandAllocator;
     ComPtr<ID3D12CommandQueue> mCommandQueue;
-    ComPtr<ID3D12RootSignature> mRootSignature;
-    ComPtr<ID3D12DescriptorHeap> mRtvHeap;
+    ComPtr<ID3D12RootSignature> mRootSignature;    
     ComPtr<ID3D12PipelineState> mPipelineState;
-    ComPtr<ID3D12GraphicsCommandList> mCommandList;
+    
 
     UINT mRtvDescriptorSize;
 
