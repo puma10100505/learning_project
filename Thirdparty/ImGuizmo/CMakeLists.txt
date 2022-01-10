@@ -6,8 +6,6 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} IMGUIZMO_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${IMGUIZMO_SRC})
 
-message(${SOLUTION_ROOT})
-
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/Thirdparty/imgui
     ${SOLUTION_ROOT}/Thirdparty/ImGuizmo

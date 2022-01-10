@@ -6,7 +6,6 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} LOGURU_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${LOGURU_SRC})
 
-message(${SOLUTION_ROOT})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/include

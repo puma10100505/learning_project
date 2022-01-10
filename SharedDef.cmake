@@ -24,19 +24,61 @@ macro(include_directories param_project_name)
 endmacro(include_directories)
 
 # 构造库引用信息
-macro(link_extra_libs param_project_name)    
-    list(APPEND EXTRA_LIBS 
-        imgui 
-        NetImGui 
-        implot 
-        imnodes 
-        node-editor 
-        glad 
-        stb_image
-        loguru
-        ImGuizmo
-        learning_foundation
-    )
+macro(link_extra_libs param_project_name)   
+    message("USE_IMPLOT: "          ${USE_IMPLOT})
+    message("USE_NETIMGUI: "        ${USE_NETIMGUI})
+    message("USE_FREEGLUT: "        ${USE_FREEGLUT})
+    message("USE_IMNODES: "         ${USE_IMNODES})
+    message("USE_NODEEDITOR: "      ${USE_NODEEDITOR})
+    message("USE_LOGURU: "          ${USE_LOGURU})
+    message("USE_IMGUIZMO: "        ${USE_IMGUIZMO})
+    message("USE_IMGUI: "           ${USE_IMGUI})
+    message("USE_PHYSX: "           ${USE_PHYSX})
+    message("USE_GLFW: "            ${USE_GLFW})
+    message("USE_D3D: "             ${USE_D3D})
+    message("USE_NAV: "             ${USE_NAV})
+
+
+    # 基础库
+    list(APPEND EXTRA_LIBS learning_foundation stb_image glad)
+
+
+    if (USE_NAV)
+        list(APPEND EXTRA_LIBS recastnavigation)
+    endif()
+
+    if (USE_IMPLOT)
+        list(APPEND EXTRA_LIBS imgui)
+        list(APPEND EXTRA_LIBS implot)
+    endif()
+
+    if (USE_NETIMGUI)
+        list(APPEND EXTRA_LIBS imgui)
+        list(APPEND EXTRA_LIBS NetImGui)
+    endif()
+
+    if (USE_IMNODES)
+        list(APPEND EXTRA_LIBS imgui)
+        list(APPEND EXTRA_LIBS imnodes)
+    endif()
+
+    if (USE_NODEEDITOR)
+        list(APPEND EXTRA_LIBS imgui)
+        list(APPEND EXTRA_LIBS node-editor)
+    endif()
+
+    if (USE_LOGURU)
+        list(APPEND EXTRA_LIBS loguru)
+    endif()
+
+    if (USE_IMGUIZMO)
+        list(APPEND EXTRA_LIBS imgui)
+        list(APPEND EXTRA_LIBS ImGuizmo)
+    endif()
+
+    if (USE_IMGUI)
+        list(APPEND EXTRA_LIBS imgui)
+    endif()    
 
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
@@ -54,7 +96,6 @@ macro(link_extra_libs param_project_name)
             -lPhysXFoundation_static_64
             -lPhysXPvdSDK_static_64
             -lPhysXVehicle_static_64
-            #-lPhysXCooking_64
             libpthread.a
             -lm
             -lstdc++
@@ -101,41 +142,59 @@ macro(link_extra_libs param_project_name)
             IrrXMLd.lib 
             zlibstaticd.lib
             assimp-vc142-mtd.lib
-            #glew32.lib
-            glfw3.lib
-            LowLevel_static_64.lib
-            LowLevelAABB_static_64.lib
-            LowLevelDynamics_static_64.lib
-            PhysXCharacterKinematic_static_64.lib
-            PhysXPvdSDK_static_64.lib
-            PhysXTask_static_64.lib
-            SceneQuery_static_64.lib
-            SimulationController_static_64.lib
-            PhysX_64.lib
-            PhysXCommon_64.lib
-            PhysXFoundation_64.lib
-            PhysXExtensions_static_64.lib
-            PhysXCooking_64.lib
-            freeglut_staticd.lib
-            freeglutd.lib
-
-            # For DirectX12
-            d3d12.lib 
-            d3dcompiler.lib 
-            dxgi.lib
-
-            # glog library
-            # glogd.lib
         )
+
+        if (USE_GLFW)
+            list(APPEND EXTRA_LIBS glfw3.lib)
+        endif()
+
+        if (USE_PHYSX)        
+            # PhysX
+            list(APPEND EXTRA_LIBS 
+                LowLevel_static_64.lib
+                LowLevelAABB_static_64.lib
+                LowLevelDynamics_static_64.lib
+                PhysXCharacterKinematic_static_64.lib
+                PhysXPvdSDK_static_64.lib
+                PhysXTask_static_64.lib
+                SceneQuery_static_64.lib
+                SimulationController_static_64.lib
+                PhysX_64.lib
+                PhysXCommon_64.lib
+                PhysXFoundation_64.lib
+                PhysXExtensions_static_64.lib
+                PhysXCooking_64.lib
+            )
+
+            target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug)
+        endif()
+
+        if (USE_FREEGLUT)        
+            # Freeglut
+            list(APPEND EXTRA_LIBS 
+                freeglut_staticd.lib
+                freeglutd.lib
+            )
+
+            target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/freeglut)
+        endif()
+
+        if (USE_D3D)        
+            # For DirectX12
+            list(APPEND EXTRA_LIBS 
+                d3d12.lib 
+                d3dcompiler.lib 
+                dxgi.lib
+            )
+        endif()
+        
 
         target_link_directories(${param_project_name}
             PRIVATE 
             ${SOLUTION_ROOT}/Libraries/Windows
-            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug
-            ${SOLUTION_ROOT}/Libraries/Windows/glew
-            ${SOLUTION_ROOT}/Libraries/Windows/freeglut
+            ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug            
+            ${SOLUTION_ROOT}/Libraries/Windows/glew            
             ${SOLUTION_ROOT}/Libraries/Windows/glut
-            ${SOLUTION_ROOT}/Libraries/Windows/glog
         )
     endif()
 

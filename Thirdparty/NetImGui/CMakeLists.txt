@@ -7,8 +7,6 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Client/Private NETIMGUI_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${NETIMGUI_SRC})
 
-message(${SOLUTION_ROOT})
-
 target_link_libraries(NetImGui PUBLIC imgui)
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
