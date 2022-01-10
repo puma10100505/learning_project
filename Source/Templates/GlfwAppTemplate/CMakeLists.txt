@@ -6,6 +6,20 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 # After invoking project, the context will change to 'gl_model'
 project(GlfwAppTempldate VERSION 1.0)
 
+option(USE_PHYSX "Use physx library" OFF)
+option(USE_D3D "Use windows d3d library" ON)
+option(USE_FREEGLUT "Use Freeglut library" OFF)
+option(USE_IMGUI "Use imgui library" OFF)
+option(USE_NETIMGUI "Use netimgui library" OFF)
+option(USE_IMPLOT "Use implot library" ON)
+option(USE_IMNODES "Use imnodes library" ON)
+option(USE_IMGUIZMO "Use imguizmo library" OFF)
+option(USE_LOGURU "Use loguru library" OFF)
+option(USE_NODEEDITOR "Use node-editor library" OFF)
+option(USE_GLFW "Use GLFW library" ON)
+option(USE_NAV "Use navigation library" OFF)
+
+
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
 
