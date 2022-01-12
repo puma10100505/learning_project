@@ -11,7 +11,7 @@ add_subdirectory(LearningFoundation)
 #  add_subdirectory(GLShaders)
 #  add_subdirectory(GLFreeglutDemo)
 
-add_subdirectory(PxLearningDemo)
+# add_subdirectory(PxLearningDemo)
 
 #  add_subdirectory(ImGuiWithFreeglutDemo)
 #  add_subdirectory(ImPlotDemo)
@@ -23,9 +23,10 @@ add_subdirectory(PxLearningDemo)
 #  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 
-add_subdirectory(D3DHelloTriangle)
+# add_subdirectory(D3DHelloTriangle)
 
-#  add_subdirectory(D3DMath)
+#  add_subdirectory(D3DMathVector)
+ add_subdirectory(D3DMathMatrix)
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 #  add_subdirectory(GLBasic)
