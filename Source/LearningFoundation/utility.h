@@ -4,7 +4,6 @@
 #include "stb_image.h"
 #include <glad/glad.h>
 
-
 static inline uint32_t texture_from_file(const char* path, const std::string& directory, bool gamma = false) {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;

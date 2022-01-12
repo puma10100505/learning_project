@@ -22,7 +22,6 @@ float XM_CALLCONV DotProduct(FXMVECTOR Param1, FXMVECTOR Param2)
             XMVectorGetZ(Param1) * XMVectorGetZ(Param2));
 }
 
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
     plog::init(plog::debug,  (DefaultLogDirectory + "D3DMath.log").c_str());
