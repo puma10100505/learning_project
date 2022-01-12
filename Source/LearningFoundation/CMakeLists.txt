@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.0...3.21)
 
 project(learning_foundation)
 
+set(ASSETS_PATH_BASE ${SOLUTION_ROOT}/)
+
+message(${SOLUTION_ROOT})
+
+configure_file(CommonDefines.h.in ${SOLUTION_ROOT}/Source/LearningFoundation/CommonDefines.h)
+
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} LEARNING_SRC)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/DirectX LEARNING_SRC)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/OpenGL LEARNING_SRC)
