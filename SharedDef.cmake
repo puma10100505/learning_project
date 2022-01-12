@@ -7,7 +7,14 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Source/${param_project_name}
         ${SOLUTION_ROOT}/Include
         ${SOLUTION_ROOT}/Thirdparty
-        ${SOLUTION_ROOT}/Source/LearningFoundation         
+        ${SOLUTION_ROOT}/Source/LearningFoundation                 
+        ${SOLUTION_ROOT}/Include/PhysX/include
+        ${SOLUTION_ROOT}/Include/pxshared/include
+        ${SOLUTION_ROOT}/Include/ImGuizmo
+        ${SOLUTION_ROOT}/Include/DirectX
+        ${SOLUTION_ROOT}/Include/plog
+        ${SOLUTION_ROOT}/Include/box2d
+        ${SOLUTION_ROOT}/Include/ogre
         ${SOLUTION_ROOT}/Thirdparty/imgui
         ${SOLUTION_ROOT}/Thirdparty/NetImGui
         ${SOLUTION_ROOT}/Thirdparty/implot
@@ -15,11 +22,6 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Include/PhysX/include
-        ${SOLUTION_ROOT}/Include/pxshared/include
-        ${SOLUTION_ROOT}/Include/ImGuizmo
-        ${SOLUTION_ROOT}/Include/DirectX
-        ${SOLUTION_ROOT}/Include/plog
     )
 endmacro(include_directories)
 
@@ -37,6 +39,8 @@ macro(link_extra_libs param_project_name)
     message("USE_GLFW: "            ${USE_GLFW})
     message("USE_D3D: "             ${USE_D3D})
     message("USE_NAV: "             ${USE_NAV})
+    message("USE_BOX2D: "           ${USE_BOX2D})
+    message("USE_OGRE: "            ${USE_OGRE})
 
 
     # 基础库
@@ -146,6 +150,38 @@ macro(link_extra_libs param_project_name)
 
         if (USE_GLFW)
             list(APPEND EXTRA_LIBS glfw3.lib)
+        endif()
+
+        if (USE_BOX2D)
+            list(APPEND EXTRA_LIBS box2d.lib)
+        endif()
+
+        if (USE_OGRE)
+            list(APPEND EXTRA_LIBS 
+                Codec_Assimp_d.lib
+                Codec_STBI_d.lib 
+                DefaultSamples_d.lib 
+                OgreBites_d.lib 
+                OgreGLSupport_d.lib 
+                OgreMain_d.lib 
+                OgreMeshLodGenerator_d.lib 
+                OgreOverlay_d.lib 
+                OgrePaging_d.lib 
+                OgreProperty_d.lib 
+                OgreRTShaderSystem_d.lib 
+                OgreTerrain_d.lib 
+                OgreVolume_d.lib 
+                Plugin_BSPSceneManager_d.lib 
+                Plugin_DotScene_d.lib 
+                Plugin_OctreeSceneManager_d.lib 
+                Plugin_OctreeZone_d.lib 
+                Plugin_ParticleFX_d.lib 
+                Plugin_PCZSceneManager_d.lib 
+                RenderSystem_Direct3D11_d.lib 
+                RenderSystem_GL_d.lib 
+                RenderSystem_GL3Plus_d.lib 
+                RenderSystem_GLES2_d.lib
+            )
         endif()
 
         if (USE_PHYSX)        

@@ -23,7 +23,7 @@ add_subdirectory(LearningFoundation)
 #  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 
-# add_subdirectory(D3DHelloTriangle)
+ add_subdirectory(D3DHelloTriangle)
 
 #  add_subdirectory(D3DMathVector)
  add_subdirectory(D3DMathMatrix)

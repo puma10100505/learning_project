@@ -5,7 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Windows Debug",
+            "name": "Build & Debug",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}\\Bin\\${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal",
+            "preLaunchTask": "CMake Build"
+        },
+        {
+            "name": "Rebuild & Debug",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceRoot}\\Bin\\${fileBasenameNoExtension}.exe",

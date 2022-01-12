@@ -39,12 +39,35 @@
 - Thirdparty: 第三方库的目录，部分以源码形式提供的库放在这里构建产生静态链接库文件
 
 ## 编译构建方法
-0. 确保系统中已经安装cmake最新版本
-1. 下载源代码后在工程根目录创建一个用于构建的目录，可使用命令：cmake -E make_directory cmake-build-debug, cmake-build-debug可以换成其它任何名称
-2. 在工程根目录执行命令：
+1. 如果没有特别说明，修改的CMakeLists.txt文件都是位于Source/XXX/CMakeLists.txt这个地方的文件，即程序最内层的CMakeLists.txt文件
+2. 确保系统中已经安装cmake最新版本
+3. 下载源代码后在工程根目录创建一个用于构建的目录，可使用命令：cmake -E make_directory cmake-build-debug, cmake-build-debug可以换成其它任何名称
+4. 在工程根目录执行命令：
     - cmake -B cmake-build-debug
     - cmake --build cmake-build-debug
-3. 等待构建完成后在工程根目录可以看到Bin文件夹，里边就是构建的输出（可执行文件）
+5. 等待构建完成后在工程根目录可以看到Bin文件夹，里边就是构建的输出（可执行文件）
+6. 对于一些非必要的库，可以针对性地在CMakeLists.txt文件中开启或关闭(如果不显式指定，开关默认为OFF)，构建开关列表：
+    - USE_PHYSX
+    - USE_D3D
+    - USE_FREEGLUT
+    - USE_IMGUI
+    - USE_NETIMGUI
+    - USE_IMPLOT
+    - USE_IMNODES
+    - USE_IMGUIZMO
+    - USE_LOGURU
+    - USE_NODEEDITOR
+    - USE_GLFW
+    - USE_NAV
+    - USE_BOX2D
+    - USE_OGRE
+7. 如果要创建Windows窗口程序，需要在CMakeLists.txt中加上如下的代码：
+    `
+    # 如果是WIN32窗口程序，入口函数使用WinMain
+    if (WIN32)        
+        set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    endif()
+    `
 
 ## 调试代码
 1. 工程支持在VSCode环境下调试代码，工程已经有配置好的launch.json文件

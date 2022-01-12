@@ -16,6 +16,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     PLOGD << "Entry of application..." << " CmdLine: " << lpCmdLine << ", file: " << __FILE__;
 
+    std::cout << "Hello App" << std::endl;
+
     D3D12HelloTriangle Sample(1280, 720, L"D3D12 Hello Win");
     return Win32Application::Run(&Sample, hInstance, nCmdShow);
 }

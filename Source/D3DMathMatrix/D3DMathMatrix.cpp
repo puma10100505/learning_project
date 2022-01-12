@@ -12,7 +12,8 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdLine, int nCmdShow)
+//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdLine, int nCmdShow)
+int main(int argc, char** argv)
 {
     plog::init(plog::debug, (DefaultLogDirectory + "D3DMathMatrix.log").c_str());
 
@@ -21,6 +22,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR CmdLine, 
         PLOGD << "CPU does not support SSE2";
         return EXIT_FAILURE;
     }
+
+    std::cout << "Hello " << std::endl;
 
     return EXIT_SUCCESS;
 }
