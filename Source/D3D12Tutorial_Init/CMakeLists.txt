@@ -14,10 +14,10 @@ aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
 # Target: 生成可执行文件目标
  add_executable(${PROJECT_NAME} ${SRC})
 
- if (WIN32)
-    # 入口函数使用WinMain
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-endif()
+#  if (WIN32)
+#     # 入口函数使用WinMain
+#     set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+# endif()
 
 # 生成可执行文件所需的includes路径
 include_directories(${PROJECT_NAME})
