@@ -28,7 +28,7 @@ add_subdirectory(D3DHelloTriangle)
 #  add_subdirectory(D3DMathVector)
 add_subdirectory(D3DMathMatrix)
 
-add_subdirectory(D3D12Tutorial_Init)
+# add_subdirectory(D3D12Tutorial_Init)
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 #  add_subdirectory(GLBasic)

@@ -1,6 +1,34 @@
 cmake_minimum_required(VERSION 3.0...3.21)
 
 # 构造Include目录列表
+macro(generate_include_directories param_project_name)
+
+    target_include_directories(${param_project_name} 
+        PRIVATE 
+        ${SOLUTION_ROOT}/Source/${param_project_name}
+        ${SOLUTION_ROOT}/Include
+        ${SOLUTION_ROOT}/Thirdparty
+        ${SOLUTION_ROOT}/Source/LearningFoundation
+        ${SOLUTION_ROOT}/Include/PhysX/include
+        ${SOLUTION_ROOT}/Include/pxshared/include
+        ${SOLUTION_ROOT}/Include/ImGuizmo
+        ${SOLUTION_ROOT}/Include/DirectX
+        ${SOLUTION_ROOT}/Include/plog
+        ${SOLUTION_ROOT}/Include/box2d
+        ${SOLUTION_ROOT}/Include/ogre
+        ${SOLUTION_ROOT}/Thirdparty/imgui
+        ${SOLUTION_ROOT}/Thirdparty/NetImGui
+        ${SOLUTION_ROOT}/Thirdparty/implot
+        ${SOLUTION_ROOT}/Thirdparty/imnodes
+        ${SOLUTION_ROOT}/Thirdparty/node-editor
+        ${SOLUTION_ROOT}/Thirdparty/stb_image
+        ${SOLUTION_ROOT}/Thirdparty/loguru
+    )
+endmacro(generate_include_directories)
+
+###########################################
+
+
 macro(include_directories param_project_name)
     target_include_directories(${param_project_name} 
         PRIVATE 

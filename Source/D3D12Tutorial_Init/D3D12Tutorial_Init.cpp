@@ -12,6 +12,7 @@
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 
+#include "d3dx12.h"
 #include "plog/Log.h"
 #include "plog/Initializers/RollingFileInitializer.h"
 
