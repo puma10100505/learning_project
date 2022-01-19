@@ -18,6 +18,11 @@ using namespace Microsoft::WRL;
 
 namespace D3DInit
 {
+    static const int SwapChainBufferCount = 2;
+    int CurrentBackBuffer = 0;
+    UINT ClientWidth = 1280;
+    UINT ClientHeight = 720;
+
     ComPtr<ID3D12Device> MainDevice;
     ComPtr<IDXGIFactory4> DXGIFactory;
     ComPtr<ID3D12Fence> Fence;
@@ -27,15 +32,15 @@ namespace D3DInit
     ComPtr<IDXGISwapChain> SwapChain;
     ComPtr<ID3D12DescriptorHeap> RTVHeap;
     ComPtr<ID3D12DescriptorHeap> DSVHeap;
+    ComPtr<ID3D12Resource> SwapChainBuffer[SwapChainBufferCount];
+    ComPtr<ID3D12Resource> DepthStencilBuffer;
 
     UINT RTVDescSize = 0;
     UINT DSVDescSize = 0;
     UINT CBVSRVDescSize = 0;
+    UINT MSAA4XQuality = 0;  
 
-    UINT MSAA4XQuality = 0;
-
-    static const int SwapChainBufferCount = 2;
-    int CurrentBackBuffer = 0;
+    RECT ScissorRect = {0, 0, ClientWidth / 2, ClientHeight / 2};
 
     void InitializeDevice();
     void CreateFence();
@@ -54,4 +59,9 @@ namespace D3DInit
     {
         return DSVHeap->GetCPUDescriptorHandleForHeapStart();
     }
+
+    void CreateRenderTargetView();
+    void CreateDepthStencilView();
+
+    void SetScissorRectangles();
 };

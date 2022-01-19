@@ -159,3 +159,53 @@ void D3DInit::CreateRTVAndDSVDescriptorHeap(UINT InBufferCount)
         return ;
     }
 }
+
+void D3DInit::CreateRenderTargetView()
+{
+    CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHeapHandle(RTVHeap->GetCPUDescriptorHandleForHeapStart());
+    for (UINT i = 0; i < SwapChainBufferCount; ++i)
+    {
+        if (FAILED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&SwapChainBuffer[i]))))
+        {
+            PLOGD << "Create get buffer failed";
+            continue;
+        }
+
+        MainDevice->CreateRenderTargetView(SwapChainBuffer[i].Get(), nullptr, RTVHeapHandle);
+
+        RTVHeapHandle.Offset(1, RTVDescSize);
+    }
+}
+
+void D3DInit::CreateDepthStencilView()
+{
+    D3D12_RESOURCE_DESC DepthStencilDesc;
+    DepthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    DepthStencilDesc.Alignment = 0; 
+    DepthStencilDesc.Width = ClientWidth;
+    DepthStencilDesc.Height = ClientHeight;
+    DepthStencilDesc.DepthOrArraySize = 1;
+    DepthStencilDesc.MipLevels = 1;
+    DepthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    DepthStencilDesc.SampleDesc.Count = MSAA4XQuality;
+    DepthStencilDesc.SampleDesc.Quality = MSAA4XQuality ? (MSAA4XQuality - 1) : 0;
+    DepthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    DepthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    
+    D3D12_CLEAR_VALUE OptClear;
+    OptClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    OptClear.DepthStencil.Depth = 1.f;
+    OptClear.DepthStencil.Stencil = 0;
+    MainDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, 
+        &DepthStencilDesc, D3D12_RESOURCE_STATE_COMMON, &OptClear, IID_PPV_ARGS(DepthStencilBuffer.GetAddressOf()));
+
+    MainDevice->CreateDepthStencilView(DepthStencilBuffer.Get(), nullptr, DepthStencilView());
+
+    CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(DepthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+}
+
+void D3DInit::SetScissorRectangles()
+{
+    
+    CommandList->RSSetScissorRects(1, &ScissorRect);
+}
