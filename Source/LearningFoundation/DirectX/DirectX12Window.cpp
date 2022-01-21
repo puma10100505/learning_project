@@ -303,6 +303,8 @@ int dx::CreateWindowInstance(const std::string& InWinTitle,
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+    ImNodes::GetIO().LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyAlt;
+
     ImGui::StyleColorsDark();
 
     ImGui_ImplWin32_Init(hwnd);

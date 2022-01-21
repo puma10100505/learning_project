@@ -206,8 +206,13 @@ int GLInitGUI() {
     IMGUI_CHECKVERSION();
     
     ImGui::CreateContext();
+    #if USE_IMNODES
     ImNodes::CreateContext();
+    #endif
+
+    #if USE_IMPLOT
     ImPlot::CreateContext();
+    #endif
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
@@ -344,8 +349,13 @@ void GLDestroyWindow() {
 
 void GLDestroyGUI() 
 {
+#if USE_IMPLOT
     ImPlot::DestroyContext();
+#endif 
+
+#if USE_IMNODES
     ImNodes::DestroyContext();
+#endif
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

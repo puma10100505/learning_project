@@ -15,9 +15,9 @@
 #include "DirectX12Window.h"
 #include "loguru.hpp"
 #include <vector>
+#include "glm/glm.hpp"
 #include "csv.h"
 #include "implot/implot.h"
-#include "ImGuizmo.h"
 #include "imnodes/imnodes.h"
 #include "BlueprintNodeManager.h"
 
@@ -34,7 +34,7 @@ const char* items[] = { "Add", "Multiple", "Substract", "Divide", "Output", "Beg
     const ImGuiViewport* viewport = ImGui::GetMainViewport();\
     ImGui::SetNextWindowPos(viewport->Pos);\
     ImGui::SetNextWindowSize(viewport->Size);\
-    ImGui::Begin("node editor", nullptr, /*, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | */ImGuiWindowFlags_NoBringToFrontOnFocus);\
+    ImGui::Begin("node editor", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);\
     BP->Draw();\
     ImGui::End();\
 }
@@ -75,6 +75,40 @@ const char* items[] = { "Add", "Multiple", "Substract", "Divide", "Output", "Beg
 
 INITIALIZE_BLUEPRINT_MANAGER;
 
+// Command Move: Direction Distance
+#define BPNode_Move \
+{\
+    BP->AddBPNode("Move")\
+        ->AddExecPin("", ENodePinType::INPUT_PIN)\
+        ->AddVector3Pin("Direction", ENodePinType::INPUT_PIN)\
+        ->AddFloatPin("Distance", ENodePinType::INPUT_PIN)\
+        ->AddExecPin("", ENodePinType::OUTPUT_PIN);\
+}
+
+// Command Fire: Direction Times
+#define BPNode_Fire \
+{\
+    BP->AddBPNode("Fire")\
+        ->AddExecPin("", ENodePinType::INPUT_PIN)\
+        ->AddVector3Pin("Direction", ENodePinType::INPUT_PIN)\
+        ->AddIntPin("Times", ENodePinType::INPUT_PIN)\
+        ->AddExecPin("", ENodePinType::OUTPUT_PIN);\
+}
+
+// Begin
+#define BPNode_Begin \
+{\
+    BP->AddBPNode("Begin")\
+        ->AddExecPin("", ENodePinType::OUTPUT_PIN);\
+}
+
+// End
+#define BPNode_End \
+{\
+    BP->AddBPNode("End")\
+        ->AddExecPin("", ENodePinType::INPUT_PIN);\
+}
+
 static void WinTick(float Duration)
 {
     
@@ -85,21 +119,19 @@ static void WinInput(float Duration)
     if (GetAsyncKeyState(VK_UP))
     {
         LOG_F(INFO, "Up key pressed");
-    }
-
-    
+    }    
 }
 
 static void WinGUI(float Duration)
 {
     {
-        ImGui::Begin("Node Selector");
+        // ImGui::Begin("Node Selector");
 
-        if (ImGui::ListBox("", &item_current, items, IM_ARRAYSIZE(items), 10))
-        {
-            LOG_F(INFO, "Selected: Index: %d, Val: %s", item_current, items[item_current]);
-        }
-        ImGui::End();
+        // if (ImGui::ListBox("", &item_current, items, IM_ARRAYSIZE(items), 10))
+        // {
+        //     LOG_F(INFO, "Selected: Index: %d, Val: %s", item_current, items[item_current]);
+        // }
+        // ImGui::End();
     }
 
     DRAW_BLUEPRINT;
@@ -118,9 +150,11 @@ int main(int argc, char** argv)
 
     LOG_F(INFO, "entry of app");
 
-    BPNode_ADD;
-    BPNode_Multiple;
-
+    BPNode_Move;
+    BPNode_Begin;
+    BPNode_End;
+    BPNode_Fire;
     
-    return dx::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, WinTick, WinGUI, WinPostGUI, WinInput);
+    return dx::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, 
+        WinTick, WinGUI, WinPostGUI, WinInput);
 }

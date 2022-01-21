@@ -206,6 +206,5 @@ void D3DInit::CreateDepthStencilView()
 
 void D3DInit::SetScissorRectangles()
 {
-    
     CommandList->RSSetScissorRects(1, &ScissorRect);
 }
