@@ -61,6 +61,7 @@
     - USE_NAV
     - USE_BOX2D
     - USE_OGRE
+    - USE_PERFETTO
 7. 如果要创建Windows窗口程序，需要在CMakeLists.txt中加上如下的代码：
     `
     # 如果是WIN32窗口程序，入口函数使用WinMain

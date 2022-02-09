@@ -13,12 +13,12 @@ add_subdirectory(LearningFoundation)
 # add_subdirectory(PxLearningDemo)
 #  add_subdirectory(ImGuiWithFreeglutDemo)
 #  add_subdirectory(ImPlotDemo)
- add_subdirectory(ImNodesDemo)
+#  add_subdirectory(ImNodesDemo)
 #  add_subdirectory(NodeEditorDemo)
 #  add_subdirectory(GizmoDemo)
 #  add_subdirectory(GizmoExample)
 #  add_subdirectory(DxImGuiWindowDemo)
- add_subdirectory(NodeApp)
+#  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 
 # add_subdirectory(D3DHelloTriangle)
@@ -27,6 +27,10 @@ add_subdirectory(LearningFoundation)
 # add_subdirectory(D3DMathMatrix)
 
 # add_subdirectory(D3D12Tutorial_Init)
+add_subdirectory(GooglePerfettoExample)
+
+
+
 
 # 使用了老的glfw窗口接口（老接口已废弃）
 #  add_subdirectory(GLBasic)

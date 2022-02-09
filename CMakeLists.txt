@@ -23,6 +23,7 @@ set(SOLUTION_ROOT ${PROJECT_SOURCE_DIR})
 # option(USE_NODEEDITOR "Use node-editor library" ON)
 # option(USE_GLFW "Use GLFW library" ON)
 # option(USE_NAV "Use navigation library" ON)
+# option(USE_PERFETTO "Use GOOGLE Perfetto SDK library" ON)
 
 
 if (WIN32)

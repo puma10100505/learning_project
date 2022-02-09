@@ -23,6 +23,7 @@ macro(generate_include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
+        ${SOLUTION_ROOT}/Include/perfetto_sdk
     )
 endmacro(generate_include_directories)
 
@@ -50,6 +51,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
+        ${SOLUTION_ROOT}/Include/perfetto_sdk
     )
 endmacro(include_directories)
 
@@ -69,6 +71,7 @@ macro(link_extra_libs param_project_name)
     message("USE_NAV: "             ${USE_NAV})
     message("USE_BOX2D: "           ${USE_BOX2D})
     message("USE_OGRE: "            ${USE_OGRE})
+    message("USE_PERFETTO: "        ${USE_PERFETTO})
 
 
     # 基础库
@@ -110,7 +113,11 @@ macro(link_extra_libs param_project_name)
 
     if (USE_IMGUI)
         list(APPEND EXTRA_LIBS imgui)
-    endif()    
+    endif()
+
+    # if (USE_PERFETTO)
+    #     list(APPEND EXTRA_LIBS perfetto_sdk)
+    # endif()
 
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
@@ -182,6 +189,11 @@ macro(link_extra_libs param_project_name)
 
         if (USE_BOX2D)
             list(APPEND EXTRA_LIBS box2d.lib)
+        endif()
+
+        if (USE_PERFETTO)
+            list(APPEND EXTRA_LIBS perfetto.lib)
+            target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/perfetto_sdk)
         endif()
 
         if (USE_OGRE)
