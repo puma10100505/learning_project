@@ -27,7 +27,7 @@
  - loguru: 日志库
  - glog: Google的日志库，loguru在Win32应用中无法使用，loguru初始化的时候需要argc, argv参数，这在WinMain中不提供
  - p7: 日志库同时实现了基于网络的日志监控服务的开源项目
- - perfetto: Google Android中的性能数据采集以及跟踪库，功能强大，具体可参考：https://perfetto.dev/docs/，C++ SDK可参考：https://perfetto.dev/docs/instrumentation/tracing-sdk
+ - perfetto: Google Android中的性能数据采集以及跟踪服务框架，功能强大，具体可参考：https://perfetto.dev/docs/，C++ SDK可参考：https://perfetto.dev/docs/instrumentation/tracing-sdk
 
 
 ## 工程结构介绍
