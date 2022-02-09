@@ -5,7 +5,6 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 
 # After invoking project, the context will change to 'gl_model'
 project(GooglePerfettoExample VERSION 1.0)
-find_package(Threads)
 
 option(USE_PERFETTO "Use perfetto sdk" ON)
 option(USE_LOGURU "Use loguru" ON)

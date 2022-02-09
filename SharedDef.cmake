@@ -193,6 +193,7 @@ macro(link_extra_libs param_project_name)
 
         if (USE_PERFETTO)
             list(APPEND EXTRA_LIBS perfetto.lib)
+            list(APPEND EXTRA_LIBS ws2_32)
             target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/perfetto_sdk)
         endif()
 
