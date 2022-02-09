@@ -24,7 +24,8 @@
 #include <fstream>
 #include <thread>
 
-void InitializePerfetto() {
+void InitializePerfetto() 
+{
   perfetto::TracingInitArgs args;
   // The backends determine where trace events are recorded. For this example we
   // are going to use the in-process tracing service, which only includes in-app
@@ -35,7 +36,8 @@ void InitializePerfetto() {
   perfetto::TrackEvent::Register();
 }
 
-std::unique_ptr<perfetto::TracingSession> StartTracing() {
+std::unique_ptr<perfetto::TracingSession> StartTracing() 
+{
   // The trace config defines which types of data sources are enabled for
   // recording. In this example we just need the "track_event" data source,
   // which corresponds to the TRACE_EVENT trace points.
@@ -50,7 +52,8 @@ std::unique_ptr<perfetto::TracingSession> StartTracing() {
   return tracing_session;
 }
 
-void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) {
+void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) 
+{
   // Make sure the last event is closed for this example.
   perfetto::TrackEvent::Flush();
 
@@ -67,18 +70,26 @@ void StopTracing(std::unique_ptr<perfetto::TracingSession> tracing_session) {
   output.close();
 }
 
-void DrawPlayer(int player_number) {
+void DrawWeapons(int PlayerNum, int WeaponNum)
+{
+  TRACE_EVENT("rendering", "DrawWeapons", "WeaponNum", WeaponNum, "PlayerNum", PlayerNum);
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+}
+
+void DrawPlayer(int player_number, int weapon_num) 
+{
   TRACE_EVENT("rendering", "DrawPlayer", "player_number", player_number);
   // Sleep to simulate a long computation.
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  DrawWeapons(player_number, weapon_num);
 }
 
 void DrawGame() {
   // This is an example of an unscoped slice, which begins and ends at specific
   // points (instead of at the end of the current block scope).
   TRACE_EVENT_BEGIN("rendering", "DrawGame");
-  DrawPlayer(1);
-  DrawPlayer(2);
+  DrawPlayer(1, 3);
+  DrawPlayer(2, 4);
   TRACE_EVENT_END("rendering");
 
   // Record the rendering framerate as a counter sample.

@@ -27,4 +27,9 @@ include_directories(${PROJECT_NAME})
 
 link_extra_libs(${PROJECT_NAME})
 
+# Enable standards-compliant mode when using the Visual Studio compiler.
+if (MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE "/permissive-")
+endif (MSVC)
+
 deploy_files(${PROJECT_NAME})

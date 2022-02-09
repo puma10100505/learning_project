@@ -23,7 +23,7 @@ macro(generate_include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Include/perfetto_sdk
+        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
     )
 endmacro(generate_include_directories)
 
@@ -51,7 +51,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Include/perfetto_sdk
+        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
     )
 endmacro(include_directories)
 
@@ -115,9 +115,15 @@ macro(link_extra_libs param_project_name)
         list(APPEND EXTRA_LIBS imgui)
     endif()
 
-    # if (USE_PERFETTO)
-    #     list(APPEND EXTRA_LIBS perfetto_sdk)
-    # endif()
+    if (USE_PERFETTO)
+        # The perfetto library contains many symbols, so it needs the big object
+        # format.
+        target_compile_options(${param_project_name} PRIVATE "/bigobj")
+        # Disable legacy features in windows.h.
+        add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+
+        list(APPEND EXTRA_LIBS ws2_32 perfetto)
+    endif()
 
     if (APPLE)
         target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
@@ -191,11 +197,12 @@ macro(link_extra_libs param_project_name)
             list(APPEND EXTRA_LIBS box2d.lib)
         endif()
 
-        if (USE_PERFETTO)
-            list(APPEND EXTRA_LIBS perfetto.lib)
-            list(APPEND EXTRA_LIBS ws2_32)
-            target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/perfetto_sdk)
-        endif()
+        # if (USE_PERFETTO)
+        #     list(APPEND EXTRA_LIBS perfetto.lib)
+        #     list(APPEND EXTRA_LIBS ws2_32)
+
+        #     target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/perfetto_sdk)
+        # endif()
 
         if (USE_OGRE)
             list(APPEND EXTRA_LIBS 

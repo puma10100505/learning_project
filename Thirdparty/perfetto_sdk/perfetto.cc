@@ -1207,7 +1207,7 @@ class StringView {
   StringView substr(size_t pos, size_t count = npos) const {
     if (pos >= size_)
       return StringView("", 0);
-    size_t rcount = (std::min)(count, size_ - pos);
+    size_t rcount = std::min(count, size_ - pos);
     return StringView(data_ + pos, rcount);
   }
 
@@ -1265,7 +1265,7 @@ inline bool operator!=(const StringView& x, const StringView& y) {
 }
 
 inline bool operator<(const StringView& x, const StringView& y) {
-  auto size = (std::min)(x.size(), y.size());
+  auto size = std::min(x.size(), y.size());
   if (size == 0)
     return x.size() < y.size();
   int result = memcmp(x.data(), y.data(), size);
@@ -1831,7 +1831,7 @@ class CrashKey {
   }
 
   void Set(StringView sv) {
-    size_t len = (std::min)(sv.size(), sizeof(str_value_) - 1);
+    size_t len = std::min(sv.size(), sizeof(str_value_) - 1);
     for (size_t i = 0; i < len; ++i)
       str_value_[i].store(sv.data()[i], std::memory_order_relaxed);
     str_value_[len].store('\0', std::memory_order_relaxed);
@@ -2072,7 +2072,7 @@ class StackString {
     int res = vsnprintf(buf_, sizeof(buf_), fmt, args);
     va_end(args);
     buf_[sizeof(buf_) - 1] = '\0';
-    len_ = res < 0 ? 0 : (std::min)(static_cast<size_t>(res), sizeof(buf_) - 1);
+    len_ = res < 0 ? 0 : std::min(static_cast<size_t>(res), sizeof(buf_) - 1);
   }
 
   StringView string_view() const { return StringView(buf_, len_); }
@@ -3015,7 +3015,8 @@ ssize_t WriteAll(int fd, const void* buf, size_t count) {
   size_t written = 0;
   while (written < count) {
     // write() on windows takes an unsigned int size.
-    uint32_t bytes_left = static_cast<uint32_t>((std::min)(count - written, static_cast<size_t>(UINT32_MAX)));
+    uint32_t bytes_left = static_cast<uint32_t>(
+        std::min(count - written, static_cast<size_t>(UINT32_MAX)));
     ssize_t wr = PERFETTO_EINTR(
         write(fd, static_cast<const char*>(buf) + written, bytes_left));
     if (wr == 0)
@@ -3673,7 +3674,7 @@ class LogRingBuffer {
       char* const wptr = dst + dst_written;
       // |src| might not be null terminated. This can happen if some
       // thread-race happened. Limit the copy length.
-      const size_t limit = (std::min)(len - dst_written, kLogRingBufMsgLen);
+      const size_t limit = std::min(len - dst_written, kLogRingBufMsgLen);
       for (size_t i = 0; i < limit; ++i) {
         const char c = src[i];
         ++dst_written;
@@ -3833,7 +3834,7 @@ void LogMessage(LogLev level,
     if (res < static_cast<int>(max_len) || max_len >= 128 * 1024) {
       // In case of truncation vsnprintf returns the len that "would have been
       // written if the string was longer", not the actual chars written.
-      log_msg_len = (std::min)(static_cast<size_t>(res), max_len - 1);
+      log_msg_len = std::min(static_cast<size_t>(res), max_len - 1);
       break;
     }
     max_len *= 4;
@@ -4860,7 +4861,7 @@ PagedMemory PagedMemory::Allocate(size_t req_size, int flags) {
 #if TRACK_COMMITTED_SIZE()
   size_t initial_commit = req_size;
   if (flags & kDontCommit)
-    initial_commit = (std::min)(initial_commit, kCommitChunkSize);
+    initial_commit = std::min(initial_commit, kCommitChunkSize);
   memory.EnsureCommitted(initial_commit);
 #endif  // TRACK_COMMITTED_SIZE()
   return memory;
@@ -4932,7 +4933,7 @@ void PagedMemory::EnsureCommitted(size_t committed_size) {
       (delta + kCommitChunkSize - 1) / kCommitChunkSize;
   PERFETTO_DCHECK(num_additional_chunks * kCommitChunkSize >= delta);
   // Don't commit more than the total size.
-  size_t commit_size = (std::min)(num_additional_chunks * kCommitChunkSize,
+  size_t commit_size = std::min(num_additional_chunks * kCommitChunkSize,
                                 size_ - committed_size_);
   void* res = VirtualAlloc(p_ + committed_size_, commit_size, MEM_COMMIT,
                            PAGE_READWRITE);
@@ -4942,7 +4943,7 @@ void PagedMemory::EnsureCommitted(size_t committed_size) {
   committed_size_ += commit_size;
 #else   // PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
   // mmap commits automatically as needed, so we only track here for ASAN.
-  committed_size = (std::max)(committed_size_, committed_size);
+  committed_size = std::max(committed_size_, committed_size);
   ANNOTATE_CHANGE_SIZE(p_, size_, committed_size_, committed_size)
   committed_size_ = committed_size;
 #endif  // PERFETTO_BUILDFLAG(PERFETTO_OS_WIN)
@@ -5775,7 +5776,7 @@ std::vector<std::string> SplitString(const std::string& text,
   size_t start = 0;
   size_t next;
   for (;;) {
-    next = (std::min)(text.find(delimiter, start), text.size());
+    next = std::min(text.find(delimiter, start), text.size());
     if (next > start)
       output.emplace_back(&text[start], next - start);
     start = next + delimiter.size();
@@ -8237,7 +8238,7 @@ int UnixTaskRunner::GetDelayMsToNextTaskLocked() const {
     return 0;
   if (!delayed_tasks_.empty()) {
     TimeMillis diff = delayed_tasks_.begin()->first - GetWallTimeMs();
-    return (std::max)(0, static_cast<int>(diff.count()));
+    return std::max(0, static_cast<int>(diff.count()));
   }
   return -1;
 }
@@ -10108,7 +10109,7 @@ void TypedProtoDecoderBase::ExpandHeapStorage() {
   // trivial re-allocations when dealing with repeated fields of a message that
   // has > INITIAL_STACK_CAPACITY fields.
   const uint32_t min_capacity = num_fields_ + 2048;  // Any num >= +1 will do.
-  const uint32_t new_capacity = (std::max)(capacity_ * 2, min_capacity);
+  const uint32_t new_capacity = std::max(capacity_ * 2, min_capacity);
   PERFETTO_CHECK(new_capacity > size_ && new_capacity > num_fields_);
   std::unique_ptr<Field[]> new_storage(new Field[new_capacity]);
 
@@ -10121,7 +10122,7 @@ void TypedProtoDecoderBase::ExpandHeapStorage() {
   // randomly accessed. Instead, there is no need to initialize the repeated
   // slots, because they are written linearly with no gaps and are always
   // initialized before incrementing |size_|.
-  const uint32_t new_size = (std::max)(size_, num_fields_);
+  const uint32_t new_size = std::max(size_, num_fields_);
   memset(&new_storage[size_], 0, sizeof(Field) * (new_size - size_));
 
   memcpy(&new_storage[0], fields_, sizeof(Field) * size_);
@@ -10201,7 +10202,7 @@ protozero::ContiguousMemoryRange ScatteredHeapBuffer::GetNewBuffer() {
   } else {
     slices_.emplace_back(next_slice_size_);
   }
-  next_slice_size_ = (std::min)(maximum_slice_size_, next_slice_size_ * 2);
+  next_slice_size_ = std::min(maximum_slice_size_, next_slice_size_ * 2);
   return slices_.back().GetTotalRange();
 }
 
@@ -10391,7 +10392,7 @@ void ScatteredStreamWriter::WriteBytesSlowPath(const uint8_t* src,
   while (bytes_left > 0) {
     if (write_ptr_ >= cur_range_.end)
       Extend();
-    const size_t burst_size = (std::min)(bytes_available(), bytes_left);
+    const size_t burst_size = std::min(bytes_available(), bytes_left);
     WriteBytesUnsafe(src, burst_size);
     bytes_left -= burst_size;
     src += burst_size;
@@ -36622,7 +36623,7 @@ Chunk SharedMemoryArbiterImpl::GetNewChunk(
     } else {
       base::SleepMicroseconds(stall_interval_us);
       stall_interval_us =
-          (std::min)(kMaxStallIntervalUs, (stall_interval_us + 1) * 8);
+          std::min(kMaxStallIntervalUs, (stall_interval_us + 1) * 8);
     }
   }
 }
@@ -37168,7 +37169,7 @@ void SharedMemoryArbiterImpl::NotifyFlushComplete(FlushRequestID req_id) {
     } else {
       // If there is another request queued and that also contains is a reply
       // to a flush request, reply with the highest id.
-      req_id = (std::max)(req_id, commit_data_req_->flush_request_id());
+      req_id = std::max(req_id, commit_data_req_->flush_request_id());
     }
     commit_data_req_->set_flush_request_id(req_id);
   }  // scoped_lock
@@ -39149,7 +39150,7 @@ ConsoleColor HueToRGB(uint32_t hue) {
   PERFETTO_DCHECK(hue < kMaxHue);
   uint32_t c1 = hue >> kHueBits;
   uint32_t c2 =
-      (std::min)(static_cast<uint32_t>(kTurboColors.size() - 1), c1 + 1u);
+      std::min(static_cast<uint32_t>(kTurboColors.size() - 1), c1 + 1u);
   uint32_t ratio = hue & ((1 << kHueBits) - 1);
   return Mix(kTurboColors[c1], kTurboColors[c2],
              static_cast<uint8_t>(ratio | (ratio << kHueBits)));
@@ -39260,7 +39261,7 @@ void ConsoleInterceptor::Delegate::OnTrackEvent(
 
   // Print category.
   Printf(context_, "%-5.*s ",
-         (std::min)(5, static_cast<int>(event.category.size)),
+         std::min(5, static_cast<int>(event.category.size)),
          event.category.data);
 
   // Print stack depth.
@@ -44808,7 +44809,7 @@ bool FilterBytecodeParser::LoadInternal(const uint8_t* bytecode_data,
 
   auto add_directly_indexed_field = [&](uint32_t field_id, uint32_t msg_id) {
     PERFETTO_DCHECK(field_id > 0 && field_id < kDirectlyIndexLimit);
-    direct_indexed_fields.resize((std::max)(direct_indexed_fields.size(),
+    direct_indexed_fields.resize(std::max(direct_indexed_fields.size(),
                                           static_cast<size_t>(field_id) + 1));
     direct_indexed_fields[field_id] = kAllowed | msg_id;
   };
@@ -44850,7 +44851,7 @@ bool FilterBytecodeParser::LoadInternal(const uint8_t* bytecode_data,
           return false;
         }
         msg_id = words[++i];
-        max_msg_index = (std::max)(max_msg_index, msg_id);
+        max_msg_index = std::max(max_msg_index, msg_id);
       }
 
       if (field_id < kDirectlyIndexLimit) {
@@ -46450,7 +46451,7 @@ bool PacketStreamValidator::Validate(const Slices& slices) {
   size_t skip_bytes = 0;
   for (const Slice& slice : slices) {
     for (size_t i = 0; i < slice.size;) {
-      const size_t skip_bytes_cur_slice = (std::min)(skip_bytes, slice.size - i);
+      const size_t skip_bytes_cur_slice = std::min(skip_bytes, slice.size - i);
       if (skip_bytes_cur_slice > 0) {
         i += skip_bytes_cur_slice;
         skip_bytes -= skip_bytes_cur_slice;
@@ -47214,7 +47215,7 @@ bool TraceBuffer::Initialize(size_t size) {
   }
   size_ = size;
   stats_.set_buffer_size(size);
-  max_chunk_size_ = (std::min)(size, ChunkRecord::kMaxSize);
+  max_chunk_size_ = std::min(size, ChunkRecord::kMaxSize);
   wptr_ = begin();
   index_.clear();
   last_chunk_id_written_.clear();
@@ -47956,7 +47957,7 @@ TraceBuffer::ReadPacketResult TraceBuffer::ReadNextPacketInChunk(
   // the producer is using a redundant encoding)
   uint64_t packet_size = 0;
   const uint8_t* header_end =
-      (std::min)(packet_begin + protozero::proto_utils::kMessageLengthFieldSize,
+      std::min(packet_begin + protozero::proto_utils::kMessageLengthFieldSize,
                record_end);
   const uint8_t* packet_data = protozero::proto_utils::ParseVarInt(
       packet_begin, header_end, &packet_size);
@@ -53308,8 +53309,8 @@ std::tuple<size_t /*shm_size*/, size_t /*page_size*/> EnsureValidShmSizes(
   if (shm_size == 0)
     shm_size = TracingServiceImpl::kDefaultShmSize;
 
-  page_size = (std::min)<size_t>(page_size, kMaxPageSize);
-  shm_size = (std::min)<size_t>(shm_size, TracingServiceImpl::kMaxShmSize);
+  page_size = std::min<size_t>(page_size, kMaxPageSize);
+  shm_size = std::min<size_t>(shm_size, TracingServiceImpl::kMaxShmSize);
 
   // The tracing page size has to be multiple of 4K. On some systems (e.g. Mac
   // on Arm64) the system page size can be larger (e.g., 16K). That doesn't
@@ -53408,7 +53409,7 @@ void AppendOwnedSlicesToPacket(std::unique_ptr<uint8_t[]> data,
   }
   uint8_t* src_ptr = data.get();
   for (size_t size_left = size; size_left > 0;) {
-    const size_t slice_size = (std::min)(size_left, max_slice_size);
+    const size_t slice_size = std::min(size_left, max_slice_size);
 
     Slice slice = Slice::Allocate(slice_size);
     memcpy(slice.own_data(), src_ptr, slice_size);
@@ -55395,7 +55396,7 @@ bool TracingServiceImpl::ReadBuffers(TracingSessionID tsid,
     // writev() can take at most IOV_MAX entries per call. Batch them.
     constexpr size_t kIOVMax = IOV_MAX;
     for (size_t i = 0; i < num_iovecs; i += kIOVMax) {
-      int iov_batch_size = static_cast<int>((std::min)(num_iovecs - i, kIOVMax));
+      int iov_batch_size = static_cast<int>(std::min(num_iovecs - i, kIOVMax));
       ssize_t wr_size = PERFETTO_EINTR(writev(fd, &iovecs[i], iov_batch_size));
       if (wr_size <= 0) {
         PERFETTO_PLOG("writev() failed");
@@ -65427,7 +65428,7 @@ bool BufferedFrameDeserializer::EndReceive(size_t recv_size) {
     // Saturate the |payload_size| to prevent overflows. The > capacity_ check
     // below will abort the parsing.
     size_t next_frame_size =
-        (std::min)(static_cast<size_t>(payload_size), capacity_);
+        std::min(static_cast<size_t>(payload_size), capacity_);
     next_frame_size += kHeaderSize;
     rd_ptr += kHeaderSize;
 
