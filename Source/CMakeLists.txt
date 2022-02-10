@@ -21,10 +21,10 @@ add_subdirectory(LearningFoundation)
 #  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 
-# add_subdirectory(D3DHelloTriangle)
+add_subdirectory(D3DHelloTriangle)
 
 #  add_subdirectory(D3DMathVector)
-# add_subdirectory(D3DMathMatrix)
+add_subdirectory(D3DMathMatrix)
 
 # add_subdirectory(D3D12Tutorial_Init)
 add_subdirectory(GooglePerfettoExample)

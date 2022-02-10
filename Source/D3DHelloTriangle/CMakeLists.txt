@@ -9,6 +9,7 @@ project(D3DHello VERSION 1.0)
 option(USE_D3D "Use windows d3d library" ON)
 option(USE_IMPLOT "Use implot library" ON)
 option(USE_IMNODES "Use imnodes library" ON)
+option(USE_PERFETTO "Use perfetto" ON)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
