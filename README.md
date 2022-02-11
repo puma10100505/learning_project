@@ -81,6 +81,7 @@
 - OPENGL中VBO, VAO, EBO的概念以及关系，学习使用GL的基础API指令绘制图形
 - 集成Freeglut以及基于Glut的ImGUI, GlutWindowWithImGui目录下的代码可作为其DEMO, 此DEMO可用于物理引擎试验，因为Freeglut有方便的接口用于绘制基础几何形状。下一步可在此基础上引入物理计算。
 - 将implot, imnodes以及node-editor集成到工程中，后续创建窗口的时候默认支持implot, imnodes和node-editor, 可以在应用中直接调用它们的API，不用考虑它们的初始化和销毁
+- 自己部署的远程perfetto ui web应用，如果加载数据时出错可以修改chrome://flags/#unsafely-treat-insecure-origin-as-secure的配置（chrome）
 
 ## TODO
 * 重构场景相关对象集中管理渲染对象
