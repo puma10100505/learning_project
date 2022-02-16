@@ -14,6 +14,8 @@
 
 #include <perfetto.h>
 
+#include "boost/filesystem.hpp"
+
 using namespace std;
 using namespace DirectX;
 using namespace DirectX::PackedVector;

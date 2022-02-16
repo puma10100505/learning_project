@@ -72,6 +72,7 @@ macro(link_extra_libs param_project_name)
     message("USE_BOX2D: "           ${USE_BOX2D})
     message("USE_OGRE: "            ${USE_OGRE})
     message("USE_PERFETTO: "        ${USE_PERFETTO})
+    message("USE_BOOST_FILESYSTEM: "        ${USE_BOOST_FILESYSTEM})
 
 
     # 基础库
@@ -271,6 +272,12 @@ macro(link_extra_libs param_project_name)
                 dxgi.lib
             )
         endif()
+
+        if (USE_BOOST_FILESYSTEM)
+            list(APPEND EXTRA_LIBS 
+            libboost_filesystem-vc143-mt-gd-x64-1_79.lib
+            )
+        endif()
         
 
         target_link_directories(${param_project_name}
@@ -279,6 +286,7 @@ macro(link_extra_libs param_project_name)
             ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug            
             ${SOLUTION_ROOT}/Libraries/Windows/glew            
             ${SOLUTION_ROOT}/Libraries/Windows/glut
+            ${SOLUTION_ROOT}/Libraries/Windows/boost
         )
     endif()
 
