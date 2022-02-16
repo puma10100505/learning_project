@@ -43,6 +43,7 @@ std::unique_ptr<perfetto::TracingSession> StartTracing()
     auto tracing_session = perfetto::Tracing::NewTrace();
     tracing_session->Setup(cfg);
     tracing_session->StartBlocking();
+
     return tracing_session;
 }
 
@@ -55,6 +56,7 @@ void StopTracing(std::unique_ptr<perfetto::TracingSession> Session)
     std::ofstream output;
     output.open("D3DMathMatrix.ptrace", std::ios::out | std::ios::binary);
     output.write(&trace_data[0], trace_data.size());
+    
     output.close();
 }
 
