@@ -13,8 +13,8 @@
 #include "plog/Initializers/RollingFileInitializer.h"
 
 #include <perfetto.h>
+// #include "perfetto_helper.h"
 
-#include "boost/filesystem.hpp"
 
 using namespace std;
 using namespace DirectX;
@@ -42,8 +42,16 @@ std::unique_ptr<perfetto::TracingSession> StartTracing()
     auto* ds_cfg = cfg.add_data_sources()->mutable_config();
     ds_cfg->set_name("track_event");
 
+    FILE* TraceFileStream = fopen("TestPerf.ptrace", "w+");
+
     auto tracing_session = perfetto::Tracing::NewTrace();
-    tracing_session->Setup(cfg);
+    if (TraceFileStream == nullptr)
+    {
+        return tracing_session;
+    }
+
+    
+    tracing_session->Setup(cfg, _fileno(TraceFileStream));
     tracing_session->StartBlocking();
 
     return tracing_session;
@@ -54,12 +62,12 @@ void StopTracing(std::unique_ptr<perfetto::TracingSession> Session)
     perfetto::TrackEvent::Flush();
 
     Session->StopBlocking();
-    std::vector<char> trace_data(Session->ReadTraceBlocking());
-    std::ofstream output;
-    output.open("D3DMathMatrix.ptrace", std::ios::out | std::ios::binary);
-    output.write(&trace_data[0], trace_data.size());
+    // std::vector<char> trace_data(Session->ReadTraceBlocking());
+    // std::ofstream output;
+    // output.open("D3DMathMatrix.ptrace", std::ios::out | std::ios::binary);
+    // output.write(&trace_data[0], trace_data.size());
     
-    output.close();
+    // output.close();
 }
 
 ostream& XM_CALLCONV operator << (ostream& os, FXMVECTOR v)
@@ -95,6 +103,8 @@ int main(int argc, char** argv)
     perfetto::protos::gen::TrackDescriptor desc = process_track.Serialize();
     desc.mutable_process()->set_process_name("D3DMathPerf");
     perfetto::TrackEvent::SetTrackDescriptor(process_track, desc);
+
+    // PerfettoTraceHelper::GetInstance()->Init("TestPerf.ptrace")->StartTracing();
 
     plog::init(plog::debug, (DefaultLogDirectory + "D3DMathMatrix.log").c_str());
 
@@ -142,6 +152,7 @@ int main(int argc, char** argv)
     //std::cout << Vec * RotXMat << std::endl;
 
     StopTracing(std::move(TracingSession));
+    //PerfettoTraceHelper::GetInstance()->StopTracing();
 
     return EXIT_SUCCESS;
 }
