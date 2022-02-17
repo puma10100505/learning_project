@@ -24,7 +24,7 @@ macro(generate_include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Include/perfetto_sdk
+        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
     )
 endmacro(generate_include_directories)
 
@@ -53,7 +53,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Include/perfetto_sdk
+        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
     )
 endmacro(include_directories)
 
