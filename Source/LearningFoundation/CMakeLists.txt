@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0...3.21)
 
 project(learning_foundation)
 
+option(USE_PERFETTO "Use perfetto" ON)
+
 set(ASSETS_PATH_BASE ${SOLUTION_ROOT}/)
 
 message(${SOLUTION_ROOT})

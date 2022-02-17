@@ -9,6 +9,7 @@ macro(generate_include_directories param_project_name)
         ${SOLUTION_ROOT}/Include
         ${SOLUTION_ROOT}/Thirdparty
         ${SOLUTION_ROOT}/Source/LearningFoundation
+        ${SOLUTION_ROOT}/Source/Shared
         ${SOLUTION_ROOT}/Include/PhysX/include
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include/ImGuizmo
@@ -23,7 +24,7 @@ macro(generate_include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
+        ${SOLUTION_ROOT}/Include/perfetto_sdk
     )
 endmacro(generate_include_directories)
 
@@ -37,13 +38,14 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Include
         ${SOLUTION_ROOT}/Thirdparty
         ${SOLUTION_ROOT}/Source/LearningFoundation                 
+        ${SOLUTION_ROOT}/Source/Shared
         ${SOLUTION_ROOT}/Include/PhysX/include
         ${SOLUTION_ROOT}/Include/pxshared/include
         ${SOLUTION_ROOT}/Include/ImGuizmo
         ${SOLUTION_ROOT}/Include/DirectX
         ${SOLUTION_ROOT}/Include/plog
         ${SOLUTION_ROOT}/Include/box2d
-        ${SOLUTION_ROOT}/Include/ogre
+        ${SOLUTION_ROOT}/Include/ogre        
         ${SOLUTION_ROOT}/Thirdparty/imgui
         ${SOLUTION_ROOT}/Thirdparty/NetImGui
         ${SOLUTION_ROOT}/Thirdparty/implot
@@ -51,7 +53,7 @@ macro(include_directories param_project_name)
         ${SOLUTION_ROOT}/Thirdparty/node-editor
         ${SOLUTION_ROOT}/Thirdparty/stb_image
         ${SOLUTION_ROOT}/Thirdparty/loguru
-        ${SOLUTION_ROOT}/Thirdparty/perfetto_sdk
+        ${SOLUTION_ROOT}/Include/perfetto_sdk
     )
 endmacro(include_directories)
 

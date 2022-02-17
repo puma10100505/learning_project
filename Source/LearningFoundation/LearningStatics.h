@@ -6,6 +6,7 @@
 
 #include "learning.h"
 
+
 namespace LearningStatics
 {
     static inline void GLDrawLine(const glm::vec3& P1, const glm::vec3& P2, const int LineWidth, const glm::vec3& LineColor)
@@ -42,4 +43,6 @@ namespace LearningStatics
             GLDrawLine(StartPt, StopPt, LineWidth, LineColor);
         }
     }
+
+    
 }

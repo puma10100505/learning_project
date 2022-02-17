@@ -12,6 +12,7 @@ option(USE_BOOST_FILESYSTEM "Use boost filesystem" ON)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
+aux_source_directory(${SOLUTION_ROOT}/Source/Shared SRC)
 
 # Target: 生成可执行文件目标
 add_executable(${PROJECT_NAME} ${SRC})

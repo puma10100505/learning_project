@@ -11,63 +11,60 @@
 
 #include "plog/Log.h"
 #include "plog/Initializers/RollingFileInitializer.h"
-
-#include <perfetto.h>
-// #include "perfetto_helper.h"
-
+#include "perfetto.h"
 
 using namespace std;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
 PERFETTO_DEFINE_CATEGORIES(
-    perfetto::Category("d3d.math").SetDescription("D3D Math perf")
-);
+        perfetto::Category("d3d.math").SetDescription("D3D Math perf")  
+    );
 
 PERFETTO_TRACK_EVENT_STATIC_STORAGE();
 
-void InitPerfetto()
+ std::unique_ptr<perfetto::TracingSession> StartPerfettoTracing(const std::string& InDataSourceName, 
+            const std::string& InTraceFilePath, const std::string& InProcessName)
 {
     perfetto::TracingInitArgs args;
-
     args.backends = perfetto::kInProcessBackend;
     perfetto::Tracing::Initialize(args);
-    perfetto::TrackEvent::Register();
-}
-
-std::unique_ptr<perfetto::TracingSession> StartTracing()
-{
+    perfetto::TrackEvent::Register();    
+    
+    
     perfetto::TraceConfig cfg;
     cfg.add_buffers()->set_size_kb(1024);
+
     auto* ds_cfg = cfg.add_data_sources()->mutable_config();
-    ds_cfg->set_name("track_event");
+    ds_cfg->set_name(InDataSourceName.c_str());
 
-    FILE* TraceFileStream = fopen("TestPerf.ptrace", "w+");
+    FILE* TraceFileStream = fopen(InTraceFilePath.c_str(), "wb+");
 
-    auto tracing_session = perfetto::Tracing::NewTrace();
+    std::unique_ptr<perfetto::TracingSession> tracing_session = perfetto::Tracing::NewTrace(perfetto::kInProcessBackend);
     if (TraceFileStream == nullptr)
     {
         return tracing_session;
     }
 
-    
     tracing_session->Setup(cfg, _fileno(TraceFileStream));
     tracing_session->StartBlocking();
+
+    perfetto::ProcessTrack process_track = perfetto::ProcessTrack::Current();
+    perfetto::protos::gen::TrackDescriptor desc = process_track.Serialize();
+    desc.mutable_process()->set_process_name(InProcessName.c_str());
+    perfetto::TrackEvent::SetTrackDescriptor(process_track, desc);
+        
 
     return tracing_session;
 }
 
-void StopTracing(std::unique_ptr<perfetto::TracingSession> Session)
+void StopPerfettoTracing(std::unique_ptr<perfetto::TracingSession> Session)
 {
-    perfetto::TrackEvent::Flush();
-
-    Session->StopBlocking();
-    // std::vector<char> trace_data(Session->ReadTraceBlocking());
-    // std::ofstream output;
-    // output.open("D3DMathMatrix.ptrace", std::ios::out | std::ios::binary);
-    // output.write(&trace_data[0], trace_data.size());
-    
-    // output.close();
+    if (Session.get())
+    {
+        perfetto::TrackEvent::Flush();
+        Session->StopBlocking();
+    }
 }
 
 ostream& XM_CALLCONV operator << (ostream& os, FXMVECTOR v)
@@ -96,15 +93,7 @@ ostream& XM_CALLCONV operator << (ostream& os, FXMMATRIX m)
 
 int main(int argc, char** argv)
 {
-    InitPerfetto();
-    auto TracingSession = StartTracing();
-
-    perfetto::ProcessTrack process_track = perfetto::ProcessTrack::Current();
-    perfetto::protos::gen::TrackDescriptor desc = process_track.Serialize();
-    desc.mutable_process()->set_process_name("D3DMathPerf");
-    perfetto::TrackEvent::SetTrackDescriptor(process_track, desc);
-
-    // PerfettoTraceHelper::GetInstance()->Init("TestPerf.ptrace")->StartTracing();
+    auto TracingSession = StartPerfettoTracing("track_event", "TestPerf.ptrace", "D3DMatrixPerf");
 
     plog::init(plog::debug, (DefaultLogDirectory + "D3DMathMatrix.log").c_str());
 
@@ -149,10 +138,7 @@ int main(int argc, char** argv)
 
     TRACE_EVENT_END("d3d.math");
 
-    //std::cout << Vec * RotXMat << std::endl;
-
-    StopTracing(std::move(TracingSession));
-    //PerfettoTraceHelper::GetInstance()->StopTracing();
+    StopPerfettoTracing(std::move(TracingSession));
 
     return EXIT_SUCCESS;
 }
