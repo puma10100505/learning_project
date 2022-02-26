@@ -30,7 +30,7 @@ endmacro(generate_include_directories)
 
 ###########################################
 
-
+# 兼容老工程
 macro(include_directories param_project_name)
     target_include_directories(${param_project_name} 
         PRIVATE 

@@ -23,6 +23,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${SOLUTION_ROOT}/Source/LearningFoundation/OpenGL
     ${SOLUTION_ROOT}/Source/LearningFoundation/Physics
     ${SOLUTION_ROOT}/Include
+    ${SOLUTION_ROOT}/Include/DirectX
     ${SOLUTION_ROOT}/Thirdparty
     ${SOLUTION_ROOT}/Thirdparty/loguru
     ${SOLUTION_ROOT}/Thirdparty/imgui

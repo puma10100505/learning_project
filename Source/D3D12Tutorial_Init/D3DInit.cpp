@@ -201,10 +201,12 @@ void D3DInit::CreateDepthStencilView()
 
     MainDevice->CreateDepthStencilView(DepthStencilBuffer.Get(), nullptr, DepthStencilView());
 
-    CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(DepthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(DepthStencilBuffer.Get(), 
+        D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 }
 
 void D3DInit::SetScissorRectangles()
 {
     CommandList->RSSetScissorRects(1, &ScissorRect);
 }
+
