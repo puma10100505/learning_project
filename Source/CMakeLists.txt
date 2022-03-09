@@ -17,17 +17,18 @@ add_subdirectory(LearningFoundation)
 #  add_subdirectory(NodeEditorDemo)
 #  add_subdirectory(GizmoDemo)
 #  add_subdirectory(GizmoExample)
- add_subdirectory(DxImGuiWindowDemo)
+#　add_subdirectory(DxImGuiWindowDemo)
 #  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 
-add_subdirectory(D3DHelloTriangle)
+#  add_subdirectory(D3DHelloTriangle)
+ add_subdirectory(D3DSimpleApp)
 
-#  add_subdirectory(D3DMathVector)
-add_subdirectory(D3DMathMatrix)
+# add_subdirectory(D3DMathVector)
+# add_subdirectory(D3DMathMatrix)
 
 # add_subdirectory(D3D12Tutorial_Init)
-add_subdirectory(GooglePerfettoExample)
+# add_subdirectory(GooglePerfettoExample)
 
 
 

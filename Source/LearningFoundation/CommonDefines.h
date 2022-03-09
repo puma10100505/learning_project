@@ -5,7 +5,7 @@
 #define LearningOpenGL_VERSION_MAJOR 
 #define LearningOpenGL_VERSION_MINOR 
 
-const std::string solution_base_path = "D:/Development/Projects/learning_project/";
+const std::string solution_base_path = "G:/Development/Projects/learning_project/";
 const std::string DefaultAssetsDirectory = solution_base_path + "Assets/";
 const std::string DefaultShaderDirectory = solution_base_path + "Assets/Shaders/";
 const std::string DefaultTextureDirectory = solution_base_path + "Assets/Textures/";
@@ -15,7 +15,7 @@ const std::string DefaultDataDirectory = solution_base_path + "Assets/Data/";
 const std::string DefaultLogDirectory = solution_base_path + "Logs/";
 
 
-const std::wstring wide_solution_base_path = L"D:/Development/Projects/learning_project/";
+const std::wstring wide_solution_base_path = L"G:/Development/Projects/learning_project/";
 const std::wstring WideDefaultAssetsDirectory = wide_solution_base_path + L"Assets/";
 const std::wstring WideDefaultShaderDirectory = wide_solution_base_path + L"Assets/Shaders/";
 const std::wstring WideDefaultTextureDirectory = wide_solution_base_path + L"Assets/Textures/";
