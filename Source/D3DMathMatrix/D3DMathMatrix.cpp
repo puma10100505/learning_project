@@ -57,7 +57,7 @@ ostream& XM_CALLCONV operator << (ostream& os, FXMMATRIX m)
 
 int main(int argc, char** argv)
 {
-    auto TracingSession = StartPerfettoTracing("track_event", "TestPerf.ptrace", "D3DMatrixPerf");
+    auto TracingSession = StartPerfettoTracing2("track_event", "D3DMatrixPerf");
 
     plog::init(plog::debug, (DefaultLogDirectory + "D3DMathMatrix.log").c_str());
 
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 
     TRACE_EVENT_END(TraceEventCategory(D3DMath));
 
-    StopPerfettoTracing(std::move(TracingSession));
+    StopPerfettoTracing2(std::move(TracingSession), "TestPerf.ptrace");
 
     return EXIT_SUCCESS;
 }

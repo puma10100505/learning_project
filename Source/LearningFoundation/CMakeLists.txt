@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0...3.21)
 project(learning_foundation)
 
 option(USE_PERFETTO "Use perfetto" ON)
+option(USE_D3D "Use D3D" ON)
 
 set(ASSETS_PATH_BASE ${SOLUTION_ROOT}/)
 
