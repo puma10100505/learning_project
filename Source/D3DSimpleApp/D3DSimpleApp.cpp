@@ -6,6 +6,7 @@
 
 #include "d3dx12.h"
 #include "stdafx.h"
+#include <DirectXPackedVector.h>
 
 #include "CommonDefines.h"
 
