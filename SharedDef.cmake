@@ -83,39 +83,47 @@ macro(link_extra_libs param_project_name)
 
     if (USE_NAV)
         list(APPEND EXTRA_LIBS recastnavigation)
+        add_compile_definitions(USE_NAV)
     endif()
 
     if (USE_IMPLOT)
         list(APPEND EXTRA_LIBS imgui)
         list(APPEND EXTRA_LIBS implot)
+        add_compile_definitions(USE_IMPLOT)
     endif()
 
     if (USE_NETIMGUI)
         list(APPEND EXTRA_LIBS imgui)
         list(APPEND EXTRA_LIBS NetImGui)
+        add_compile_definitions(USE_NETIMGUI)
     endif()
 
     if (USE_IMNODES)
         list(APPEND EXTRA_LIBS imgui)
         list(APPEND EXTRA_LIBS imnodes)
+        add_compile_definitions(USE_IMNODES)
     endif()
 
     if (USE_NODEEDITOR)
         list(APPEND EXTRA_LIBS imgui)
         list(APPEND EXTRA_LIBS node-editor)
+        add_compile_definitions(USE_NODEEDITOR)
     endif()
 
     if (USE_LOGURU)
         list(APPEND EXTRA_LIBS loguru)
+        add_compile_definitions(USE_LOGURU)
     endif()
 
     if (USE_IMGUIZMO)
         list(APPEND EXTRA_LIBS imgui)
         list(APPEND EXTRA_LIBS ImGuizmo)
+        add_compile_definitions(USE_IMGUIZMO)
     endif()
 
     if (USE_IMGUI)
         list(APPEND EXTRA_LIBS imgui)
+        add_compile_definitions(USE_IMGUI)
     endif()
 
     if (USE_PERFETTO)
@@ -126,6 +134,8 @@ macro(link_extra_libs param_project_name)
         add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
 
         list(APPEND EXTRA_LIBS ws2_32 perfetto)
+
+        add_compile_definitions(USE_PERFETTO)
     endif()
 
     if (APPLE)
@@ -194,10 +204,12 @@ macro(link_extra_libs param_project_name)
 
         if (USE_GLFW)
             list(APPEND EXTRA_LIBS glfw3.lib)
+            add_compile_definitions(USE_GLFW)
         endif()
 
         if (USE_BOX2D)
             list(APPEND EXTRA_LIBS box2d.lib)
+            add_compile_definitions(USE_BOX2D)
         endif()
 
         # if (USE_PERFETTO)
@@ -233,6 +245,8 @@ macro(link_extra_libs param_project_name)
                 RenderSystem_GL3Plus_d.lib 
                 RenderSystem_GLES2_d.lib
             )
+
+            add_compile_definitions(USE_OGRE)
         endif()
 
         if (USE_PHYSX)        
@@ -252,6 +266,8 @@ macro(link_extra_libs param_project_name)
                 PhysXExtensions_static_64.lib
                 PhysXCooking_64.lib
             )
+
+            add_compile_definitions(USE_PHYSX)
 
             target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/PhysX/Debug)
         endif()
@@ -273,12 +289,15 @@ macro(link_extra_libs param_project_name)
                 d3dcompiler.lib 
                 dxgi.lib
             )
+            add_compile_definitions(USE_D3D)
         endif()
 
         if (USE_BOOST_FILESYSTEM)
             list(APPEND EXTRA_LIBS 
             libboost_filesystem-vc143-mt-gd-x64-1_79.lib
             )
+
+            add_compile_definitions(USE_BOOST_FILESYSTEM)
         endif()
         
 

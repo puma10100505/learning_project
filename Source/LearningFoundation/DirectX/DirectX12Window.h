@@ -20,7 +20,20 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
-namespace dx
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx12.h"
+
+#if USE_IMPLOT
+#include "implot.h"
+#endif 
+
+#if USE_IMNODES
+#include "imnodes.h"
+#endif
+
+
+namespace DirectX
 {
     typedef void (*DxWindowTick)(float DeltaTime);
     typedef void (*DxWindowGUI)(float DeltaTime);
@@ -63,6 +76,9 @@ namespace dx
     static void ResizeSwapChain(HWND hWnd, int width, int height);    
 
     // Public 
+    /*
+    * DirectX窗口，集成了ImGui, ImPlot, ImNodes
+    */
     int CreateWindowInstance(const std::string& InWinTitle,
             int InWidth, int InHeight, 
             int InPosX, int InPosY, 
