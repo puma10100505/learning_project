@@ -18,6 +18,7 @@ add_subdirectory(LearningFoundation)
 #  add_subdirectory(GizmoDemo)
 #  add_subdirectory(GizmoExample)
 add_subdirectory(DxImGuiWindowDemo)
+add_subdirectory(RecastNaviDemo)
 #  add_subdirectory(NodeApp)
 #  add_subdirectory(Templates)
 

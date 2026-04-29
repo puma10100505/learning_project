@@ -2,6 +2,7 @@
 
 
 #include "CommonDefines.h"
+#include "loguru.hpp"
 
 using namespace DirectX;
 
@@ -313,11 +314,62 @@ int DirectX::CreateWindowInstance(const std::string& InWinTitle,
         g_pd3dSrvDescHeap, g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(), 
         g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
 
-    // Load Founts
-    io.Fonts->AddFontDefault();
-    io.Fonts->AddFontFromFileTTF((DefaultFontDirectory + "Karla-Regular.ttf").c_str(), 16);
-    //io.Fonts->AddFontFromFileTTF(DefaultFontDirectory + "Roboto-Medium.ttf");
-    //io.Fonts->AddFontFromFileTTF(DefaultFontDirectory + "Karla-Regular.ttf");
+    // ---- Fonts ----
+    // 一个 CJK 字体作为主字体, 保证 ASCII + 中文都能直接渲染.
+    // 优先用 Windows 系统的微软雅黑 (Regular, 笔画干净不发粗), 其次 SimHei,
+    // 再退回项目内打包的字体. 全部失败才退回 ImGui 默认 ASCII 字体.
+    {
+        ImFontConfig cjkCfg;
+        cjkCfg.OversampleH = 2;
+        cjkCfg.OversampleV = 1;
+        cjkCfg.PixelSnapH  = true;
+        cjkCfg.FontNo      = 0;   // .ttc 取集合中第一个字体 (msyh.ttc 第 0 项 = Microsoft YaHei Regular)
+
+        struct Candidate { std::string path; const char* tag; };
+        const std::vector<Candidate> candidates = {
+            { "C:/Windows/Fonts/msyh.ttc",                                  "system: Microsoft YaHei (Regular)" },
+            { "C:/Windows/Fonts/msyhl.ttc",                                 "system: Microsoft YaHei (Light)"   },
+            { "C:/Windows/Fonts/simhei.ttf",                                "system: SimHei"                    },
+            { "C:/Windows/Fonts/simsun.ttc",                                "system: SimSun"                    },
+            { DefaultFontDirectory + "LongShuManShengHuoShuiJian-2.ttf",    "bundled: LongShu (handwriting)"    },
+            { DefaultFontDirectory + "ZaoZiGongFangShuJianTi-2.ttf",        "bundled: ZaoZiGongFang"            },
+            { DefaultFontDirectory + "HYZhuZiSuDaHeiW-2.ttf",               "bundled: HanYi (heavy)"            },
+        };
+
+        const float kFontSize = 18.0f;
+        ImFont* primary = nullptr;
+        for (const Candidate& c : candidates)
+        {
+            FILE* fp = fopen(c.path.c_str(), "rb");
+            if (!fp)
+            {
+                LOG_F(WARNING, "[Font] not found: %s (%s)", c.path.c_str(), c.tag);
+                continue;
+            }
+            fclose(fp);
+            primary = io.Fonts->AddFontFromFileTTF(
+                c.path.c_str(), kFontSize, &cjkCfg,
+                io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+            if (primary)
+            {
+                LOG_F(INFO, "[Font] loaded CJK primary: %s (%s, %.0fpx)", c.path.c_str(), c.tag, kFontSize);
+                break;
+            }
+            LOG_F(WARNING, "[Font] failed to load: %s (%s)", c.path.c_str(), c.tag);
+        }
+
+        if (primary)
+        {
+            io.FontDefault = primary;
+        }
+        else
+        {
+            LOG_F(ERROR, "[Font] no CJK font available, falling back to ASCII default");
+            io.Fonts->AddFontDefault();
+            io.Fonts->AddFontFromFileTTF((DefaultFontDirectory + "Karla-Regular.ttf").c_str(), 16);
+        }
+    }
+
     
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
