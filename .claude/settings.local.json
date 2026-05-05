@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git diff *)",
+      "Bash(git --no-pager diff Source/LearningFoundation/CommonDefines.h)",
+      "Bash(git --no-pager diff Source/RecastNaviDemo/RecastNaviDemo.cpp)",
+      "Bash(git *)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(cmake --build build_macos --target RecastNaviDemo)",
+      "Bash(cmake --build build_macos --target RecastNaviDemo --config Debug)",
+      "Bash(otool -L /Users/yinpsoft/GameScience/Github/learning_project/Bin/RecastNaviDemo)",
+      "Bash(otool -l /Users/yinpsoft/GameScience/Github/learning_project/Bin/RecastNaviDemo)",
+      "Read(//usr/local/lib/**)",
+      "Read(//opt/homebrew/**)",
+      "Read(//usr/lib/**)",
+      "Bash(install_name_tool -id /usr/lib/libz.1.dylib /Users/yinpsoft/GameScience/Github/learning_project/Libraries/MacOS/libz.1.2.11.dylib)",
+      "Bash(otool -L /Users/yinpsoft/GameScience/Github/learning_project/Libraries/MacOS/libz.1.2.11.dylib)",
+      "Bash(otool *)",
+      "Bash(dyld_info -dependents RecastNaviDemo)",
+      "Bash(DYLD_PRINT_LIBRARIES=1 /Users/yinpsoft/GameScience/Github/learning_project/Bin/RecastNaviDemo)",
+      "Bash(cmake --build build --target RecastNaviDemo -- -j4)",
+      "Bash(cmake --build /Users/yinpsoft/GameScience/Github/learning_project/build_macos --target RecastNaviDemo -- -j4)",
+      "Bash(cmake --build build --target RecastNaviDemo)",
+      "Bash(cmake --build /Users/yinpsoft/GameScience/Github/learning_project/cmake-build-debug --target RecastNaviDemo)",
+      "Bash(cmake -B /Users/yinpsoft/GameScience/Github/learning_project/cmake-build-debug -S /Users/yinpsoft/GameScience/Github/learning_project)",
+      "Bash(cmake *)",
+      "Bash(xargs cat *)"
+    ]
+  }
+}

@@ -21,7 +21,13 @@
 
 #include "utility.h"
 #include "defines.h"
-#include "GL/freeglut.h"
+#if defined(_WIN32)
+#  include "GL/freeglut.h"
+#elif defined(__APPLE__)
+#  include <GLUT/glut.h>
+#else
+#  include <GL/freeglut.h>
+#endif
 
 static const int WINDOW_WIDTH = 1280;
 static const int WINDOW_HEIGHT = 900;

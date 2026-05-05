@@ -1,6 +1,8 @@
 #pragma once
-// 下面这行可以隐藏FreeGlut或Glfw的Console窗口
+// 隐藏 FreeGlut/GLFW 的 Console 窗口（仅 MSVC/Windows 有效）
+#ifdef _MSC_VER
 #pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+#endif
 
 #include <chrono>
 #include <thread>

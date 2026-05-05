@@ -1,11 +1,19 @@
 
 #include "SceneManager.h"
-#include "GL/freeglut.h"
+#if defined(_WIN32)
+#  include "GL/freeglut.h"
+#  include <gl/GL.h>
+#elif defined(__APPLE__)
+#  include <GLUT/glut.h>
+#  include <OpenGL/gl.h>
+#else
+#  include <GL/freeglut.h>
+#  include <GL/gl.h>
+#endif
 #include "PxPhysicsAPI.h"
 #include "glm/glm.hpp"
 #include "PhysicsManager.h"
 #include "LearningCamera.h"
-#include <gl/GL.h>
 
 using namespace physx;
 using namespace std;

@@ -4,6 +4,9 @@
 #include <imgui_internal.h>
 #include <imgui_node_editor.h>
 #include "glad/glad.h"
+#if !defined(_WIN32)
+#  include <unistd.h>   // access()
+#endif
 
 namespace ed = ax::NodeEditor;
 
@@ -223,13 +226,27 @@ int GLInitGUI() {
     ImGui_ImplGlfw_InitForOpenGL(GetGlobalWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
+    // 加载支持中文的字体，按平台选择系统字体路径
+    // 字体文件不存在时自动回退到 ImGui 内置 ASCII 字体
+#if defined(_WIN32)
+    const char* chineseFontPath = "C:\\Windows\\Fonts\\msyh.ttc";   // 微软雅黑
+#elif defined(__APPLE__)
+    const char* chineseFontPath = "/System/Library/Fonts/STHeiti Light.ttc";
+#else
+    // Linux: 优先 Noto，其次文泉驿
+    const char* chineseFontPath = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc";
+    if (access(chineseFontPath, F_OK) != 0)
+        chineseFontPath = "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc";
+#endif
+
+    ImFontConfig fontCfg;
+    fontCfg.OversampleH = 2;
+    fontCfg.OversampleV = 2;
+    ImFont* font = io.Fonts->AddFontFromFileTTF(
+        chineseFontPath, 18.0f, &fontCfg,
+        io.Fonts->GetGlyphRangesChineseFull());
+    if (!font)
+        io.Fonts->AddFontDefault();  // 字体文件缺失时回退
 
     return 0;
 }

@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavBuilder.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavBuilder.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavGeometry.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavGeometry.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavLinkGen.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavLinkGen.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavPathSmooth.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavPathSmooth.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavQuery.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavQuery.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/RecastNaviDemo.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/RecastNaviDemo.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o.d"
+  "CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o"
+  "CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o.d"
+  "RecastNaviDemo"
+  "RecastNaviDemo.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/RecastNaviDemo.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

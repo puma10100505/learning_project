@@ -127,13 +127,16 @@ macro(link_extra_libs param_project_name)
     endif()
 
     if (USE_PERFETTO)
-        # The perfetto library contains many symbols, so it needs the big object
-        # format.
-        target_compile_options(${param_project_name} PRIVATE "/bigobj")
-        # Disable legacy features in windows.h.
-        add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
-
-        list(APPEND EXTRA_LIBS ws2_32 perfetto)
+        if (MSVC)
+            # The perfetto library contains many symbols, so it needs the big object format.
+            target_compile_options(${param_project_name} PRIVATE "/bigobj")
+            # Disable legacy features in windows.h.
+            add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+            # ws2_32 is a Windows-only socket library required by perfetto on Windows.
+            list(APPEND EXTRA_LIBS ws2_32 perfetto)
+        else()
+            list(APPEND EXTRA_LIBS perfetto)
+        endif()
 
         add_compile_definitions(USE_PERFETTO)
     endif()
@@ -160,11 +163,18 @@ macro(link_extra_libs param_project_name)
             -ldl
         )
 
-        target_link_directories(${param_project_name}
-            PRIVATE 
+        # 工程内预置库 + Homebrew（Apple Silicon: /opt/homebrew, Intel: /usr/local）
+        set(_MACOS_LINK_DIRS
             ${SOLUTION_ROOT}/Libraries/MacOS
             ${SOLUTION_ROOT}/Libraries/MacOS/PhysX/Debug
         )
+        if (EXISTS "/opt/homebrew/lib")
+            list(APPEND _MACOS_LINK_DIRS "/opt/homebrew/lib")
+        endif()
+        if (EXISTS "/usr/local/lib")
+            list(APPEND _MACOS_LINK_DIRS "/usr/local/lib")
+        endif()
+        target_link_directories(${param_project_name} PRIVATE ${_MACOS_LINK_DIRS})
 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo")
 

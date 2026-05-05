@@ -5,18 +5,28 @@ project(learning_foundation)
 option(USE_PERFETTO "Use perfetto" ON)
 option(USE_D3D "Use D3D" ON)
 
-set(ASSETS_PATH_BASE ${SOLUTION_ROOT}/)
-
 message(${SOLUTION_ROOT})
+
+set(LearningOpenGL_VERSION_MAJOR ${CMAKE_PROJECT_VERSION_MAJOR})
+set(LearningOpenGL_VERSION_MINOR ${CMAKE_PROJECT_VERSION_MINOR})
 
 configure_file(CommonDefines.h.in ${SOLUTION_ROOT}/Source/LearningFoundation/CommonDefines.h)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} LEARNING_SRC)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/DirectX LEARNING_SRC)
+# DirectX 与 Win32 绑定，仅在 Windows 上编译进静态库
+if (WIN32)
+    aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/DirectX LEARNING_SRC)
+endif()
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/OpenGL LEARNING_SRC)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Physics LEARNING_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${LEARNING_SRC})
+
+# PhysX 头文件（PxPreprocessor.h）要求 _DEBUG 与 NDEBUG 必须恰好定义其一。
+# MSVC Debug 构建会自动定义 _DEBUG；Clang/GCC 不会，需要手动补充。
+if (NOT WIN32)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${SOLUTION_ROOT}/Source/LearningFoundation

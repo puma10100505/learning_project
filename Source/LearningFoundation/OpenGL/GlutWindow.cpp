@@ -2,7 +2,13 @@
 
 #include <glm/ext/quaternion_common.hpp>
 
-#include "GL/freeglut.h"
+#if defined(_WIN32)
+#  include "GL/freeglut.h"
+#elif defined(__APPLE__)
+#  include <GLUT/glut.h>
+#else
+#  include <GL/freeglut.h>
+#endif
 #include "PxPhysicsAPI.h"
 #include "SceneManager.h"
 
@@ -172,7 +178,10 @@ void GlutWindow::Initialize(int InArgc, char** InArgv)
     glutInit(&InArgc, InArgv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE);
     glutInitWindowSize(WindowWidth, WindowHeight);
-    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+#if !defined(__APPLE__)
+    // GLUT_ACTION_ON_WINDOW_CLOSE 是 FreeGLUT 扩展，Apple GLUT 不支持
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+#endif
 }
 
 void GlutWindow::UseGUI(bool InShow)

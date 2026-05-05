@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libnode-editor.a CMakeFiles/node-editor.dir/crude_json.cpp.o CMakeFiles/node-editor.dir/imgui_canvas.cpp.o CMakeFiles/node-editor.dir/imgui_node_editor.cpp.o CMakeFiles/node-editor.dir/imgui_node_editor_api.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libnode-editor.a

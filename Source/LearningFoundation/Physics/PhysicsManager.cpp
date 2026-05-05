@@ -1,10 +1,18 @@
 #include "PhysicsManager.h"
 
 #include <SceneManager.h>
-#include <GL/freeglut_std.h>
+#if defined(_WIN32)
+#  include <GL/freeglut_std.h>
+#  include "gl/GL.h"
+#elif defined(__APPLE__)
+#  include <GLUT/glut.h>
+#  include <OpenGL/gl.h>
+#else
+#  include <GL/freeglut_std.h>
+#  include <GL/gl.h>
+#endif
 
 #include "PxPhysicsAPI.h"
-#include "gl/GL.h"
 
 using namespace physx;
 
