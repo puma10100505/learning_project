@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
 
 // Recast & Detour
 #include "Recast.h"

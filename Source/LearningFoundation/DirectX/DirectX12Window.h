@@ -86,5 +86,19 @@ namespace DirectX
             std::function<void(float)> OnGUI, 
             std::function<void(float)> OnPostGUI, 
             std::function<void(float)> OnInput); 
+
+#if defined(_WIN32)
+    /// ImGui 字体 atlas 使用 CBV/SRV 堆槽位 0；其余用户纹理从 1 起（见 NavViewTextureBridge）。
+    inline constexpr UINT kD3d12SrvHeapDescriptorCount = 32;
+    inline constexpr UINT kNavViewTextureSrvHeapIndex    = 1;
+    /// GpuRenderer（D3D12 离屏渲染）输出颜色纹理、阴影图 SRV（与 imgui_impl_dx12 的 TexID 约定一致）
+    inline constexpr UINT kGpuRendererColorSrvHeapIndex  = 2;
+    inline constexpr UINT kGpuRendererShadowSrvHeapIndex = 3;
+
+    ID3D12Device*             GetD3D12Device();
+    ID3D12CommandQueue*       GetD3D12CommandQueue();
+    ID3D12DescriptorHeap*     GetD3D12SrvHeap();
+    UINT                      GetD3D12SrvDescriptorStride();
+#endif
     
 }

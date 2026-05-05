@@ -15,6 +15,12 @@
 #include <algorithm>
 
 // Platform-conditional key codes
+#if defined(_WIN32)
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  include <Windows.h>
+#endif
 #if !defined(_WIN32)
 #  include <GLFW/glfw3.h>
 #endif

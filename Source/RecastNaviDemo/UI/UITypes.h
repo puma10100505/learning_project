@@ -95,6 +95,15 @@ struct LightSettings
 struct ViewSettings
 {
     bool bShowGrid         = true;   ///< 显示网格辅助线
+    /// 世界 XZ 网格自适应：true 时按场景包围盒对角线自动计算半边长（clamp 到 [25,100]）；
+    /// false 时使用 WorldGridHalfExt。仅 3D 视图、bShowGrid 开启时参与。
+    bool  bWorldGridAuto    = true;
+    /// 手动指定的网格半边长（沿 X、Z 各画 ±halfExt）。
+    /// 仅 !bWorldGridAuto 时生效；与 minorStep=1m 共同决定线条数（2*halfExt+1 条/方向）。
+    float WorldGridHalfExt  = 50.0f;
+    /// 世界网格线粗（像素，乘到 minor / major / axis 三档基础粗细上）。
+    /// 1.0 = 默认（次线 1px、主线 1.5px、轴线 2px）；调高用于高 DPI / 远视角；调低用于密集网格。
+    float WorldGridLineThickness = 1.0f;
     /// 与 PhysX/Recast 输入一致的碰撞体着色：三角网地面 + 障碍棱柱
     bool          bShowCollisionTint     = true;
     ImVec4        GroundCollisionTint     = { 0.28f, 0.52f, 0.40f, 0.48f };
@@ -103,10 +112,13 @@ struct ViewSettings
     ImVec4        ObstacleSideBackTint    = { 0.38f, 0.16f, 0.24f, 0.88f };  ///< 侧面背向相机（与正面同不透明显示；无 Z 缓冲时远侧面已剔除）
     ImVec4        ObstacleCollisionEdge   = { 1.00f, 0.55f, 0.42f, 0.95f };
     bool bShowObstacles    = true;   ///< 显示障碍物轮廓
-    /// 默认 None：ImDrawList 直接走 GPU，1800 三角的默认场景轻松 60 FPS。
-    /// CpuZBuffer 是软件光栅化，大场景下会到 10 FPS 量级（仅作演示/对比用，请按需开启）。
-    /// Windows D3D12 版未接 Z-Buffer 纹理上传，CpuZBuffer 也不会显示。
+    /// 默认：macOS/Linux 用 None（ImDrawList 轻量）；Windows D3D12 用 CpuZBuffer（接 NavView→D3D12 纹理，有真深度与遮挡）。
+    /// CpuZBuffer 是软件光栅，大场景可能明显掉帧；可改 None / Painter 等作对比。
+#if defined(_WIN32)
+    View3DDepthMode DepthMode3D = View3DDepthMode::CpuZBuffer;
+#else
     View3DDepthMode DepthMode3D = View3DDepthMode::None;
+#endif
     /// CpuZBuffer 模式的内部缓冲降采样系数：rw = panel.x / N, rh = panel.y / N。
     /// N=1 原生分辨率（最清晰，最慢）；N=2 半分辨率（默认，质量/速度平衡）；
     /// N=3、4 进一步降采样以换 FPS。仅 CpuZBuffer 生效，None / PainterSort 走 GPU 不受影响。

@@ -113,5 +113,7 @@ void main()
     vec3  litMul = vec3(uAmbient) + (1.0 - uAmbient) * diffK * uLightColor;
     // vLit = 1 → 应用上面的 multiplier；vLit = 0（线段）→ 直接用顶点色
     vec3  mult   = mix(vec3(1.0), litMul, vLit);
-    fragColor    = vec4(vCol.rgb * mult, vCol.a);
+    // 输出不透明 alpha：离屏 FBO 与深度测试一起用作“实体”合成；若 a<1 且仍开 blending，
+    // 半透明会与背后几何在混合顺序上打架，看起来像遮挡错乱。
+    fragColor    = vec4(vCol.rgb * mult, 1.0);
 }

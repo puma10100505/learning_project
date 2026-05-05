@@ -73,7 +73,7 @@ bool DirectX::CreateDeviceD3D(HWND hWnd)
     {
         D3D12_DESCRIPTOR_HEAP_DESC desc = {};
         desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        desc.NumDescriptors = 1;
+        desc.NumDescriptors = kD3d12SrvHeapDescriptorCount;
         desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         if (g_pd3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_pd3dSrvDescHeap)) != S_OK)
             return false;
@@ -478,3 +478,27 @@ int DirectX::CreateWindowInstance(const std::string& InWinTitle,
 
     return EXIT_SUCCESS;
 }
+
+#if defined(_WIN32)
+ID3D12Device* DirectX::GetD3D12Device()
+{
+    return g_pd3dDevice;
+}
+
+ID3D12CommandQueue* DirectX::GetD3D12CommandQueue()
+{
+    return g_pd3dCommandQueue;
+}
+
+ID3D12DescriptorHeap* DirectX::GetD3D12SrvHeap()
+{
+    return g_pd3dSrvDescHeap;
+}
+
+UINT DirectX::GetD3D12SrvDescriptorStride()
+{
+    if (!g_pd3dDevice)
+        return 0;
+    return g_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+}
+#endif

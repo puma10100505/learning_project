@@ -12,8 +12,9 @@
  *   - samples > 1：渲到多采样 FBO（颜色 + 深度都是 multisample renderbuffer），
  *     End() 时 glBlitFramebuffer 解析到 colorTex 供 ImGui 采样；
  *   - samples = 1：直接渲到 colorTex（depth 用单采样 renderbuffer）。
+ * 合成：主 pass 关闭 GL_BLEND、片元 a=1，避免半透明与深度写入叠加导致遮挡观感错误。
  *
- * 平台：!_WIN32 走 OpenGL 3.3 Core；_WIN32 全 stub（D3D12 后端无 GL 上下文）。
+ * 平台：!_WIN32 走 OpenGL 3.3 Core；_WIN32 走 D3D12（详见 GpuRendererD3D12.inl）。
  *
  * Shader 源码：从外部文件加载，文件位于 Render/Shaders/ 目录下：
  *   - recast_demo.vs  (顶点着色器)
@@ -30,18 +31,7 @@
 
 #if defined(_WIN32)
 
-namespace GpuRenderer
-{
-bool Available() { return false; }
-bool IsActive()  { return false; }
-void Begin(int, int, ImU32, const Mat4&, float, const Vec3&, float, int, const LightParams&) {}
-void End() {}
-int  BufferWidth()  { return 0; }
-int  BufferHeight() { return 0; }
-ImTextureID TextureId() { return (ImTextureID)0; }
-void DrawTriangleWorld(const Mat4&, Vec3, Vec3, Vec3, ImU32, bool) {}
-void DrawLineWorld   (const Mat4&, Vec3, Vec3, ImU32, float) {}
-} // namespace GpuRenderer
+#include "GpuRendererD3D12.inl"
 
 #else // !_WIN32
 
@@ -596,8 +586,9 @@ void Begin(int rw, int rh, ImU32 clearColor, const Mat4& vp, float fovyRad,
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // 关闭混合：碰撞 tint / 半透明 ImU32 若与 SRC_ALPHA 混合，会与深度写入叠加产生错误的“前后层”观感。
+    // 离屏 RGBA 按不透明输出（见 recast_demo.fs 中 a=1），由深度测试唯一决定遮挡。
+    glDisable(GL_BLEND);
     if (samples > 1) glEnable(GL_MULTISAMPLE);
 
     float cr, cg, cb, ca;
@@ -659,8 +650,7 @@ void End()
         glEnable (GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glDepthMask(GL_TRUE);
-        glEnable (GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_BLEND);
         glDisable(GL_CULL_FACE);
     }
 
@@ -761,14 +751,15 @@ void DrawLineWorld(const Mat4& /*vp*/, Vec3 a, Vec3 b, ImU32 col, float thicknes
     const float len = Length(ab);
     if (len < 1e-6f) return;
 
-    const float distA = Length(a - g_S.eye);
-    const float distB = Length(b - g_S.eye);
-    const float dist  = std::max(distA, distB);
+    // 每端各算 halfWidth → 梯形 quad，屏幕宽度与线长解耦（恒定 thicknessPixels）。
+    const float distA = std::max(Length(a - g_S.eye), 0.1f);
+    const float distB = std::max(Length(b - g_S.eye), 0.1f);
     const float halfH = static_cast<float>(g_S.rh);
-    const float pxToWorld =
-        (2.0f * std::tan(g_S.fovy * 0.5f) * std::max(dist, 0.1f)) / std::max(halfH, 1.0f);
-    const float halfWidth =
-        std::max(thicknessPixels * pxToWorld * 0.5f, g_S.worldDiag * 1e-4f);
+    const float k     =
+        (2.0f * std::tan(g_S.fovy * 0.5f)) / std::max(halfH, 1.0f);
+    const float floorW   = g_S.worldDiag * 1e-4f;
+    const float halfWidA = std::max(thicknessPixels * k * 0.5f * distA, floorW);
+    const float halfWidB = std::max(thicknessPixels * k * 0.5f * distB, floorW);
 
     const Vec3 eab   = ab * (1.0f / len);
     const Vec3 mid   = (a + b) * 0.5f;
@@ -778,12 +769,14 @@ void DrawLineWorld(const Mat4& /*vp*/, Vec3 a, Vec3 b, ImU32 col, float thicknes
     Vec3 side = Cross(eab, toEye);
     if (Length(side) < 1e-4f) side = Cross(eab, V3(0, 1, 0));
     if (Length(side) < 1e-4f) return;
-    side = Normalize(side) * halfWidth;
+    side = Normalize(side);
+    const Vec3 sA = side * halfWidA;
+    const Vec3 sB = side * halfWidB;
 
-    const Vec3 p0 = a + side;
-    const Vec3 p1 = a - side;
-    const Vec3 p2 = b - side;
-    const Vec3 p3 = b + side;
+    const Vec3 p0 = a + sA;
+    const Vec3 p1 = a - sA;
+    const Vec3 p2 = b - sB;
+    const Vec3 p3 = b + sB;
 
     // 线段不参与光照（lit=0），任意 normal 都行
     const Vec3 nDummy = V3(0, 1, 0);

@@ -206,6 +206,26 @@ int main(int argc, char** argv)
         PhysWorld::RebuildFromInputGeometry(g_State.Geom);
     };
 
+    // -- GenerateNavLinks --
+    // 基于当前 NavMesh 边界生成自动 NavLink，并以新链接为 extraLinks 再 build 一次烘焙进 NavMesh。
+    // 定义放在 doTryAutoRebuild 之前，使后者能直接调用（auto lambda 引用必须前向可见）。
+    auto doGenerateNavLinks = [&]()
+    {
+        g_State.AutoNavLinks = NavLinkGen::GenerateEdgeNavLinks(
+            g_State.Nav, g_State.AutoNavLinkCfg);
+        LOG_F(INFO, "GenerateNavLinks: %d links generated",
+              static_cast<int>(g_State.AutoNavLinks.size()));
+
+        if (!g_State.AutoNavLinks.empty())
+        {
+            bool ok = NavBuilder::BuildNavMesh(g_State.Geom, g_State.Config,
+                                               g_State.BV, g_State.Nav, g_State.Timings,
+                                               &g_State.AutoNavLinks);
+            g_State.BuildStatus = ok ? "OK (with AutoNavLinks)" : "rebuild failed";
+            LOG_F(INFO, "Rebuild with AutoNavLinks: %s", ok ? "OK" : "FAILED");
+        }
+    };
+
     // -- TryAutoRebuild --
     auto doTryAutoRebuild = [&]()
     {
@@ -221,6 +241,13 @@ int main(int argc, char** argv)
             else
             {
                 doBuildNavMesh();
+                // 几何变化后，旧的 AutoNavLinks 是基于旧 NavMesh 边界生成的，
+                // 在新网格上很可能错位/失效。Auto NavLinks 启用时立即按新网格重生成
+                // （doGenerateNavLinks 会用新链接再 build 一次，最后烘焙到当前 NavMesh）。
+                // TileCache 模式不走完整 build 流水线，链接生成需要触发非 tile 重建，
+                // 易和 TileCache 状态冲突，因此仅在非 tile 模式下自动联动。
+                if (g_State.AutoNavLinkCfg.bEnabled && g_State.Nav.bBuilt)
+                    doGenerateNavLinks();
             }
             if (g_State.View.bAutoReplan && g_State.Nav.bBuilt)
                 doFindPath();
@@ -279,25 +306,6 @@ int main(int argc, char** argv)
     auto doLoadNavMesh = [&](const char* path, std::string& errOut) -> bool
     {
         return NavSerializer::LoadNavMesh(g_State.Nav, path, errOut);
-    };
-
-    // -- GenerateNavLinks --
-    auto doGenerateNavLinks = [&]()
-    {
-        g_State.AutoNavLinks = NavLinkGen::GenerateEdgeNavLinks(
-            g_State.Nav, g_State.AutoNavLinkCfg);
-        LOG_F(INFO, "GenerateNavLinks: %d links generated",
-              static_cast<int>(g_State.AutoNavLinks.size()));
-
-        // 将自动 NavLink 烘焙进 NavMesh：以 AutoNavLinks 为 extraLinks 重新构建一次
-        if (!g_State.AutoNavLinks.empty())
-        {
-            bool ok = NavBuilder::BuildNavMesh(g_State.Geom, g_State.Config,
-                                               g_State.BV, g_State.Nav, g_State.Timings,
-                                               &g_State.AutoNavLinks);
-            g_State.BuildStatus = ok ? "OK (with AutoNavLinks)" : "rebuild failed";
-            LOG_F(INFO, "Rebuild with AutoNavLinks: %s", ok ? "OK" : "FAILED");
-        }
     };
 
     // 装填 Panel 回调

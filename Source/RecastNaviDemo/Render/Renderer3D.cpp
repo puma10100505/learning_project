@@ -31,6 +31,90 @@ namespace
 {
 constexpr int kGroundOcclusionSubdivDepth = 2;
 
+// =============================================================================
+// 世界坐标轴 Widget（左下角小窗口）
+//   - 跟随相机旋转：使用相机 view 矩阵的旋转分量，把世界 +X/+Y/+Z 投到屏幕；
+//   - 不受平移与缩放影响：常驻面板左下角；
+//   - 三轴用 R/G/B + 末端圆点 + 字母 X/Y/Z 标识；
+//   - 按当前朝向远近排序绘制：靠近相机的轴覆盖在远端轴之上。
+// =============================================================================
+void DrawWorldAxisGizmo(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
+                        const OrbitCamera& cam)
+{
+    constexpr float kRadius      = 32.0f;     ///< 三轴长度（像素）
+    constexpr float kPadding     = 14.0f;     ///< 距离面板左下的内边距
+    constexpr float kLineThick   = 2.5f;
+    constexpr float kCapRadius   = 5.0f;
+    constexpr float kBgRadius    = kRadius + 14.0f;
+
+    if (panelSize.x < kBgRadius * 2.5f || panelSize.y < kBgRadius * 2.5f) return;
+
+    const ImVec2 center = ImVec2(panelMin.x + kBgRadius + kPadding,
+                                 panelMin.y + panelSize.y - kBgRadius - kPadding);
+
+    // 相机视图矩阵的旋转分量（与 DrawCanvas3D 完全同一来源，保证 widget 与场景同步）。
+    // MakeLookAtRH 的 m[0..2][0..2] 行向量 = 视空间基的世界坐标分量。
+    // 把世界基(1,0,0)/(0,1,0)/(0,0,1)用 view 旋转后取 (x,y) 即可投影到屏幕：
+    //   screen.x =  view_x（向右为正）；screen.y = -view_y（屏幕 y 向下为正）
+    const float cy   = std::cos(cam.Pitch);
+    const float sy   = std::sin(cam.Pitch);
+    const float cx   = std::cos(cam.Yaw);
+    const float sx   = std::sin(cam.Yaw);
+    const Vec3  eye  = cam.Target + V3(cx * cy, sy, sx * cy) * cam.Distance;
+    const Mat4  view = MakeLookAtRH(eye, cam.Target, V3(0, 1, 0));
+
+    struct Axis
+    {
+        Vec3   world;
+        ImU32  col;
+        const char* lbl;
+    };
+    const Axis axes[3] = {
+        { V3(1, 0, 0), IM_COL32(232,  72,  72, 255), "X" },
+        { V3(0, 1, 0), IM_COL32( 88, 204,  92, 255), "Y" },
+        { V3(0, 0, 1), IM_COL32( 76, 144, 255, 255), "Z" },
+    };
+
+    struct Proj { ImVec2 end; ImU32 col; const char* lbl; float depth; };
+    Proj projs[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        // 只用旋转：用 view 的 3x3 上左部分对方向向量（w=0）变换。
+        const Vec3& w = axes[i].world;
+        const float vx =  view.m[0][0] * w.x + view.m[0][1] * w.y + view.m[0][2] * w.z;
+        const float vy =  view.m[1][0] * w.x + view.m[1][1] * w.y + view.m[1][2] * w.z;
+        const float vz =  view.m[2][0] * w.x + view.m[2][1] * w.y + view.m[2][2] * w.z;
+        projs[i].end   = ImVec2(center.x + vx * kRadius, center.y - vy * kRadius);
+        projs[i].col   = axes[i].col;
+        projs[i].lbl   = axes[i].lbl;
+        // RH 视空间中 -z 朝相机：vz 越小（更负）越靠近相机，越大越远；
+        // 用 vz 作为远近 key，远的先画。
+        projs[i].depth = vz;
+    }
+
+    int order[3] = { 0, 1, 2 };
+    std::sort(order, order + 3, [&](int a, int b) { return projs[a].depth > projs[b].depth; });
+
+    // 背板：半透明圆 + 边框，提升可读性
+    dl->AddCircleFilled(center, kBgRadius, IM_COL32(20, 22, 28, 170), 32);
+    dl->AddCircle      (center, kBgRadius, IM_COL32(120, 120, 130, 200), 32, 1.0f);
+
+    // 三轴：先线、再末端圆点、最后字母（外缘描黑提升对比度）
+    for (int k = 0; k < 3; ++k)
+    {
+        const Proj& p = projs[order[k]];
+        dl->AddLine    (center, p.end, p.col, kLineThick);
+        dl->AddCircleFilled(p.end, kCapRadius,    p.col, 16);
+        dl->AddCircle      (p.end, kCapRadius + 1, IM_COL32(0, 0, 0, 200), 16, 1.0f);
+
+        const ImVec2 ts = ImGui::CalcTextSize(p.lbl);
+        const ImVec2 tp = ImVec2(p.end.x - ts.x * 0.5f, p.end.y - ts.y * 0.5f);
+        dl->AddText(ImVec2(tp.x + 1, tp.y + 1), IM_COL32(0, 0, 0, 200), p.lbl);
+        dl->AddText(tp,                          IM_COL32(255, 255, 255, 255), p.lbl);
+    }
+}
+
+
 /// 对障碍做视线遮挡时，在三角内多点采样 + 细分，减轻障碍投影边界处的锯齿
 void DrawGroundTriWithOcclusion(ImDrawList* dl, const Mat4& vp, ImVec2 panelMin, ImVec2 panelSize,
                                 const Vec3& eye, const std::vector<Obstacle>* obstacles, ImU32 col,
@@ -67,6 +151,65 @@ void DrawGroundTriWithOcclusion(ImDrawList* dl, const Mat4& vp, ImVec2 panelMin,
     DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, b, mbc, mab, depth + 1);
     DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, c, mca, mbc, depth + 1);
     DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, mab, mbc, mca, depth + 1);
+}
+
+// =============================================================================
+// 世界 XZ 平面网格
+//   - 经过 Render3D::Line3D 走当前 3D 渲染后端，参与真实深度测试（CpuZ / GpuShader / PainterSort 都正确遮挡）；
+//   - 网格中心吸附到 majorStep 的整数倍，避免相机平移时网格"飘"；
+//   - 每 1 单位画一条次级线，每 10 单位画一条主线，X 轴（z=0）红色，Z 轴（x=0）蓝色；
+//   - halfExt 由调用方决定（自适应：clamp(worldDiag*0.6, 25, 100)；手动：UI 滑块）。
+// =============================================================================
+void DrawWorldGridXZ(ImDrawList* dl, const Mat4& vp, ImVec2 panelMin, ImVec2 panelSize,
+                     const Vec3& sceneCenter, float halfExt, float thicknessScale)
+{
+    const float minorStep = 1.0f;
+    const float majorStep = 10.0f;
+
+    const float cx = std::round(sceneCenter.x / majorStep) * majorStep;
+    const float cz = std::round(sceneCenter.z / majorStep) * majorStep;
+    const float yPlane = 0.0f;
+
+    const ImU32 colMinor = IM_COL32( 70,  76,  88, 200);
+    const ImU32 colMajor = IM_COL32(120, 128, 142, 220);
+    const ImU32 colXAxis = IM_COL32(220,  92,  92, 240);  // 沿 X 方向的轴线（z=0）
+    const ImU32 colZAxis = IM_COL32( 92, 144, 230, 240);  // 沿 Z 方向的轴线（x=0）
+    const float ts         = std::max(thicknessScale, 0.1f);
+    const float thickMinor = 1.0f * ts;
+    const float thickMajor = 1.5f * ts;
+    const float thickAxis  = 2.0f * ts;
+
+    const int nCells = static_cast<int>(halfExt / minorStep);
+
+    auto isMajorCoord = [majorStep](float v) {
+        const float r = std::fmod(std::fabs(v) + 1e-3f, majorStep);
+        return r < 0.02f || r > majorStep - 0.02f;
+    };
+
+    // 沿 X 方向的网格线（一条线对应一个 z 值）
+    for (int i = -nCells; i <= nCells; ++i)
+    {
+        const float z       = cz + i * minorStep;
+        const bool  isAxis  = std::fabs(z) < 0.01f;
+        const bool  isMajor = !isAxis && isMajorCoord(z);
+        const ImU32 col     = isAxis ? colXAxis : (isMajor ? colMajor : colMinor);
+        const float thick   = isAxis ? thickAxis : (isMajor ? thickMajor : thickMinor);
+        Render3D::Line3D(dl, vp, panelMin, panelSize,
+                         V3(cx - halfExt, yPlane, z),
+                         V3(cx + halfExt, yPlane, z), col, thick);
+    }
+    // 沿 Z 方向的网格线（一条线对应一个 x 值）
+    for (int i = -nCells; i <= nCells; ++i)
+    {
+        const float x       = cx + i * minorStep;
+        const bool  isAxis  = std::fabs(x) < 0.01f;
+        const bool  isMajor = !isAxis && isMajorCoord(x);
+        const ImU32 col     = isAxis ? colZAxis : (isMajor ? colMajor : colMinor);
+        const float thick   = isAxis ? thickAxis : (isMajor ? thickMajor : thickMinor);
+        Render3D::Line3D(dl, vp, panelMin, panelSize,
+                         V3(x, yPlane, cz - halfExt),
+                         V3(x, yPlane, cz + halfExt), col, thick);
+    }
 }
 } // namespace
 
@@ -188,6 +331,29 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             PainterSort::Begin(eye, vp, panelMin, panelSize);
     }
 
+    // ---------------------------------------------------------------------
+    // 世界 XZ 平面网格：在 Begin() 之后绘制以参与深度测试，被几何正确遮挡。
+    // 即使没有加载几何也显示，便于初始视角参考；与 2D 视图共用 bShowGrid 开关。
+    // ---------------------------------------------------------------------
+    if (!p.View || p.View->bShowGrid)
+    {
+        Vec3  gridCenter = V3(0, 0, 0);
+        if (p.Geom)
+        {
+            const float* bmn = p.Geom->Bounds + 0;
+            const float* bmx = p.Geom->Bounds + 3;
+            gridCenter = V3((bmn[0] + bmx[0]) * 0.5f, 0.0f, (bmn[2] + bmx[2]) * 0.5f);
+        }
+        // halfExt：自适应取 [25,100] 内的 0.6×对角线；手动则使用 UI 设置（下限 1m 防越界）。
+        float halfExt;
+        if (p.View && !p.View->bWorldGridAuto)
+            halfExt = std::max(1.0f, p.View->WorldGridHalfExt);
+        else
+            halfExt = std::clamp(worldDiag * 0.6f, 25.0f, 100.0f);
+        const float gridThick = p.View ? p.View->WorldGridLineThickness : 1.0f;
+        DrawWorldGridXZ(dl, vp, panelMin, panelSize, gridCenter, halfExt, gridThick);
+    }
+
     if (!p.Geom)
     {
         if (useCpuZ)
@@ -208,7 +374,15 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             GpuRenderer::End();
             const ImTextureID tid = GpuRenderer::TextureId();
             if (tid)
+            {
+#if defined(_WIN32)
+                // D3D12：纹理已是“v=0 在顶部”的 D3D 约定，直接 (0,0)-(1,1) 显示
+                dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
+#else
+                // OpenGL FBO：v=0 在底部，需要翻转
                 dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 1), ImVec2(1, 0));
+#endif
+            }
         }
         else if (usePainter)
             PainterSort::Flush(dl);
@@ -253,27 +427,8 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
         }
     }
 
-    // -------------------------------------------------------------------------
-    // 网格（在 y=0 平面）
-    // -------------------------------------------------------------------------
-    if (p.View && p.View->bShowGrid)
-    {
-        const int   gridN = 12;
-        const float w     = bmax[0] - bmin[0];
-        const float h     = bmax[2] - bmin[2];
-        for (int i = 0; i <= gridN; ++i)
-        {
-            const float t = static_cast<float>(i) / gridN;
-            Render3D::Line3D(dl, vp, panelMin, panelSize,
-                             V3(bmin[0] + t * w, 0, bmin[2]),
-                             V3(bmin[0] + t * w, 0, bmax[2]),
-                             IM_COL32(70, 70, 80, 200));
-            Render3D::Line3D(dl, vp, panelMin, panelSize,
-                             V3(bmin[0], 0, bmin[2] + t * h),
-                             V3(bmax[0], 0, bmin[2] + t * h),
-                             IM_COL32(70, 70, 80, 200));
-        }
-    }
+    // 注：早先这里有一段按场景包围盒等分 12 段的简易网格；现已迁移到 Begin() 之后的
+    // DrawWorldGridXZ()——按世界单位画，且无几何时也可见，更接近 Blender / Maya 风格。
 
     // -------------------------------------------------------------------------
     // 输入几何线框（仅 OBJ 模式；大模型稀疏采样）
@@ -716,12 +871,22 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     {
         GpuRenderer::End();
         const ImTextureID tid = GpuRenderer::TextureId();
-        // GL FBO 的 v=0 在纹理底部 → 用 (0,1)-(1,0) 翻转后正确朝上
         if (tid)
+        {
+#if defined(_WIN32)
+            // D3D12：纹理顶部对应 NDC y=+1（v=0 在顶部，与 ImGui 一致）
+            dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
+#else
+            // OpenGL FBO：v=0 在底部，反转 V 才能正立显示
             dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 1), ImVec2(1, 0));
+#endif
+        }
     }
     else if (usePainter)
         PainterSort::Flush(dl);
+
+    // 世界坐标轴 widget（屏幕空间叠绘，永远位于场景纹理之上、面板边框之下）
+    DrawWorldAxisGizmo(dl, panelMin, panelSize, cam);
 
     dl->AddRect(panelMin, panelMax, IM_COL32(90, 90, 100, 255));
     dl->PopClipRect();

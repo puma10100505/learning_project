@@ -43,14 +43,14 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
         int dm = static_cast<int>(app.View.DepthMode3D);
         const char* depthItems[] = {
             "None (ImDrawList only)",
-            "CPU Z-Buffer + GL texture",
+            "CPU Z-Buffer + GPU texture",
             "Depth sort (painter)",
             "GPU Shader (FBO + GLSL)",
         };
         if (ImGui::Combo("3D composite##depthmode", &dm, depthItems, IM_ARRAYSIZE(depthItems)))
             app.View.DepthMode3D = static_cast<View3DDepthMode>(dm);
 #if defined(_WIN32)
-        ImGui::TextDisabled("本 Windows 构建未接 GL 纹理桥；选第 2 / 4 项会等同于 None。");
+        ImGui::TextDisabled("Windows：第 2 项为 CPU Z + D3D12 纹理；第 4 项 GpuShader 为 D3D12 HLSL 离屏渲染。");
 #endif
         ImGui::TextDisabled("Painter：按三角距相机由远到近画，再画线；有穿插时仍可能错序。");
 
@@ -100,6 +100,25 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
     ImGui::Checkbox("Grid",          &app.View.bShowGrid);         ImGui::SameLine();
     ImGui::Checkbox("Input mesh",    &app.View.bShowInputMesh);    ImGui::SameLine();
     ImGui::Checkbox("Obstacles",     &app.View.bShowObstacles);
+    if (app.View.bShowGrid)
+    {
+        ImGui::Indent();
+        ImGui::Checkbox("Grid auto-fit (按场景包围盒)", &app.View.bWorldGridAuto);
+        if (!app.View.bWorldGridAuto)
+        {
+            ImGui::PushItemWidth(-FLT_MIN);
+            ImGui::SliderFloat("Grid half extent (m)##gridhalf",
+                               &app.View.WorldGridHalfExt, 5.0f, 500.0f, "%.1f");
+            ImGui::PopItemWidth();
+            ImGui::TextDisabled("沿 X、Z 各画 ±halfExt；总宽 = 2×halfExt");
+        }
+        ImGui::PushItemWidth(-FLT_MIN);
+        ImGui::SliderFloat("Grid line thickness##gridth",
+                           &app.View.WorldGridLineThickness, 0.25f, 4.0f, "%.2fx");
+        ImGui::PopItemWidth();
+        ImGui::TextDisabled("作用于 minor/major/axis 三档基础粗细的倍数（高 DPI 可调高）");
+        ImGui::Unindent();
+    }
     ImGui::Checkbox("Collision tint", &app.View.bShowCollisionTint);
     if (app.View.bShowCollisionTint)
     {

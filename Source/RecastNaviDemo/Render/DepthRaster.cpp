@@ -281,13 +281,17 @@ void DrawLineWorld(const Mat4& vp, Vec3 a, Vec3 b, ImU32 col, float thicknessPix
     const float len = Length(ab);
     if (len < 1e-6f) return;
 
-    const float distA = Length(a - g_Active.eye);
-    const float distB = Length(b - g_Active.eye);
-    const float dist  = std::max(distA, distB);
+    // 每端各按自身到相机的距离算 halfWidth → 梯形，屏幕上是均匀 1 像素宽。
+    // 旧实现取 max(distA,distB) 让 quad 整体加粗：长线段（如大半径世界网格）
+    // 因为远端 dist 大，近端会变得非常粗。
+    const float distA = std::max(Length(a - g_Active.eye), 0.1f);
+    const float distB = std::max(Length(b - g_Active.eye), 0.1f);
     const float halfH = static_cast<float>(g_Active.rh);
-    const float pxToWorld =
-        (2.0f * std::tan(g_Active.fovy * 0.5f) * std::max(dist, 0.1f)) / std::max(halfH, 1.0f);
-    const float halfWidth = std::max(thicknessPixels * pxToWorld * 0.5f, g_Active.worldDiag * 1e-4f);
+    const float k     =
+        (2.0f * std::tan(g_Active.fovy * 0.5f)) / std::max(halfH, 1.0f);
+    const float floorW   = g_Active.worldDiag * 1e-4f;
+    const float halfWidA = std::max(thicknessPixels * k * 0.5f * distA, floorW);
+    const float halfWidB = std::max(thicknessPixels * k * 0.5f * distB, floorW);
 
     const Vec3      eab   = ab * (1.0f / len);
     const Vec3      mid   = (a + b) * 0.5f;
@@ -297,12 +301,14 @@ void DrawLineWorld(const Mat4& vp, Vec3 a, Vec3 b, ImU32 col, float thicknessPix
     Vec3 side = Cross(eab, toEye);
     if (Length(side) < 1e-4f) side = Cross(eab, V3(0, 1, 0));
     if (Length(side) < 1e-4f) return;
-    side = Normalize(side) * halfWidth;
+    side = Normalize(side);
 
-    const Vec3 p0 = a + side;
-    const Vec3 p1 = a - side;
-    const Vec3 p2 = b - side;
-    const Vec3 p3 = b + side;
+    const Vec3 sA = side * halfWidA;
+    const Vec3 sB = side * halfWidB;
+    const Vec3 p0 = a + sA;
+    const Vec3 p1 = a - sA;
+    const Vec3 p2 = b - sB;
+    const Vec3 p3 = b + sB;
 
     DrawTriangleWorld(vp, p0, p1, p2, col, false);
     DrawTriangleWorld(vp, p0, p2, p3, col, false);

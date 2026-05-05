@@ -42,6 +42,8 @@
 7. **资源生命周期**：
    - canvas 尺寸变化时：等当前帧 fence 完成 → 释放旧 RTT/DSV → 重建。
    - Shutdown 时跟随 `DirectX12Window` 的 Cleanup 一起释放。
+8. **重构UI**:
+   - 将左侧UI分类重构，增加主菜单，主菜单是功能分类，如NAVMESH、光照、渲染等功能，在主菜单下增加子菜单项，分别对应每个功能的配置项和功能，配置内容后续通过浮动窗口实现，可以增加主场景的可视范围
 
 **验证清单**：
 - [ ] `View > 3D composite = GPU Shader` 在 Windows 下 FPS = 60（vsync），CPU 占用接近 0%。

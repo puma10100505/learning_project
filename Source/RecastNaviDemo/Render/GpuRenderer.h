@@ -8,9 +8,8 @@
  *   - End() 后通过 TextureId() 取 ImTextureID，由 ImGui::Image 显示在画布。
  *
  * 平台支持：
- *   - macOS / Linux：基于 GLFW + glad 已建立的 GL 3.3 Core context，可用。
- *   - Windows：当前 demo 走 D3D12 后端，无 GL 上下文 → Available() 返回 false，
- *     调用方应回退到 None / CpuZBuffer / PainterSort。
+ *   - macOS / Linux：GLFW + glad，OpenGL 3.3 Core（运行时加载 Shaders/*.vs|fs）。
+ *   - Windows：D3D12（GpuRendererD3D12.inl），HLSL 编译后离屏渲染到纹理供 ImGui 采样。
  *
  * 使用模式（与 DepthRaster 完全一致）：
  *   GpuRenderer::Begin(rw, rh, clearColor, vp, fovy, eye, worldDiag);
@@ -55,7 +54,7 @@ struct LightParams
     float sceneRadius    = 50.0f;
 };
 
-/// 当前平台/构建是否可用（Windows D3D12 构建下为 false）
+/// 当前平台/构建是否可用（Windows 在 D3D 设备与着色器管线就绪后为 true）
 bool Available();
 
 /// 是否处于 Begin/End 之间（Primitives 转发用）
