@@ -367,6 +367,102 @@ RecastNaviDemo.cpp.s:
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/RecastNaviDemo.cpp.s
 .PHONY : RecastNaviDemo.cpp.s
 
+Render/DepthRaster.o: Render/DepthRaster.cpp.o
+.PHONY : Render/DepthRaster.o
+
+# target to build an object file
+Render/DepthRaster.cpp.o:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o
+.PHONY : Render/DepthRaster.cpp.o
+
+Render/DepthRaster.i: Render/DepthRaster.cpp.i
+.PHONY : Render/DepthRaster.i
+
+# target to preprocess a source file
+Render/DepthRaster.cpp.i:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.i
+.PHONY : Render/DepthRaster.cpp.i
+
+Render/DepthRaster.s: Render/DepthRaster.cpp.s
+.PHONY : Render/DepthRaster.s
+
+# target to generate assembly for a file
+Render/DepthRaster.cpp.s:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.s
+.PHONY : Render/DepthRaster.cpp.s
+
+Render/GpuRenderer.o: Render/GpuRenderer.cpp.o
+.PHONY : Render/GpuRenderer.o
+
+# target to build an object file
+Render/GpuRenderer.cpp.o:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/GpuRenderer.cpp.o
+.PHONY : Render/GpuRenderer.cpp.o
+
+Render/GpuRenderer.i: Render/GpuRenderer.cpp.i
+.PHONY : Render/GpuRenderer.i
+
+# target to preprocess a source file
+Render/GpuRenderer.cpp.i:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/GpuRenderer.cpp.i
+.PHONY : Render/GpuRenderer.cpp.i
+
+Render/GpuRenderer.s: Render/GpuRenderer.cpp.s
+.PHONY : Render/GpuRenderer.s
+
+# target to generate assembly for a file
+Render/GpuRenderer.cpp.s:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/GpuRenderer.cpp.s
+.PHONY : Render/GpuRenderer.cpp.s
+
+Render/NavViewTextureBridge.o: Render/NavViewTextureBridge.cpp.o
+.PHONY : Render/NavViewTextureBridge.o
+
+# target to build an object file
+Render/NavViewTextureBridge.cpp.o:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o
+.PHONY : Render/NavViewTextureBridge.cpp.o
+
+Render/NavViewTextureBridge.i: Render/NavViewTextureBridge.cpp.i
+.PHONY : Render/NavViewTextureBridge.i
+
+# target to preprocess a source file
+Render/NavViewTextureBridge.cpp.i:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.i
+.PHONY : Render/NavViewTextureBridge.cpp.i
+
+Render/NavViewTextureBridge.s: Render/NavViewTextureBridge.cpp.s
+.PHONY : Render/NavViewTextureBridge.s
+
+# target to generate assembly for a file
+Render/NavViewTextureBridge.cpp.s:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.s
+.PHONY : Render/NavViewTextureBridge.cpp.s
+
+Render/PainterSort.o: Render/PainterSort.cpp.o
+.PHONY : Render/PainterSort.o
+
+# target to build an object file
+Render/PainterSort.cpp.o:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o
+.PHONY : Render/PainterSort.cpp.o
+
+Render/PainterSort.i: Render/PainterSort.cpp.i
+.PHONY : Render/PainterSort.i
+
+# target to preprocess a source file
+Render/PainterSort.cpp.i:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.i
+.PHONY : Render/PainterSort.cpp.i
+
+Render/PainterSort.s: Render/PainterSort.cpp.s
+.PHONY : Render/PainterSort.s
+
+# target to generate assembly for a file
+Render/PainterSort.cpp.s:
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_mac && $(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.s
+.PHONY : Render/PainterSort.cpp.s
+
 Render/Primitives.o: Render/Primitives.cpp.o
 .PHONY : Render/Primitives.o
 
@@ -620,6 +716,18 @@ help:
 	@echo "... RecastNaviDemo.o"
 	@echo "... RecastNaviDemo.i"
 	@echo "... RecastNaviDemo.s"
+	@echo "... Render/DepthRaster.o"
+	@echo "... Render/DepthRaster.i"
+	@echo "... Render/DepthRaster.s"
+	@echo "... Render/GpuRenderer.o"
+	@echo "... Render/GpuRenderer.i"
+	@echo "... Render/GpuRenderer.s"
+	@echo "... Render/NavViewTextureBridge.o"
+	@echo "... Render/NavViewTextureBridge.i"
+	@echo "... Render/NavViewTextureBridge.s"
+	@echo "... Render/PainterSort.o"
+	@echo "... Render/PainterSort.i"
+	@echo "... Render/PainterSort.s"
 	@echo "... Render/Primitives.o"
 	@echo "... Render/Primitives.i"
 	@echo "... Render/Primitives.s"

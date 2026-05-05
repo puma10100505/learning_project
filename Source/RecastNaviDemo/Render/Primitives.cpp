@@ -7,6 +7,7 @@
 
 #include "Primitives.h"
 #include "DepthRaster.h"
+#include "GpuRenderer.h"
 #include "PainterSort.h"
 
 #include <cmath>
@@ -59,6 +60,11 @@ void Line3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
         PainterSort::RecordLine(vp, vMin, vSize, a, b, col, thickness);
         return;
     }
+    if (GpuRenderer::IsActive())
+    {
+        GpuRenderer::DrawLineWorld(vp, a, b, col, thickness);
+        return;
+    }
     if (DepthRaster::IsActive())
     {
         DepthRaster::DrawLineWorld(vp, a, b, col, thickness);
@@ -73,6 +79,11 @@ void TriFilled3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
     if (PainterSort::IsCollecting())
     {
         PainterSort::RecordTri(vp, vMin, vSize, a, b, c, col);
+        return;
+    }
+    if (GpuRenderer::IsActive())
+    {
+        GpuRenderer::DrawTriangleWorld(vp, a, b, c, col);
         return;
     }
     if (DepthRaster::IsActive())
@@ -103,12 +114,16 @@ void RingXZ(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
 void DiscXZFilled(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                   float cx, float cz, float y, float r, int segs, ImU32 col)
 {
+    // 顶点序 (center, cur, prev)：从 +Y 上方俯视为顺时针，
+    // 经 cross(e1,e2) 算出的面法线指向 +Y（朝上），与"圆柱顶面朝上"一致。
+    // 旧顺序 (center, prev, cur) 法线朝 −Y，会被深度模式 (CpuZBuffer / GpuShader)
+    // 的背面剔除丢掉，导致圆柱顶面不封闭、能看穿到内壁。
     Vec3 prev = V3(cx + r, y, cz);
     for (int i = 1; i <= segs; ++i)
     {
         const float a   = (i / (float)segs) * 6.28318530718f;
         const Vec3  cur = V3(cx + r * std::cos(a), y, cz + r * std::sin(a));
-        TriFilled3D(dl, vp, vMin, vSize, V3(cx, y, cz), prev, cur, col);
+        TriFilled3D(dl, vp, vMin, vSize, V3(cx, y, cz), cur, prev, col);
         prev = cur;
     }
 }
@@ -153,8 +168,8 @@ void DrawCylinderObstacleShaded3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, I
         const Vec3  n(std::cos(amid), 0.0f, std::sin(amid));
         const Vec3  ctr = (p00 + p01 + p10 + p11) * 0.25f;
         const bool  front = Dot(n, eyeWorld - ctr) > 1e-5f;
-        if (!front && !DepthRaster::IsActive())
-            continue; // 无深度缓冲时剔除远侧；有 Z-Buffer 时两面都画
+        if (!front && !DepthRaster::IsActive() && !GpuRenderer::IsActive())
+            continue; // 无深度缓冲时剔除远侧；有 Z-Buffer / GPU 深度时两面都画
         const ImU32 col = front ? sideFrontCol : sideBackCol;
         TriFilled3D(dl, vp, vMin, vSize, p00, p01, p11, col);
         TriFilled3D(dl, vp, vMin, vSize, p00, p11, p10, col);

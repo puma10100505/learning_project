@@ -73,6 +73,9 @@ namespace Panels
 /// 视图模式 / 渲染开关 / 颜色 / 相机参数（折叠头 "View"）
 void DrawViewPanel(AppState& app, const PanelCallbacks& cb);
 
+/// GpuShader 模式的灯光参数（折叠头 "Lighting"）：类型 / 方向 / 距离 / 颜色 / 强度 / 环境光
+void DrawLightingPanel(AppState& app);
+
 /// 程序化场景尺寸 / 网格密度 / 预设按钮（折叠头 "Scene / 场景"）
 void DrawScenePanel(AppState& app, const PanelCallbacks& cb);
 

@@ -8,6 +8,7 @@
 #include "Renderer3D.h"
 #include "CollisionRender.h"
 #include "DepthRaster.h"
+#include "GpuRenderer.h"
 #include "NavViewTextureBridge.h"
 #include "PainterSort.h"
 #include "Primitives.h"
@@ -114,9 +115,12 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
         p.View ? p.View->DepthMode3D : View3DDepthMode::None;
     const bool            useCpuZ =
         (depthMode == View3DDepthMode::CpuZBuffer) && NavViewTextureBridgeAvailable();
+    const bool            useGpu =
+        (depthMode == View3DDepthMode::GpuShader) && GpuRenderer::Available();
     const bool            usePainter = (depthMode == View3DDepthMode::PainterSort);
     // 软件光栅成本是 O(像素)：可降采样渲染再由 GL 线性放大显示。
     //   N=1 原生（最清晰，最慢）；N=2 半分辨率（默认）；N=3/4 更快但更糊。
+    // GPU 模式无此瓶颈，恒走原生分辨率。
     const int kDownscale = useCpuZ
         ? std::clamp(p.View ? p.View->CpuZBufferDownscale : 2, 1, 8)
         : 1;
@@ -125,6 +129,58 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
 
     if (useCpuZ)
         DepthRaster::Begin(rw, rh, IM_COL32(28, 30, 36, 255), vp, cam.Fovy, eye, worldDiag);
+    else if (useGpu)
+    {
+        const int gpuSamples = std::clamp(p.View ? p.View->GpuMsaaSamples : 4, 1, 16);
+
+        // ---- 把 UI 端 LightSettings 折成 GpuRenderer::LightParams ----
+        // Directional：vec = 用户填的方向（shader 内 normalize）
+        // Point      ：vec = normalize(dir) * Distance（=世界坐标位置；同时其模长充当衰减半径）
+        GpuRenderer::LightParams lp{};
+        if (p.View)
+        {
+            const LightSettings& ls = p.View->Light;
+            lp.type      = (ls.Type == 1) ? 1 : 0;
+            Vec3 dir     = V3(ls.DirX, ls.DirY, ls.DirZ);
+            const float dl = Length(dir);
+            if (dl < 1e-6f) dir = V3(0.0f, 1.0f, 0.0f);
+            else            dir = dir * (1.0f / dl);
+            lp.vec       = (lp.type == 1) ? (dir * std::max(ls.Distance, 0.01f)) : dir;
+            lp.color     = V3(ls.Color[0], ls.Color[1], ls.Color[2]);
+            lp.intensity = std::max(ls.Intensity, 0.0f);
+            lp.ambient   = std::clamp(ls.Ambient, 0.0f, 1.0f);
+
+            // ---- Shadow 配置 ----
+            lp.shadowsOn      = ls.bShadowsOn;
+            lp.shadowMapSize  = std::clamp(ls.ShadowMapSize, 64, 4096);
+            lp.shadowStrength = std::clamp(ls.ShadowStrength, 0.0f, 1.0f);
+            lp.shadowBias     = std::max(ls.ShadowBias, 0.0f);
+            lp.shadowPcf      = (ls.ShadowPcf != 0) ? 1 : 0;
+
+            // 场景中心 / 半径：取包围盒的 (center, half-diagonal)，用于 ortho frustum
+            if (p.Geom)
+            {
+                const float* bmn = p.Geom->Bounds + 0;
+                const float* bmx = p.Geom->Bounds + 3;
+                lp.sceneCenter = V3((bmn[0] + bmx[0]) * 0.5f,
+                                    (bmn[1] + bmx[1]) * 0.5f,
+                                    (bmn[2] + bmx[2]) * 0.5f);
+                const float dx = bmx[0] - bmn[0];
+                const float dy = bmx[1] - bmn[1];
+                const float dz = bmx[2] - bmn[2];
+                lp.sceneRadius = 0.5f * std::sqrt(dx * dx + dy * dy + dz * dz);
+            }
+            else
+            {
+                lp.sceneCenter = V3(0, 0, 0);
+                lp.sceneRadius = std::max(worldDiag * 0.5f, 1.0f);
+            }
+        }
+
+        GpuRenderer::Begin(static_cast<int>(panelSize.x), static_cast<int>(panelSize.y),
+                           IM_COL32(28, 30, 36, 255), vp, cam.Fovy, eye, worldDiag,
+                           gpuSamples, lp);
+    }
     else
     {
         dl->AddRectFilled(panelMin, panelMax, IM_COL32(28, 30, 36, 255));
@@ -146,6 +202,13 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
                 if (tid)
                     dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
             }
+        }
+        else if (useGpu)
+        {
+            GpuRenderer::End();
+            const ImTextureID tid = GpuRenderer::TextureId();
+            if (tid)
+                dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 1), ImVec2(1, 0));
         }
         else if (usePainter)
             PainterSort::Flush(dl);
@@ -170,10 +233,10 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
                                  ? std::min(p.Geom->GroundTriCount, totalTris)
                                  : totalTris;
         const int   stride     = (triCount > 40000) ? (triCount / 40000 + 1) : 1;
-        // CpuZBuffer 已逐像素做深度测试，地面被障碍遮挡的部分会被自然剔除；
+        // CpuZBuffer / GpuShader 都有真深度测试：地面被障碍遮挡的部分会被自然剔除，
         // 再做 CPU 射线 vs 障碍 + 三角细分纯属重复，性能损失非常大。
         const std::vector<Obstacle>* obsPtr =
-            (useCpuZ || p.Geom->Obstacles.empty()) ? nullptr : &p.Geom->Obstacles;
+            (useCpuZ || useGpu || p.Geom->Obstacles.empty()) ? nullptr : &p.Geom->Obstacles;
         for (int t = 0; t < triCount; t += stride)
         {
             const int*   tri = &p.Geom->Triangles[t * 3];
@@ -248,7 +311,8 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
         {
             const Vec3 ctr = (v0 + v1 + v2 + v3) * 0.25f;
             // 无深度缓冲时剔除背向面；有 Z-Buffer 时两面都画，由深度决定可见性
-            if (!useTopColor && !DepthRaster::IsActive() && Dot(nOut, eye - ctr) <= 1e-5f)
+            if (!useTopColor && !DepthRaster::IsActive() && !GpuRenderer::IsActive()
+                && Dot(nOut, eye - ctr) <= 1e-5f)
                 return;
             const ImU32 col = useTopColor ? topCol
                                           : (Dot(nOut, eye - ctr) > 0.0f ? sideFrontCol : sideBackCol);
@@ -647,6 +711,14 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             if (tid)
                 dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
         }
+    }
+    else if (useGpu)
+    {
+        GpuRenderer::End();
+        const ImTextureID tid = GpuRenderer::TextureId();
+        // GL FBO 的 v=0 在纹理底部 → 用 (0,1)-(1,0) 翻转后正确朝上
+        if (tid)
+            dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 1), ImVec2(1, 0));
     }
     else if (usePainter)
         PainterSort::Flush(dl);

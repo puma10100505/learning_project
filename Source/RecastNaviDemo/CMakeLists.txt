@@ -28,8 +28,19 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/UI      UI_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/App     APP_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/Phys    PHYS_SRC)
 
+# Shader 源（独立 .vs/.fs 文件，由 Render/GpuRenderer.cpp 在运行时加载）
+# 这里仅为：① 让 IDE/工程视图能看到这些文件；② 触发 IDE 的 source group。
+# 文件本身不参与编译，只在运行时通过 std::filesystem 找到并 fopen 读入。
+file(GLOB RECAST_SHADER_FILES
+    "${PROJECT_SOURCE_DIR}/Render/Shaders/*.vs"
+    "${PROJECT_SOURCE_DIR}/Render/Shaders/*.fs")
+set_source_files_properties(${RECAST_SHADER_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+source_group("Render/Shaders" FILES ${RECAST_SHADER_FILES})
+
 # 可执行目标
-add_executable(${PROJECT_NAME} ${SRC} ${NAV_SRC} ${RENDER_SRC} ${UI_SRC} ${APP_SRC} ${PHYS_SRC})
+add_executable(${PROJECT_NAME}
+    ${SRC} ${NAV_SRC} ${RENDER_SRC} ${UI_SRC} ${APP_SRC} ${PHYS_SRC}
+    ${RECAST_SHADER_FILES})
 
 # PhysX：macOS 在 SharedDef 中已链接；Windows 需打开 USE_PHYSX
 if(APPLE)

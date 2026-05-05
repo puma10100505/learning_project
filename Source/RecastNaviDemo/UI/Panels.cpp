@@ -45,11 +45,12 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
             "None (ImDrawList only)",
             "CPU Z-Buffer + GL texture",
             "Depth sort (painter)",
+            "GPU Shader (FBO + GLSL)",
         };
         if (ImGui::Combo("3D composite##depthmode", &dm, depthItems, IM_ARRAYSIZE(depthItems)))
             app.View.DepthMode3D = static_cast<View3DDepthMode>(dm);
 #if defined(_WIN32)
-        ImGui::TextDisabled("本 Windows 构建未接 Z-Buffer 纹理；选第 2 项时与第 1 项相同。");
+        ImGui::TextDisabled("本 Windows 构建未接 GL 纹理桥；选第 2 / 4 项会等同于 None。");
 #endif
         ImGui::TextDisabled("Painter：按三角距相机由远到近画，再画线；有穿插时仍可能错序。");
 
@@ -72,6 +73,27 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
                 app.View.CpuZBufferDownscale = kResValues[curIdx];
             }
             ImGui::TextDisabled("软件光栅吞吐 = O(像素)；上调系数可换 FPS。");
+        }
+
+        // GpuShader: MSAA 采样数
+        if (app.View.DepthMode3D == View3DDepthMode::GpuShader)
+        {
+            static const char* kMsaaLabels[] = {
+                "MSAA off (1x)",
+                "MSAA 2x",
+                "MSAA 4x   (default)",
+                "MSAA 8x   (best, slower)",
+            };
+            constexpr int kMsaaValues[] = { 1, 2, 4, 8 };
+            int curIdx = 2; // default = 4x
+            for (int i = 0; i < IM_ARRAYSIZE(kMsaaValues); ++i)
+                if (kMsaaValues[i] == app.View.GpuMsaaSamples) { curIdx = i; break; }
+            if (ImGui::Combo("MSAA samples##gpumsaa", &curIdx,
+                             kMsaaLabels, IM_ARRAYSIZE(kMsaaLabels)))
+            {
+                app.View.GpuMsaaSamples = kMsaaValues[curIdx];
+            }
+            ImGui::TextDisabled("光照参数详见下方 Lighting 折叠面板（fragment shader 实时读取）");
         }
     }
 
@@ -127,6 +149,150 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
         ImGui::SliderFloat("Yaw",      &app.Cam.Yaw,      -3.14f, 3.14f);
         ImGui::SliderFloat("Pitch",    &app.Cam.Pitch,    -1.50f, 1.50f);
         ImGui::SliderFloat("Distance", &app.Cam.Distance,  2.00f, 800.0f);
+    }
+}
+
+// =============================================================================
+// DrawLightingPanel
+//   仅 GpuShader 模式的 fragment shader 真正消费这些值；
+//   面板始终可见，方便切到 GpuShader 前预先调好。
+// =============================================================================
+void DrawLightingPanel(AppState& app)
+{
+    if (!ImGui::CollapsingHeader("Lighting", ImGuiTreeNodeFlags_DefaultOpen)) return;
+
+    LightSettings& L = app.View.Light;
+
+    const bool active =
+        (app.CurrentViewMode == ViewMode::Orbit3D) &&
+        (app.View.DepthMode3D == View3DDepthMode::GpuShader);
+
+    if (!active)
+        ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f),
+                           "仅在 3D + GpuShader 模式下生效（其余模式忽略）");
+    else
+        ImGui::TextDisabled("Lambert 漫反射 + 环境光（fragment shader 内合成）");
+
+    ImGui::PushItemWidth(-FLT_MIN);
+
+    // ---- 类型 ----
+    static const char* kTypes[] = { "Directional (sun)", "Point (lamp)" };
+    int type = (L.Type == 1) ? 1 : 0;
+    if (ImGui::Combo("Type##lighttype", &type, kTypes, IM_ARRAYSIZE(kTypes)))
+        L.Type = type;
+
+    // ---- 方向 ----
+    float dir[3] = { L.DirX, L.DirY, L.DirZ };
+    if (ImGui::SliderFloat3("Direction##lightdir", dir, -1.0f, 1.0f, "%.2f"))
+    {
+        L.DirX = dir[0]; L.DirY = dir[1]; L.DirZ = dir[2];
+    }
+    {
+        // 显示归一化后的向量，便于直观理解 shader 实际看到的 L
+        const float n = std::sqrt(L.DirX * L.DirX + L.DirY * L.DirY + L.DirZ * L.DirZ);
+        if (n > 1e-6f)
+            ImGui::TextDisabled("  normalized: (%+.2f, %+.2f, %+.2f)",
+                                L.DirX / n, L.DirY / n, L.DirZ / n);
+        else
+            ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "  零向量；shader 会回退到 +Y");
+    }
+
+    // ---- 距离（仅 Point 有意义）----
+    if (L.Type == 1)
+    {
+        ImGui::SliderFloat("Distance##lightdist", &L.Distance, 1.0f, 200.0f, "%.1f m");
+        ImGui::TextDisabled("  灯位 = normalize(Direction) * Distance；衰减 d²/(d²+Distance²)");
+    }
+    else
+    {
+        ImGui::BeginDisabled();
+        ImGui::SliderFloat("Distance##lightdist", &L.Distance, 1.0f, 200.0f,
+                           "%.1f m  (Directional 模式下不生效)");
+        ImGui::EndDisabled();
+    }
+
+    // ---- 颜色 ----
+    ImGui::ColorEdit3("Color##lightcol", L.Color,
+                      ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
+
+    // ---- 强度 / 环境光 ----
+    ImGui::SliderFloat("Intensity##lightint", &L.Intensity, 0.0f, 3.0f, "%.2fx");
+    ImGui::SliderFloat("Ambient##lightamb",   &L.Ambient,   0.0f, 1.0f, "%.2f");
+
+    ImGui::PopItemWidth();
+
+    // ---- 阴影 (Shadow Mapping) ----
+    ImGui::Spacing();
+    if (ImGui::TreeNodeEx("Shadows##lightshadow", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        const bool shadowEffective = active && (L.Type == 0);
+        if (active && L.Type == 1)
+            ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.4f, 1.0f),
+                               "Point 光暂不支持阴影（需要 cubemap，开销大）");
+
+        ImGui::Checkbox("Enable Shadows##sh_on", &L.bShadowsOn);
+        if (!shadowEffective)
+        {
+            ImGui::SameLine();
+            ImGui::TextDisabled("(仅 Directional + GpuShader)");
+        }
+
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        // 分辨率
+        static const char* kSizeLabels[] = {
+            "512  (fast, blocky)",
+            "1024 (default)",
+            "2048 (sharp)",
+            "4096 (best, slow)",
+        };
+        constexpr int kSizeValues[] = { 512, 1024, 2048, 4096 };
+        int sizeIdx = 1;
+        for (int i = 0; i < IM_ARRAYSIZE(kSizeValues); ++i)
+            if (kSizeValues[i] == L.ShadowMapSize) { sizeIdx = i; break; }
+        if (ImGui::Combo("Map Size##sh_size", &sizeIdx, kSizeLabels, IM_ARRAYSIZE(kSizeLabels)))
+            L.ShadowMapSize = kSizeValues[sizeIdx];
+
+        // 强度
+        ImGui::SliderFloat("Strength##sh_str", &L.ShadowStrength, 0.0f, 1.0f, "%.2f");
+        ImGui::TextDisabled("  0=无阴影, 1=阴影区漫反射全抹");
+
+        // Bias
+        ImGui::SliderFloat("Bias##sh_bias", &L.ShadowBias, 0.0f, 0.01f, "%.4f");
+        ImGui::TextDisabled("  小 → 自阴影条纹 (acne)；大 → 阴影脱离根部 (peter-panning)");
+
+        // PCF
+        bool pcf = (L.ShadowPcf != 0);
+        if (ImGui::Checkbox("3x3 PCF (soft)##sh_pcf", &pcf)) L.ShadowPcf = pcf ? 1 : 0;
+
+        ImGui::PopItemWidth();
+        ImGui::TreePop();
+    }
+
+    // ---- 预设 / 重置 ----
+    if (ImGui::SmallButton("Reset"))      L = LightSettings{};
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Noon"))
+    {
+        L = LightSettings{};
+        L.Type = 0; L.DirX = 0.05f; L.DirY = 1.0f; L.DirZ = 0.10f;
+        L.Color[0] = L.Color[1] = L.Color[2] = 1.0f;
+        L.Intensity = 1.0f; L.Ambient = 0.42f;
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Sunset"))
+    {
+        L.Type = 0; L.DirX = 0.85f; L.DirY = 0.20f; L.DirZ = 0.40f;
+        L.Color[0] = 1.00f; L.Color[1] = 0.62f; L.Color[2] = 0.38f;
+        L.Intensity = 1.20f; L.Ambient = 0.25f;
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Lamp"))
+    {
+        L.Type = 1; L.DirX = 0.30f; L.DirY = 0.85f; L.DirZ = 0.20f;
+        L.Distance = 25.0f;
+        L.Color[0] = 1.00f; L.Color[1] = 0.92f; L.Color[2] = 0.78f;
+        L.Intensity = 1.30f; L.Ambient = 0.20f;
     }
 }
 

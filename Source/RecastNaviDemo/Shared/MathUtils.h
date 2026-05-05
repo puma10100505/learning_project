@@ -68,6 +68,21 @@ inline Mat4 MakePerspectiveRH(float fovyRad, float aspect, float znear, float zf
     return r;
 }
 
+/// 右手坐标系正交投影矩阵，NDC z 范围 [-1, 1]（与 GL 默认一致）。
+/// 用于方向光 shadow map：光源固定看向 -Z（光空间），把 [l,r]×[b,t]×[-far,-near] 映射到 [-1,1]³。
+inline Mat4 MakeOrthoRH(float l, float r, float b, float t, float znear, float zfar)
+{
+    Mat4 m{};
+    m.m[0][0] =  2.0f / (r - l);
+    m.m[1][1] =  2.0f / (t - b);
+    m.m[2][2] = -2.0f / (zfar - znear);
+    m.m[0][3] = -(r + l) / (r - l);
+    m.m[1][3] = -(t + b) / (t - b);
+    m.m[2][3] = -(zfar + znear) / (zfar - znear);
+    m.m[3][3] =  1.0f;
+    return m;
+}
+
 inline Mat4 MatMul(const Mat4& a, const Mat4& b)
 {
     Mat4 r{};

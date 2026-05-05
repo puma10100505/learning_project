@@ -46,6 +46,47 @@ enum class View3DDepthMode : uint8_t
     None        = 0, ///< 直接 ImDrawList，无全局深度/排序
     CpuZBuffer  = 1, ///< CPU 深度缓冲 + OpenGL 纹理
     PainterSort = 2, ///< 按三角重心距相机排序后绘制（画家算法）
+    GpuShader   = 3, ///< GPU 着色器（FBO + GLSL 330）+ 硬件深度（仅 GL 平台可用）
+};
+
+// =============================================================================
+// 光照参数（仅 GpuShader 模式生效）
+// -----------------------------------------------------------------------------
+//   - Directional：把场景当作太阳照射，Direction 为光指向（fragment 看到的 L =
+//     normalize(Direction)），距离 / 衰减无效。
+//   - Point：把光当作放在 normalize(Direction) * Distance 的世界坐标点光源，
+//     片元 L = normalize(lightPos - fragPos)，距离衰减按 d²/(d² + Distance²)。
+// =============================================================================
+struct LightSettings
+{
+    int   Type        = 0;        ///< 0 = Directional（太阳），1 = Point（点光源）
+    /// 方向（Directional：光行进方向；Point：从场景原点指向灯位的方向）。
+    /// 不必预先归一化，shader 内会 normalize；但建议保持非零向量。
+    float DirX        = 0.45f;
+    float DirY        = 0.85f;
+    float DirZ        = 0.30f;
+    /// Point 模式下灯到场景原点的距离（米）。lightPos = normalize(Dir) * Distance。
+    /// Directional 模式下忽略。
+    float Distance    = 30.0f;
+    /// 灯光颜色（RGB，线性，0-1）；alpha 不参与计算。
+    float Color[3]    = { 1.0f, 1.0f, 1.0f };
+    /// 漫反射强度倍数（0 = 无方向光；1 = 默认；>1 过曝增强）。
+    float Intensity   = 1.0f;
+    /// 环境光强度（0 = 全黑阴影；1 = 平涂无方向感）；与原 fragment shader 的常量等价。
+    float Ambient     = 0.38f;
+
+    // -------- 阴影 (Shadow Mapping)。仅 Directional + GpuShader 模式下生效 --------
+    /// 是否启用阴影（Directional 模式额外渲一遍深度图，主 pass 采样比较）
+    bool  bShadowsOn      = false;
+    /// 阴影贴图分辨率（正方形）。1024 默认；512 模糊但快；2048/4096 锐利但占显存。
+    int   ShadowMapSize   = 1024;
+    /// 阴影颜色强度：0 = 完全无阴影（仅环境光照亮），1 = 受光面与背光面亮度差最大。
+    float ShadowStrength  = 0.7f;
+    /// 深度比较 bias，防止 shadow acne（自阴影条纹）。典型 0.0005 ~ 0.005。
+    /// 太小 → 出现条纹噪声；太大 → 出现 peter-panning（阴影脱离物体根部）。
+    float ShadowBias      = 0.0015f;
+    /// 0 = 单点采样（硬阴影边）；1 = 3x3 PCF（软边，9 次贴图采样开销）
+    int   ShadowPcf       = 1;
 };
 
 // =============================================================================
@@ -70,6 +111,11 @@ struct ViewSettings
     /// N=1 原生分辨率（最清晰，最慢）；N=2 半分辨率（默认，质量/速度平衡）；
     /// N=3、4 进一步降采样以换 FPS。仅 CpuZBuffer 生效，None / PainterSort 走 GPU 不受影响。
     int             CpuZBufferDownscale = 2;
+    /// GpuShader 模式的 MSAA 采样数：1 关闭、2、4、8（超过 GL_MAX_SAMPLES 自动夹紧）。
+    /// 仅 GpuShader 生效；其它模式忽略。
+    int             GpuMsaaSamples      = 4;
+    /// GpuShader 模式的灯光参数（仅 fragment 着色阶段读取）；其它模式不参与计算但仍可调。
+    LightSettings   Light;
     bool bShowInputMesh    = true;   ///< 显示输入几何线框（地面/OBJ）
     bool bFillPolygons     = true;   ///< 填充 NavMesh 多边形
     bool bRegionColors     = true;   ///< 使用区域哈希色区分多边形

@@ -150,6 +150,8 @@ void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
 
             Panels::DrawViewPanel  (app, cb.Panels);
             ImGui::Separator();
+            Panels::DrawLightingPanel(app);
+            ImGui::Separator();
             Panels::DrawScenePanel (app, cb.Panels);
             ImGui::Separator();
             Panels::DrawEditPanel  (app, cb.Panels);
