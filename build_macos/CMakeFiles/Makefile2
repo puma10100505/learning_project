@@ -429,12 +429,12 @@ Thirdparty/stb_image/clean: Thirdparty/stb_image/CMakeFiles/stb_image.dir/clean
 Source/LearningFoundation/CMakeFiles/learning_foundation.dir/all:
 	$(MAKE) $(MAKESILENT) -f Source/LearningFoundation/CMakeFiles/learning_foundation.dir/build.make Source/LearningFoundation/CMakeFiles/learning_foundation.dir/depend
 	$(MAKE) $(MAKESILENT) -f Source/LearningFoundation/CMakeFiles/learning_foundation.dir/build.make Source/LearningFoundation/CMakeFiles/learning_foundation.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90 "Built target learning_foundation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=76,77,78,79,80,81,82,83,84,85,86,87,88,89,90 "Built target learning_foundation"
 .PHONY : Source/LearningFoundation/CMakeFiles/learning_foundation.dir/all
 
 # Build rule for subdir invocation for target.
 Source/LearningFoundation/CMakeFiles/learning_foundation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 16
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 15
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Source/LearningFoundation/CMakeFiles/learning_foundation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Source/LearningFoundation/CMakeFiles/learning_foundation.dir/rule
@@ -452,6 +452,7 @@ Source/LearningFoundation/CMakeFiles/learning_foundation.dir/clean:
 # Target rules for target Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir
 
 # All Build rule for target.
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Source/LearningFoundation/CMakeFiles/learning_foundation.dir/all
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/loguru/CMakeFiles/loguru.dir/all
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/perfetto_sdk/CMakeFiles/perfetto.dir/all
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/glad/CMakeFiles/glad.dir/all
@@ -461,15 +462,14 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/recastnaviga
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/all
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/all
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/all
-Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all: Source/LearningFoundation/CMakeFiles/learning_foundation.dir/all
 	$(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/depend
 	$(MAKE) $(MAKESILENT) -f Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=44,45,46,47,48,49,50,51,52,53,54,55,56,57,58 "Built target RecastNaviDemo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60 "Built target RecastNaviDemo"
 .PHONY : Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all
 
 # Build rule for subdir invocation for target.
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 74
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 76
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/rule
@@ -490,12 +490,12 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/clean:
 Thirdparty/glad/CMakeFiles/glad.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/glad/CMakeFiles/glad.dir/build.make Thirdparty/glad/CMakeFiles/glad.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/glad/CMakeFiles/glad.dir/build.make Thirdparty/glad/CMakeFiles/glad.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=59,60 "Built target glad"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=61 "Built target glad"
 .PHONY : Thirdparty/glad/CMakeFiles/glad.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/glad/CMakeFiles/glad.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 1
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/glad/CMakeFiles/glad.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/glad/CMakeFiles/glad.dir/rule
@@ -516,7 +516,7 @@ Thirdparty/glad/CMakeFiles/glad.dir/clean:
 Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/all: Thirdparty/imgui/CMakeFiles/imgui.dir/all
 	$(MAKE) $(MAKESILENT) -f Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/build.make Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/build.make Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=27,28,29,30,31,32 "Built target NetImGui"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=26,27,28,29,30,31 "Built target NetImGui"
 .PHONY : Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/all
 
 # Build rule for subdir invocation for target.
@@ -542,7 +542,7 @@ Thirdparty/NetImGui/CMakeFiles/NetImGui.dir/clean:
 Thirdparty/imgui/CMakeFiles/imgui.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/imgui/CMakeFiles/imgui.dir/build.make Thirdparty/imgui/CMakeFiles/imgui.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/imgui/CMakeFiles/imgui.dir/build.make Thirdparty/imgui/CMakeFiles/imgui.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=61,62,63,64,65,66,67,68,69 "Built target imgui"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=62,63,64,65,66,67,68,69,70 "Built target imgui"
 .PHONY : Thirdparty/imgui/CMakeFiles/imgui.dir/all
 
 # Build rule for subdir invocation for target.
@@ -648,12 +648,12 @@ Thirdparty/recastnavigation/Detour/CMakeFiles/Detour.dir/clean:
 Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/all: Thirdparty/recastnavigation/Detour/CMakeFiles/Detour.dir/all
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/build.make Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/build.make Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=12,13,14,15,16,17,18 "Built target DetourCrowd"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=12,13,14,15,16,17 "Built target DetourCrowd"
 .PHONY : Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 13
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/rule
@@ -674,12 +674,12 @@ Thirdparty/recastnavigation/DetourCrowd/CMakeFiles/DetourCrowd.dir/clean:
 Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/all: Thirdparty/recastnavigation/Detour/CMakeFiles/Detour.dir/all
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/build.make Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/build.make Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=19,20 "Built target DetourTileCache"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=18,19,20 "Built target DetourTileCache"
 .PHONY : Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 9
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/rule
@@ -700,12 +700,12 @@ Thirdparty/recastnavigation/DetourTileCache/CMakeFiles/DetourTileCache.dir/clean
 Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/build.make Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/build.make Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=33,34,35,36,37,38,39,40,41,42,43 "Built target Recast"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=32,33,34,35,36,37,38,39,40,41 "Built target Recast"
 .PHONY : Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/rule
@@ -726,7 +726,7 @@ Thirdparty/recastnavigation/Recast/CMakeFiles/Recast.dir/clean:
 Thirdparty/implot/CMakeFiles/implot.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/implot/CMakeFiles/implot.dir/build.make Thirdparty/implot/CMakeFiles/implot.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/implot/CMakeFiles/implot.dir/build.make Thirdparty/implot/CMakeFiles/implot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=72,73,74 "Built target implot"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=73,74,75 "Built target implot"
 .PHONY : Thirdparty/implot/CMakeFiles/implot.dir/all
 
 # Build rule for subdir invocation for target.
@@ -752,7 +752,7 @@ Thirdparty/implot/CMakeFiles/implot.dir/clean:
 Thirdparty/imnodes/CMakeFiles/imnodes.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/imnodes/CMakeFiles/imnodes.dir/build.make Thirdparty/imnodes/CMakeFiles/imnodes.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/imnodes/CMakeFiles/imnodes.dir/build.make Thirdparty/imnodes/CMakeFiles/imnodes.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=70,71 "Built target imnodes"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=71,72 "Built target imnodes"
 .PHONY : Thirdparty/imnodes/CMakeFiles/imnodes.dir/all
 
 # Build rule for subdir invocation for target.
@@ -778,12 +778,12 @@ Thirdparty/imnodes/CMakeFiles/imnodes.dir/clean:
 Thirdparty/node-editor/CMakeFiles/node-editor.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/node-editor/CMakeFiles/node-editor.dir/build.make Thirdparty/node-editor/CMakeFiles/node-editor.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/node-editor/CMakeFiles/node-editor.dir/build.make Thirdparty/node-editor/CMakeFiles/node-editor.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=92,93,94,95,96 "Built target node-editor"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=93,94,95,96 "Built target node-editor"
 .PHONY : Thirdparty/node-editor/CMakeFiles/node-editor.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/node-editor/CMakeFiles/node-editor.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/node-editor/CMakeFiles/node-editor.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/node-editor/CMakeFiles/node-editor.dir/rule
@@ -804,12 +804,12 @@ Thirdparty/node-editor/CMakeFiles/node-editor.dir/clean:
 Thirdparty/loguru/CMakeFiles/loguru.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/loguru/CMakeFiles/loguru.dir/build.make Thirdparty/loguru/CMakeFiles/loguru.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/loguru/CMakeFiles/loguru.dir/build.make Thirdparty/loguru/CMakeFiles/loguru.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=91 "Built target loguru"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=91,92 "Built target loguru"
 .PHONY : Thirdparty/loguru/CMakeFiles/loguru.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/loguru/CMakeFiles/loguru.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/loguru/CMakeFiles/loguru.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/loguru/CMakeFiles/loguru.dir/rule
@@ -830,12 +830,12 @@ Thirdparty/loguru/CMakeFiles/loguru.dir/clean:
 Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/all:
 	$(MAKE) $(MAKESILENT) -f Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/build.make Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/depend
 	$(MAKE) $(MAKESILENT) -f Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/build.make Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=21,22,23,24,25,26 "Built target ImGuizmo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=21,22,23,24,25 "Built target ImGuizmo"
 .PHONY : Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/all
 
 # Build rule for subdir invocation for target.
 Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles 0
 .PHONY : Thirdparty/ImGuizmo/CMakeFiles/ImGuizmo.dir/rule

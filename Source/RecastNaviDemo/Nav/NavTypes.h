@@ -123,6 +123,11 @@ struct InputGeometry
     float                      Bounds[6];     ///< bmin.xyz, bmax.xyz
     GeomSource                 Source = GeomSource::Procedural;
     std::string                ObjPath;       ///< 仅 ObjFile 模式有效
+    /// "纯地面"三角数量，即 Triangles 中前多少个属于地面（不含 Obstacle 实体网格）。
+    /// Procedural 模式：在 AppendObstacleSolidMesh 之前置位；
+    /// OBJ 模式：等于 Triangles.size()/3。
+    /// 渲染时区分地面着色与障碍着色；< 0 视为"全部按地面渲染"（向后兼容默认）。
+    int                        GroundTriCount = -1;
 };
 
 // =============================================================================

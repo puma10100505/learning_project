@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libNetImGui.a CMakeFiles/NetImGui.dir/Client/Private/NetImgui_Api.cpp.o CMakeFiles/NetImGui.dir/Client/Private/NetImgui_Client.cpp.o CMakeFiles/NetImGui.dir/Client/Private/NetImgui_CmdPackets_DrawFrame.cpp.o CMakeFiles/NetImGui.dir/Client/Private/NetImgui_NetworkPosix.cpp.o CMakeFiles/NetImGui.dir/Client/Private/NetImgui_NetworkUE4.cpp.o CMakeFiles/NetImGui.dir/Client/Private/NetImgui_NetworkWin32.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libNetImGui.a

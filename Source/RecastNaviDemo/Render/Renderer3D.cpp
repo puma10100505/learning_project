@@ -6,6 +6,10 @@
  */
 
 #include "Renderer3D.h"
+#include "CollisionRender.h"
+#include "DepthRaster.h"
+#include "NavViewTextureBridge.h"
+#include "PainterSort.h"
 #include "Primitives.h"
 
 #include <cmath>
@@ -22,6 +26,48 @@
 
 namespace Renderer3D
 {
+namespace
+{
+constexpr int kGroundOcclusionSubdivDepth = 2;
+
+/// 对障碍做视线遮挡时，在三角内多点采样 + 细分，减轻障碍投影边界处的锯齿
+void DrawGroundTriWithOcclusion(ImDrawList* dl, const Mat4& vp, ImVec2 panelMin, ImVec2 panelSize,
+                                const Vec3& eye, const std::vector<Obstacle>* obstacles, ImU32 col,
+                                const Vec3& a, const Vec3& b, const Vec3& c, int depth)
+{
+    const bool cullObs = obstacles && !obstacles->empty();
+    if (!cullObs)
+    {
+        Render3D::TriFilled3D(dl, vp, panelMin, panelSize, a, b, c, col);
+        return;
+    }
+    const std::vector<Obstacle>& obs = *obstacles;
+    const bool                   oa  = CollisionRender::SegmentEyeToPointOccluded(eye, a, obs);
+    const bool                   ob  = CollisionRender::SegmentEyeToPointOccluded(eye, b, obs);
+    const bool                   oc  = CollisionRender::SegmentEyeToPointOccluded(eye, c, obs);
+    const Vec3                   g   = (a + b + c) * (1.0f / 3.0f);
+    const bool                   og  = CollisionRender::SegmentEyeToPointOccluded(eye, g, obs);
+    if (oa && ob && oc && og)
+        return;
+    if (!oa && !ob && !oc && !og)
+    {
+        Render3D::TriFilled3D(dl, vp, panelMin, panelSize, a, b, c, col);
+        return;
+    }
+    if (depth >= kGroundOcclusionSubdivDepth)
+    {
+        Render3D::TriFilled3D(dl, vp, panelMin, panelSize, a, b, c, col);
+        return;
+    }
+    const Vec3 mab = (a + b) * 0.5f;
+    const Vec3 mbc = (b + c) * 0.5f;
+    const Vec3 mca = (c + a) * 0.5f;
+    DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, a, mab, mca, depth + 1);
+    DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, b, mbc, mab, depth + 1);
+    DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, c, mca, mbc, depth + 1);
+    DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obstacles, col, mab, mbc, mca, depth + 1);
+}
+} // namespace
 
 Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
                    const OrbitCamera& cam, const Draw3DParams& p)
@@ -29,8 +75,6 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     Map3D result{};   // bValid = false
 
     const ImVec2 panelMax(panelMin.x + panelSize.x, panelMin.y + panelSize.y);
-    dl->AddRectFilled(panelMin, panelMax, IM_COL32(28, 30, 36, 255));
-    dl->AddRect(panelMin, panelMax, IM_COL32(90, 90, 100, 255));
     dl->PushClipRect(panelMin, panelMax, true);
 
     // -------------------------------------------------------------------------
@@ -55,14 +99,96 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     result.Proj         = proj;
     // InvVP 不在此计算（原始代码注释：拣取用 eye + 反向射线即可）
 
+    float worldDiag = 100.0f;
+    if (p.Geom)
+    {
+        const float* bmn = p.Geom->Bounds + 0;
+        const float* bmx = p.Geom->Bounds + 3;
+        const float  dx  = bmx[0] - bmn[0];
+        const float  dy  = bmx[1] - bmn[1];
+        const float  dz  = bmx[2] - bmn[2];
+        worldDiag        = std::sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    const View3DDepthMode depthMode =
+        p.View ? p.View->DepthMode3D : View3DDepthMode::None;
+    const bool            useCpuZ =
+        (depthMode == View3DDepthMode::CpuZBuffer) && NavViewTextureBridgeAvailable();
+    const bool            usePainter = (depthMode == View3DDepthMode::PainterSort);
+    // 软件光栅成本是 O(像素)：可降采样渲染再由 GL 线性放大显示。
+    //   N=1 原生（最清晰，最慢）；N=2 半分辨率（默认）；N=3/4 更快但更糊。
+    const int kDownscale = useCpuZ
+        ? std::clamp(p.View ? p.View->CpuZBufferDownscale : 2, 1, 8)
+        : 1;
+    const int             rw         = std::max(1, static_cast<int>(panelSize.x) / kDownscale);
+    const int             rh         = std::max(1, static_cast<int>(panelSize.y) / kDownscale);
+
+    if (useCpuZ)
+        DepthRaster::Begin(rw, rh, IM_COL32(28, 30, 36, 255), vp, cam.Fovy, eye, worldDiag);
+    else
+    {
+        dl->AddRectFilled(panelMin, panelMax, IM_COL32(28, 30, 36, 255));
+        if (usePainter)
+            PainterSort::Begin(eye, vp, panelMin, panelSize);
+    }
+
     if (!p.Geom)
     {
+        if (useCpuZ)
+        {
+            DepthRaster::End();
+            const uint8_t* px = DepthRaster::PixelsRGBA();
+            if (px)
+            {
+                NavViewTextureBridgeUpload(DepthRaster::BufferWidth(),
+                                           DepthRaster::BufferHeight(), px);
+                const ImTextureID tid = NavViewTextureBridgeTextureId();
+                if (tid)
+                    dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
+            }
+        }
+        else if (usePainter)
+            PainterSort::Flush(dl);
+        dl->AddRect(panelMin, panelMax, IM_COL32(90, 90, 100, 255));
         dl->PopClipRect();
         return result;
     }
 
     const float* bmin = p.Geom->Bounds + 0;
     const float* bmax = p.Geom->Bounds + 3;
+
+    // -------------------------------------------------------------------------
+    // 碰撞地面：输入三角网填充（与 PhysX 地形一致）；障碍与相机之间者剔除
+    // -------------------------------------------------------------------------
+    if (p.View && p.View->bShowCollisionTint && !p.Geom->Triangles.empty())
+    {
+        const ImU32 colBase = Renderer2D::ColU32(p.View->GroundCollisionTint);
+        // 仅遍历"纯地面"三角；剩下的障碍实体网格三角交给下面的 obstacle pass
+        // 用 ObstacleTopTint / ObstacleSideTint 单独着色，避免颜色混淆。
+        const int   totalTris  = static_cast<int>(p.Geom->Triangles.size() / 3);
+        const int   triCount   = (p.Geom->GroundTriCount >= 0)
+                                 ? std::min(p.Geom->GroundTriCount, totalTris)
+                                 : totalTris;
+        const int   stride     = (triCount > 40000) ? (triCount / 40000 + 1) : 1;
+        // CpuZBuffer 已逐像素做深度测试，地面被障碍遮挡的部分会被自然剔除；
+        // 再做 CPU 射线 vs 障碍 + 三角细分纯属重复，性能损失非常大。
+        const std::vector<Obstacle>* obsPtr =
+            (useCpuZ || p.Geom->Obstacles.empty()) ? nullptr : &p.Geom->Obstacles;
+        for (int t = 0; t < triCount; t += stride)
+        {
+            const int*   tri = &p.Geom->Triangles[t * 3];
+            const float* va  = &p.Geom->Vertices[tri[0] * 3];
+            const float* vb  = &p.Geom->Vertices[tri[1] * 3];
+            const float* vc  = &p.Geom->Vertices[tri[2] * 3];
+            const Vec3 a = V3(va[0], va[1], va[2]);
+            const Vec3 b = V3(vb[0], vb[1], vb[2]);
+            const Vec3 c = V3(vc[0], vc[1], vc[2]);
+            if (obsPtr)
+                DrawGroundTriWithOcclusion(dl, vp, panelMin, panelSize, eye, obsPtr, colBase, a, b, c, 0);
+            else
+                Render3D::TriFilled3D(dl, vp, panelMin, panelSize, a, b, c, colBase);
+        }
+    }
 
     // -------------------------------------------------------------------------
     // 网格（在 y=0 平面）
@@ -116,25 +242,82 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     // -------------------------------------------------------------------------
     if (p.View && p.View->bShowObstacles)
     {
+        auto shadedQuad = [&](const Vec3& v0, const Vec3& v1, const Vec3& v2, const Vec3& v3,
+                              const Vec3& nOut, ImU32 topCol, ImU32 sideFrontCol, ImU32 sideBackCol,
+                              bool useTopColor)
+        {
+            const Vec3 ctr = (v0 + v1 + v2 + v3) * 0.25f;
+            // 无深度缓冲时剔除背向面；有 Z-Buffer 时两面都画，由深度决定可见性
+            if (!useTopColor && !DepthRaster::IsActive() && Dot(nOut, eye - ctr) <= 1e-5f)
+                return;
+            const ImU32 col = useTopColor ? topCol
+                                          : (Dot(nOut, eye - ctr) > 0.0f ? sideFrontCol : sideBackCol);
+            Render3D::TriFilled3D(dl, vp, panelMin, panelSize, v0, v1, v2, col);
+            Render3D::TriFilled3D(dl, vp, panelMin, panelSize, v0, v2, v3, col);
+        };
+
         for (size_t i = 0; i < p.Geom->Obstacles.size(); ++i)
         {
             const Obstacle& o = p.Geom->Obstacles[i];
-            const bool  selected = (p.SelectedObstacle == (int)i);
-            const bool  dragging = (p.MoveStateIndex   == (int)i);
-            const ImU32 fill = IM_COL32(180, 80, 80, dragging ? 220 : (selected ? 200 : 140));
-            const ImU32 edge = selected ? IM_COL32(255, 230, 100, 255) : IM_COL32(220, 110, 110, 230);
-            const float H    = o.Height;
+            const bool      selected = (p.SelectedObstacle == (int)i);
+            const bool      dragging = (p.MoveStateIndex == (int)i);
+            ImU32           fill{};
+            ImU32           edge{};
+            ImU32           topU{};
+            ImU32           sideFU{};
+            ImU32           sideBU{};
+            if (p.View->bShowCollisionTint)
+            {
+                ImVec4 topC = p.View->ObstacleTopTint;
+                ImVec4 sf   = p.View->ObstacleSideTint;
+                ImVec4 sb   = p.View->ObstacleSideBackTint;
+                if (dragging)
+                {
+                    topC.w = std::min(1.0f, topC.w * 1.12f + 0.06f);
+                    sf.w   = std::min(1.0f, sf.w * 1.10f + 0.04f);
+                    sb.w   = std::min(1.0f, sb.w * 1.08f + 0.03f);
+                }
+                else if (selected)
+                {
+                    topC.w = std::min(1.0f, topC.w * 1.06f + 0.04f);
+                    sf.w   = std::min(1.0f, sf.w * 1.05f + 0.02f);
+                }
+                topU   = Renderer2D::ColU32(topC);
+                sideFU = Renderer2D::ColU32(sf);
+                sideBU = Renderer2D::ColU32(sb);
+                edge   = selected ? IM_COL32(255, 235, 120, 255)
+                                  : Renderer2D::ColU32(p.View->ObstacleCollisionEdge);
+            }
+            else
+            {
+                fill = IM_COL32(220, 105, 95, dragging ? 235 : (selected ? 215 : 175));
+                edge = selected ? IM_COL32(255, 235, 120, 255) : IM_COL32(255, 160, 140, 245);
+            }
+            const float H = o.Height;
 
             if (o.Shape == ObstacleShape::Box)
             {
                 const float minX = o.CX - o.SX, maxX = o.CX + o.SX;
                 const float minZ = o.CZ - o.SZ, maxZ = o.CZ + o.SZ;
-                Vec3 c000{ minX, 0, minZ }, c100{ maxX, 0, minZ };
-                Vec3 c110{ maxX, 0, maxZ }, c010{ minX, 0, maxZ };
-                Vec3 c001{ minX, H, minZ }, c101{ maxX, H, minZ };
-                Vec3 c111{ maxX, H, maxZ }, c011{ minX, H, maxZ };
-                Render3D::TriFilled3D(dl, vp, panelMin, panelSize, c001, c101, c111, fill);
-                Render3D::TriFilled3D(dl, vp, panelMin, panelSize, c001, c111, c011, fill);
+                Vec3        c000{ minX, 0, minZ }, c100{ maxX, 0, minZ };
+                Vec3        c110{ maxX, 0, maxZ }, c010{ minX, 0, maxZ };
+                Vec3        c001{ minX, H, minZ }, c101{ maxX, H, minZ };
+                Vec3        c111{ maxX, H, maxZ }, c011{ minX, H, maxZ };
+
+                if (p.View->bShowCollisionTint)
+                {
+                    shadedQuad(c000, c010, c011, c001, V3(-1, 0, 0), topU, sideFU, sideBU, false); // -X
+                    shadedQuad(c100, c101, c111, c110, V3(1, 0, 0), topU, sideFU, sideBU, false); // +X
+                    shadedQuad(c000, c001, c101, c100, V3(0, 0, -1), topU, sideFU, sideBU, false); // -Z
+                    shadedQuad(c010, c110, c111, c011, V3(0, 0, 1), topU, sideFU, sideBU, false);  // +Z
+                    shadedQuad(c000, c100, c110, c010, V3(0, -1, 0), topU, sideFU, sideBU, false); // bottom
+                    shadedQuad(c001, c011, c111, c101, V3(0, 1, 0), topU, sideFU, sideBU, true);  // top
+                }
+                else
+                {
+                    Render3D::TriFilled3D(dl, vp, panelMin, panelSize, c001, c101, c111, fill);
+                    Render3D::TriFilled3D(dl, vp, panelMin, panelSize, c001, c111, c011, fill);
+                }
                 Render3D::Line3D(dl, vp, panelMin, panelSize, c000, c100, edge);
                 Render3D::Line3D(dl, vp, panelMin, panelSize, c100, c110, edge);
                 Render3D::Line3D(dl, vp, panelMin, panelSize, c110, c010, edge);
@@ -150,8 +333,17 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             }
             else
             {
-                Render3D::DrawCylinderObstacle3D(dl, vp, panelMin, panelSize,
-                                                 o.CX, o.CZ, o.Radius, H, fill, edge);
+                if (p.View->bShowCollisionTint)
+                {
+                    Render3D::DrawCylinderObstacleShaded3D(dl, vp, panelMin, panelSize, eye,
+                                                           o.CX, o.CZ, o.Radius, H,
+                                                           topU, sideFU, sideBU, edge);
+                }
+                else
+                {
+                    Render3D::DrawCylinderObstacle3D(dl, vp, panelMin, panelSize,
+                                                     o.CX, o.CZ, o.Radius, H, fill, edge);
+                }
             }
         }
     }
@@ -444,6 +636,22 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
         }
     }
 
+    if (useCpuZ)
+    {
+        DepthRaster::End();
+        const uint8_t* px = DepthRaster::PixelsRGBA();
+        if (px)
+        {
+            NavViewTextureBridgeUpload(DepthRaster::BufferWidth(), DepthRaster::BufferHeight(), px);
+            const ImTextureID tid = NavViewTextureBridgeTextureId();
+            if (tid)
+                dl->AddImage(tid, panelMin, panelMax, ImVec2(0, 0), ImVec2(1, 1));
+        }
+    }
+    else if (usePainter)
+        PainterSort::Flush(dl);
+
+    dl->AddRect(panelMin, panelMax, IM_COL32(90, 90, 100, 255));
     dl->PopClipRect();
     return result;
 }

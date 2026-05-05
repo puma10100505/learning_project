@@ -167,10 +167,52 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.s: cma
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.s"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Nav/NavSerializer.cpp -o CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.s
 
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o: ../Source/RecastNaviDemo/Render/DepthRaster.cpp
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/DepthRaster.cpp
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.i"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/DepthRaster.cpp > CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.i
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.s"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/DepthRaster.cpp -o CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.s
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o: ../Source/RecastNaviDemo/Render/NavViewTextureBridge.cpp
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/NavViewTextureBridge.cpp
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.i"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/NavViewTextureBridge.cpp > CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.i
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.s"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/NavViewTextureBridge.cpp -o CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.s
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o: ../Source/RecastNaviDemo/Render/PainterSort.cpp
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/PainterSort.cpp
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.i"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/PainterSort.cpp > CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.i
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.s"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/PainterSort.cpp -o CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.s
+
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o: ../Source/RecastNaviDemo/Render/Primitives.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/Primitives.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.i: cmake_force
@@ -184,7 +226,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.s: cma
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o: ../Source/RecastNaviDemo/Render/Renderer2D.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/Renderer2D.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.i: cmake_force
@@ -198,7 +240,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.s: cma
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o: ../Source/RecastNaviDemo/Render/Renderer3D.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Render/Renderer3D.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.i: cmake_force
@@ -212,7 +254,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.s: cma
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o: ../Source/RecastNaviDemo/UI/FileDialog.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/FileDialog.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.i: cmake_force
@@ -226,7 +268,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/FileDialog.cpp.s: cmake_f
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o: ../Source/RecastNaviDemo/UI/Interaction.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/Interaction.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.i: cmake_force
@@ -240,7 +282,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Interaction.cpp.s: cmake_
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o: ../Source/RecastNaviDemo/UI/MainLayout.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/MainLayout.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.i: cmake_force
@@ -254,7 +296,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.s: cmake_f
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o: ../Source/RecastNaviDemo/UI/Panels.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/Panels.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.i: cmake_force
@@ -268,7 +310,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.s: cmake_force
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o: ../Source/RecastNaviDemo/UI/Splitters.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/Splitters.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.i: cmake_force
@@ -282,7 +324,7 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.s: cmake_fo
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o: ../Source/RecastNaviDemo/UI/StatsWindow.cpp
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/StatsWindow.cpp
 
 Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.i: cmake_force
@@ -293,6 +335,20 @@ Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.s: cmake_
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.s"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/UI/StatsWindow.cpp -o CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.s
 
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/flags.make
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o: ../Source/RecastNaviDemo/Phys/PhysWorld.cpp
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o -MF CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o.d -o CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o -c /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Phys/PhysWorld.cpp
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.i"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Phys/PhysWorld.cpp > CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.i
+
+Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.s"
+	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/yinpsoft/GameScience/Github/learning_project/Source/RecastNaviDemo/Phys/PhysWorld.cpp -o CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.s
+
 # Object files for target RecastNaviDemo
 RecastNaviDemo_OBJECTS = \
 "CMakeFiles/RecastNaviDemo.dir/RecastNaviDemo.cpp.o" \
@@ -302,6 +358,9 @@ RecastNaviDemo_OBJECTS = \
 "CMakeFiles/RecastNaviDemo.dir/Nav/NavPathSmooth.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/Nav/NavQuery.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.o" \
+"CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o" \
+"CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o" \
+"CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o" \
@@ -310,7 +369,8 @@ RecastNaviDemo_OBJECTS = \
 "CMakeFiles/RecastNaviDemo.dir/UI/MainLayout.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o" \
 "CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o" \
-"CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o"
+"CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o" \
+"CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o"
 
 # External object files for target RecastNaviDemo
 RecastNaviDemo_EXTERNAL_OBJECTS =
@@ -322,6 +382,9 @@ Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNav
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Nav/NavPathSmooth.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Nav/NavQuery.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Nav/NavSerializer.cpp.o
+Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/DepthRaster.cpp.o
+Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/NavViewTextureBridge.cpp.o
+Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/PainterSort.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Primitives.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer2D.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Render/Renderer3D.cpp.o
@@ -331,6 +394,7 @@ Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNav
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Panels.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/Splitters.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/UI/StatsWindow.cpp.o
+Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/Phys/PhysWorld.cpp.o
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/build.make
 Source/RecastNaviDemo/RecastNaviDemo: Source/LearningFoundation/liblearning_foundation.a
 Source/RecastNaviDemo/RecastNaviDemo: Thirdparty/stb_image/libstb_image.a
@@ -344,7 +408,7 @@ Source/RecastNaviDemo/RecastNaviDemo: Thirdparty/recastnavigation/DetourCrowd/li
 Source/RecastNaviDemo/RecastNaviDemo: Thirdparty/recastnavigation/DetourTileCache/libDetourTileCache.a
 Source/RecastNaviDemo/RecastNaviDemo: Thirdparty/recastnavigation/Detour/libDetour.a
 Source/RecastNaviDemo/RecastNaviDemo: Source/RecastNaviDemo/CMakeFiles/RecastNaviDemo.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking CXX executable RecastNaviDemo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/yinpsoft/GameScience/Github/learning_project/build_macos/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Linking CXX executable RecastNaviDemo"
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/RecastNaviDemo.dir/link.txt --verbose=$(VERBOSE)
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /usr/local/bin/cmake -E make_directory /Users/yinpsoft/GameScience/Github/learning_project/Bin
 	cd /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo && /usr/local/bin/cmake -E copy /Users/yinpsoft/GameScience/Github/learning_project/build_macos/Source/RecastNaviDemo/RecastNaviDemo /Users/yinpsoft/GameScience/Github/learning_project/Bin

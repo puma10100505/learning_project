@@ -8,6 +8,7 @@
 #include "Interaction.h"
 
 #include "../Nav/NavTypes.h"    // PointInsideObstacle
+#include "../Phys/PhysWorld.h"
 
 #include <cmath>
 #include <limits>
@@ -20,6 +21,29 @@
 
 namespace Interaction
 {
+
+namespace
+{
+
+bool BuildOrbit3DViewRay(const AppState& app, const ImVec2& mp, Vec3& outEye, Vec3& outDir)
+{
+    if (!app.LastMap3D.bValid) return false;
+    const float ndcX = ((mp.x - app.LastMap3D.ViewportMin.x) / app.LastMap3D.ViewportSize.x) * 2.0f - 1.0f;
+    const float ndcY = 1.0f - ((mp.y - app.LastMap3D.ViewportMin.y) / app.LastMap3D.ViewportSize.y) * 2.0f;
+
+    const Vec3 eye    = app.LastMap3D.EyeWorld;
+    const Vec3 target = app.Cam.Target;
+    const Vec3 fwd    = Normalize(target - eye);
+    const Vec3 right  = Normalize(Cross(fwd, V3(0, 1, 0)));
+    const Vec3 up     = Cross(right, fwd);
+    const float aspect = app.LastMap3D.ViewportSize.x / app.LastMap3D.ViewportSize.y;
+    const float th     = std::tan(app.Cam.Fovy * 0.5f);
+    outEye             = eye;
+    outDir             = Normalize(fwd + right * (ndcX * th * aspect) + up * (ndcY * th));
+    return true;
+}
+
+} // namespace
 
 // =============================================================================
 // 低层射线拣取
@@ -100,18 +124,17 @@ bool ScreenTo2DWorld(const AppState& app, const ImVec2& mp,
 bool ScreenTo3DGroundWorld(const AppState& app, const ImVec2& mp,
                            float& wx, float& wy, float& wz)
 {
-    if (!app.LastMap3D.bValid) return false;
-    const float ndcX = ((mp.x - app.LastMap3D.ViewportMin.x) / app.LastMap3D.ViewportSize.x) * 2.0f - 1.0f;
-    const float ndcY = 1.0f - ((mp.y - app.LastMap3D.ViewportMin.y) / app.LastMap3D.ViewportSize.y) * 2.0f;
+    Vec3 eye, dir;
+    if (!BuildOrbit3DViewRay(app, mp, eye, dir)) return false;
 
-    const Vec3 eye    = app.LastMap3D.EyeWorld;
-    const Vec3 target = app.Cam.Target;
-    const Vec3 fwd    = Normalize(target - eye);
-    const Vec3 right  = Normalize(Cross(fwd, V3(0, 1, 0)));
-    const Vec3 up     = Cross(right, fwd);
-    const float aspect = app.LastMap3D.ViewportSize.x / app.LastMap3D.ViewportSize.y;
-    const float th     = std::tan(app.Cam.Fovy * 0.5f);
-    const Vec3  dir    = Normalize(fwd + right * (ndcX * th * aspect) + up * (ndcY * th));
+    // PhysX：与导航输入网格（及障碍体）求最近命中
+    if (PhysWorld::IsActive())
+    {
+        int         obsIdx = -1;
+        const float o[3]   = { eye.x, eye.y, eye.z };
+        const float d[3]   = { dir.x, dir.y, dir.z };
+        if (PhysWorld::RaycastClosest(o, d, 1.0e6f, wx, wy, wz, obsIdx)) return true;
+    }
 
     // OBJ: 真三角形 raycast, 拿到模型表面点 (含 Y)
     if (app.Geom.Source == GeomSource::ObjFile && !app.Geom.Triangles.empty())
@@ -134,8 +157,46 @@ bool PickGroundWorld(const AppState& app, const ImVec2& mp,
                      float& wx, float& wy, float& wz)
 {
     if (app.CurrentViewMode == ViewMode::TopDown2D)
-        return ScreenTo2DWorld(app, mp, wx, wy, wz);
+    {
+        if (!ScreenTo2DWorld(app, mp, wx, wy, wz)) return false;
+        if (PhysWorld::IsActive())
+        {
+            int   obsIgnored = -1;
+            float hitY       = wy;
+            if (PhysWorld::RaycastVerticalTopDown(wx, wz, app.Geom.Bounds, hitY, obsIgnored)) wy = hitY;
+        }
+        return true;
+    }
     return ScreenTo3DGroundWorld(app, mp, wx, wy, wz);
+}
+
+int PickObstacleIndex(const AppState& app, const ImVec2& mp)
+{
+    if (!PhysWorld::IsActive())
+    {
+        float wx = 0.0f, wy = 0.0f, wz = 0.0f;
+        if (!PickGroundWorld(app, mp, wx, wy, wz)) return -1;
+        return FindObstacleAt(app, wx, wz);
+    }
+
+    if (app.CurrentViewMode == ViewMode::Orbit3D)
+    {
+        Vec3 eye, dir;
+        if (!BuildOrbit3DViewRay(app, mp, eye, dir)) return -1;
+        float hx = 0.f, hy = 0.f, hz = 0.f;
+        int   obs = -1;
+        const float o[3] = { eye.x, eye.y, eye.z };
+        const float d[3] = { dir.x, dir.y, dir.z };
+        if (PhysWorld::RaycastClosest(o, d, 1.0e6f, hx, hy, hz, obs)) return obs;
+        return -1;
+    }
+
+    float wx = 0.f, wy = 0.f, wz = 0.f;
+    if (!ScreenTo2DWorld(app, mp, wx, wy, wz)) return -1;
+    int   obs = -1;
+    float hitY = wy;
+    if (PhysWorld::RaycastVerticalTopDown(wx, wz, app.Geom.Bounds, hitY, obs)) return obs;
+    return FindObstacleAt(app, wx, wz);
 }
 
 // =============================================================================
@@ -178,7 +239,7 @@ void HandleCanvasInteraction(AppState& app,
         {
             const ImVec2 d = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right, 0.0f);
             app.Cam.Yaw   += d.x * 0.005f;
-            app.Cam.Pitch -= d.y * 0.005f;
+            app.Cam.Pitch += d.y * 0.005f;
             app.Cam.Pitch  = std::max(-1.5f, std::min(1.5f, app.Cam.Pitch));
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
         }
@@ -313,7 +374,7 @@ void HandleCanvasInteraction(AppState& app,
         if (app.Geom.Source != GeomSource::Procedural) return;
         if (hovered && havePick && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-            int idx = FindObstacleAt(app, wx, wz);
+            const int idx        = PickObstacleIndex(app, mp);
             app.SelectedObstacle = idx;
             if (idx >= 0)
             {
@@ -347,7 +408,7 @@ void HandleCanvasInteraction(AppState& app,
         if (app.Geom.Source != GeomSource::Procedural) return;
         if (hovered && havePick && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-            int idx = FindObstacleAt(app, wx, wz);
+            const int idx = PickObstacleIndex(app, mp);
             if (idx >= 0)
             {
                 app.Geom.Obstacles.erase(app.Geom.Obstacles.begin() + idx);
@@ -365,7 +426,7 @@ void HandleCanvasInteraction(AppState& app,
     if (hovered && havePick && ImGui::IsMouseClicked(ImGuiMouseButton_Left)
         && app.Geom.Source == GeomSource::Procedural)
     {
-        app.SelectedObstacle = FindObstacleAt(app, wx, wz);
+        app.SelectedObstacle = PickObstacleIndex(app, mp);
     }
 }
 

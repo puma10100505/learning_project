@@ -22,10 +22,12 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/Physics LEARNING_SRC)
 
 add_library(${PROJECT_NAME} STATIC ${LEARNING_SRC})
 
-# PhysX 头文件（PxPreprocessor.h）要求 _DEBUG 与 NDEBUG 必须恰好定义其一。
-# MSVC Debug 构建会自动定义 _DEBUG；Clang/GCC 不会，需要手动补充。
-if (NOT WIN32)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
+# PhysX 头文件（PxPreprocessor.h）要求 _DEBUG 与 NDEBUG 必须**恰好**定义其一。
+#  - CMake 的 Release / RelWithDebInfo / MinSizeRel 默认会加 -DNDEBUG。
+#  - Debug 配置下 CMake 不会加 NDEBUG；MSVC 会自动定义 _DEBUG，Clang/GCC 不会。
+# 所以仅在 Debug 配置且非 MSVC 时补上 _DEBUG，避免和 Release 的 NDEBUG 同时存在。
+if (NOT MSVC)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CONFIG:Debug>:_DEBUG>)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC 

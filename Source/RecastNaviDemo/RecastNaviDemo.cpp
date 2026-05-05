@@ -62,6 +62,7 @@
 #include "Nav/NavPathSmooth.h"
 #include "Nav/NavLinkGen.h"
 #include "Nav/NavSerializer.h"
+#include "Phys/PhysWorld.h"
 #include "UI/MainLayout.h"
 #include "Shared/Profiling.h"   // BuildStat / PathStat
 #include "Shared/MathUtils.h"   // V3
@@ -202,6 +203,7 @@ int main(int argc, char** argv)
     {
         NavGeometry::RebuildProceduralGeometry(g_State.Geom, g_State.Scene);
         g_State.bGeomDirty = true;
+        PhysWorld::RebuildFromInputGeometry(g_State.Geom);
     };
 
     // -- TryAutoRebuild --
@@ -243,6 +245,7 @@ int main(int argc, char** argv)
     {
         NavGeometry::InitDefaultGeometry(g_State.Geom, g_State.Scene);
         g_State.bGeomDirty = true;
+        PhysWorld::RebuildFromInputGeometry(g_State.Geom);
     };
 
     // -- FrameCameraToBounds --
@@ -260,7 +263,10 @@ int main(int argc, char** argv)
     // -- LoadObjGeometry --
     auto doLoadObjGeometry = [&](const char* path, std::string& errOut) -> bool
     {
-        return NavGeometry::LoadObjGeometry(path, g_State.Geom, errOut);
+        if (!NavGeometry::LoadObjGeometry(path, g_State.Geom, errOut)) return false;
+        g_State.bGeomDirty = true;
+        PhysWorld::RebuildFromInputGeometry(g_State.Geom);
+        return true;
     };
 
     // -- SaveNavMesh --
@@ -320,6 +326,7 @@ int main(int argc, char** argv)
     // -----------------------------------------------------------------------
     // 初始化默认场景
     // -----------------------------------------------------------------------
+    PhysWorld::Init();
     doInitDefaultGeometry();
     FrameCameraToBounds();
 
@@ -362,6 +369,7 @@ int main(int argc, char** argv)
     // -----------------------------------------------------------------------
     // 清理
     // -----------------------------------------------------------------------
+    PhysWorld::Shutdown();
     NavBuilder::DestroyNavRuntime(g_State.Nav);
     return rc;
 }

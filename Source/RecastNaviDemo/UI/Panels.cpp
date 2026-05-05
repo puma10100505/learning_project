@@ -38,9 +38,60 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
     ImGui::SameLine();
     if (ImGui::RadioButton("3D Orbit", &vm, 1)) app.CurrentViewMode = ViewMode::Orbit3D;
 
+    if (app.CurrentViewMode == ViewMode::Orbit3D)
+    {
+        int dm = static_cast<int>(app.View.DepthMode3D);
+        const char* depthItems[] = {
+            "None (ImDrawList only)",
+            "CPU Z-Buffer + GL texture",
+            "Depth sort (painter)",
+        };
+        if (ImGui::Combo("3D composite##depthmode", &dm, depthItems, IM_ARRAYSIZE(depthItems)))
+            app.View.DepthMode3D = static_cast<View3DDepthMode>(dm);
+#if defined(_WIN32)
+        ImGui::TextDisabled("本 Windows 构建未接 Z-Buffer 纹理；选第 2 项时与第 1 项相同。");
+#endif
+        ImGui::TextDisabled("Painter：按三角距相机由远到近画，再画线；有穿插时仍可能错序。");
+
+        // CpuZBuffer 渲染分辨率：值 = 内部缓冲降采样系数（N=1 原生 / N=2 半 / ...）
+        if (app.View.DepthMode3D == View3DDepthMode::CpuZBuffer)
+        {
+            static const char* kResLabels[] = {
+                "1x  Native (sharp, slowest)",
+                "2x  Half     (default)",
+                "3x  Third   (faster)",
+                "4x  Quarter (fastest, blurry)",
+            };
+            constexpr int kResValues[] = { 1, 2, 3, 4 };
+            int curIdx = 1; // default = 2x
+            for (int i = 0; i < IM_ARRAYSIZE(kResValues); ++i)
+                if (kResValues[i] == app.View.CpuZBufferDownscale) { curIdx = i; break; }
+            if (ImGui::Combo("Z-Buffer resolution##zbufres", &curIdx,
+                             kResLabels, IM_ARRAYSIZE(kResLabels)))
+            {
+                app.View.CpuZBufferDownscale = kResValues[curIdx];
+            }
+            ImGui::TextDisabled("软件光栅吞吐 = O(像素)；上调系数可换 FPS。");
+        }
+    }
+
     ImGui::Checkbox("Grid",          &app.View.bShowGrid);         ImGui::SameLine();
     ImGui::Checkbox("Input mesh",    &app.View.bShowInputMesh);    ImGui::SameLine();
     ImGui::Checkbox("Obstacles",     &app.View.bShowObstacles);
+    ImGui::Checkbox("Collision tint", &app.View.bShowCollisionTint);
+    if (app.View.bShowCollisionTint)
+    {
+        ImGui::Indent();
+        constexpr ImGuiColorEditFlags fl =
+            ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_PickerHueWheel;
+        ImGui::ColorEdit4("Ground (mesh)", &app.View.GroundCollisionTint.x, fl);
+        ImGui::ColorEdit4("Obstacle top", &app.View.ObstacleTopTint.x, fl);
+        ImGui::ColorEdit4("Obstacle side (front)", &app.View.ObstacleSideTint.x, fl);
+        ImGui::ColorEdit4("Obstacle side (back)", &app.View.ObstacleSideBackTint.x, fl);
+        ImGui::ColorEdit4("Obstacle edge", &app.View.ObstacleCollisionEdge.x, fl);
+        ImGui::TextDisabled("选中障碍仍使用黄色描边；3D 下地面被挡处不绘制");
+        ImGui::Unindent();
+    }
     ImGui::Checkbox("Fill polygons", &app.View.bFillPolygons);     ImGui::SameLine();
     ImGui::Checkbox("Region colors", &app.View.bRegionColors);
     ImGui::Checkbox("Poly edges",    &app.View.bShowPolyEdges);    ImGui::SameLine();

@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/learning_foundation.dir/BlueprintNodeManager.cpp.o"
+  "CMakeFiles/learning_foundation.dir/BlueprintNodeManager.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/CommonDefines.cpp.o"
+  "CMakeFiles/learning_foundation.dir/CommonDefines.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/LearningCamera.cpp.o"
+  "CMakeFiles/learning_foundation.dir/LearningCamera.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/LearningFoundation.cpp.o"
+  "CMakeFiles/learning_foundation.dir/LearningFoundation.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/LearningShader.cpp.o"
+  "CMakeFiles/learning_foundation.dir/LearningShader.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/LearningStatics.cpp.o"
+  "CMakeFiles/learning_foundation.dir/LearningStatics.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLCubic.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLCubic.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLMesh.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLMesh.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLModel.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLModel.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLObject.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLObject.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLQuad.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLQuad.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLScene.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GLScene.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GlfwWindows.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GlfwWindows.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GlutWindow.cpp.o"
+  "CMakeFiles/learning_foundation.dir/OpenGL/GlutWindow.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/Physics/PhysicsManager.cpp.o"
+  "CMakeFiles/learning_foundation.dir/Physics/PhysicsManager.cpp.o.d"
+  "CMakeFiles/learning_foundation.dir/Physics/SceneManager.cpp.o"
+  "CMakeFiles/learning_foundation.dir/Physics/SceneManager.cpp.o.d"
+  "liblearning_foundation.a"
+  "liblearning_foundation.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/learning_foundation.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

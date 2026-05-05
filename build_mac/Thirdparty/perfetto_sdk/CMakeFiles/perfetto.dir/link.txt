@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libperfetto.a CMakeFiles/perfetto.dir/perfetto.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libperfetto.a

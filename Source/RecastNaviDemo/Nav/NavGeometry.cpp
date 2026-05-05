@@ -165,6 +165,10 @@ void RebuildProceduralGeometry(InputGeometry& geom, const SceneConfig& scene)
                  static_cast<int>(geom.Vertices.size() / 3),
                  &geom.Bounds[0], &geom.Bounds[3]);
 
+    // 记录"纯地面三角数"：障碍实体网格之后追加的不算地面，
+    // 让渲染层能用独立颜色区分地面 vs 障碍侧/顶。
+    geom.GroundTriCount = static_cast<int>(geom.Triangles.size() / 3);
+
     // 追加障碍实体网格（侧面 + 顶面，RC_WALKABLE_AREA）
     if (scene.bObstacleSolid && !geom.Obstacles.empty())
         AppendObstacleSolidMesh(geom);
@@ -329,6 +333,8 @@ bool LoadObjGeometry(const char* path, InputGeometry& geom, std::string& errOut)
     geom.Vertices    = std::move(verts);
     geom.Triangles   = std::move(tris);
     geom.AreaTypes.assign(geom.Triangles.size() / 3, RC_WALKABLE_AREA);
+    // OBJ 模式没有"障碍实体网格"，所有三角都按地面渲染
+    geom.GroundTriCount = static_cast<int>(geom.Triangles.size() / 3);
 
     rcCalcBounds(geom.Vertices.data(),
                  static_cast<int>(geom.Vertices.size() / 3),

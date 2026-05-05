@@ -142,7 +142,10 @@ macro(link_extra_libs param_project_name)
     endif()
 
     if (APPLE)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC _DEBUG)
+        # PhysX 头要求 NDEBUG 与 _DEBUG 必须**恰好**定义其一。
+        # CMake 对 Release/RelWithDebInfo/MinSizeRel 默认会加 NDEBUG；
+        # 仅在 Debug 配置下补 _DEBUG，避免和 Release 的 NDEBUG 同时生效冲突。
+        target_compile_definitions(${param_project_name} PUBLIC $<$<CONFIG:Debug>:_DEBUG>)
 
         list(APPEND EXTRA_LIBS 
             -lglfw3

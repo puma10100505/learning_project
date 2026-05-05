@@ -7,6 +7,7 @@
 #include "MainLayout.h"
 
 #include <algorithm>    // std::max / std::min
+#include <cstdio>
 
 namespace MainLayout
 {
@@ -78,6 +79,20 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
         p3.AutoNavLinks           = &app.AutoNavLinks;
 
         app.LastMap3D = Renderer3D::DrawCanvas3D(dl, panelMin, panelSize, app.Cam, p3);
+    }
+
+    // ---- 主场景 HUD：FPS（左上角叠绘，与场景同层不被任何 ImGui 控件挤掉） ----
+    {
+        const float fps = ImGui::GetIO().Framerate;
+        char        buf[64];
+        std::snprintf(buf, sizeof(buf), "FPS: %.1f  (%.2f ms)", fps,
+                      fps > 1e-3f ? 1000.0f / fps : 0.0f);
+        const ImVec2 ts  = ImGui::CalcTextSize(buf);
+        const ImVec2 pad(6.0f, 3.0f);
+        const ImVec2 tl(panelMin.x + 8.0f, panelMin.y + 8.0f);
+        const ImVec2 br(tl.x + ts.x + pad.x * 2.0f, tl.y + ts.y + pad.y * 2.0f);
+        dl->AddRectFilled(tl, br, IM_COL32(0, 0, 0, 140), 4.0f);
+        dl->AddText(ImVec2(tl.x + pad.x, tl.y + pad.y), IM_COL32(255, 255, 255, 235), buf);
     }
 
     // 处理鼠标交互

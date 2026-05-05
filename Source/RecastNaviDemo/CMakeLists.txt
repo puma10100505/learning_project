@@ -26,9 +26,19 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/Nav     NAV_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/Render  RENDER_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/UI      UI_SRC)
 aux_source_directory(${PROJECT_SOURCE_DIR}/App     APP_SRC)
+aux_source_directory(${PROJECT_SOURCE_DIR}/Phys    PHYS_SRC)
 
 # 可执行目标
-add_executable(${PROJECT_NAME} ${SRC} ${NAV_SRC} ${RENDER_SRC} ${UI_SRC} ${APP_SRC})
+add_executable(${PROJECT_NAME} ${SRC} ${NAV_SRC} ${RENDER_SRC} ${UI_SRC} ${APP_SRC} ${PHYS_SRC})
+
+# PhysX：macOS 在 SharedDef 中已链接；Windows 需打开 USE_PHYSX
+if(APPLE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RECAST_NAVI_USE_PHYSX=1)
+endif()
+if(WIN32)
+    set(USE_PHYSX ON)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RECAST_NAVI_USE_PHYSX=1)
+endif()
 
 # 源码内嵌中文字符串字面量, 让 MSVC 按 UTF-8 解析源文件 + 执行字符集
 if (MSVC)

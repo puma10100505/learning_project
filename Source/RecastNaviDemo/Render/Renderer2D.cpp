@@ -63,6 +63,69 @@ static ImVec2 World2D(float wx, float wz,
     return ImVec2(cmin.x + fx * csz.x, cmin.y + (1.0f - fz) * csz.y);
 }
 
+static bool AnyObstacleContainsXZ(float x, float z, const std::vector<Obstacle>& obs)
+{
+    for (const Obstacle& o : obs)
+        if (PointInsideObstacle(x, z, o))
+            return true;
+    return false;
+}
+
+/// 俯视碰撞地面：障碍 footprint 内不填充；细分三角减轻边界锯齿
+static void DrawGroundTriFootprint2D(ImDrawList* dl,
+                                     ImVec2 cmin, ImVec2 csz,
+                                     const float bmin[3], const float bmax[3],
+                                     const std::vector<Obstacle>* obstacles, ImU32 col,
+                                     const float* va, const float* vb, const float* vc, int depth)
+{
+    if (!obstacles || obstacles->empty())
+    {
+        const ImVec2 pa = World2D(va[0], va[2], cmin, csz, bmin, bmax);
+        const ImVec2 pb = World2D(vb[0], vb[2], cmin, csz, bmin, bmax);
+        const ImVec2 pc = World2D(vc[0], vc[2], cmin, csz, bmin, bmax);
+        dl->AddTriangleFilled(pa, pb, pc, col);
+        return;
+    }
+    const std::vector<Obstacle>& obs = *obstacles;
+    const auto                   inV = [&](const float* v) { return AnyObstacleContainsXZ(v[0], v[2], obs); };
+    const bool                   oa  = inV(va);
+    const bool                   ob  = inV(vb);
+    const bool                   oc  = inV(vc);
+    const float                  gx  = (va[0] + vb[0] + vc[0]) * (1.0f / 3.0f);
+    const float                  gz  = (va[2] + vb[2] + vc[2]) * (1.0f / 3.0f);
+    const bool                   og  = AnyObstacleContainsXZ(gx, gz, obs);
+    if (oa && ob && oc && og)
+        return;
+    if (!oa && !ob && !oc && !og)
+    {
+        const ImVec2 pa = World2D(va[0], va[2], cmin, csz, bmin, bmax);
+        const ImVec2 pb = World2D(vb[0], vb[2], cmin, csz, bmin, bmax);
+        const ImVec2 pc = World2D(vc[0], vc[2], cmin, csz, bmin, bmax);
+        dl->AddTriangleFilled(pa, pb, pc, col);
+        return;
+    }
+    constexpr int kMaxDepth = 2;
+    if (depth >= kMaxDepth)
+    {
+        const ImVec2 pa = World2D(va[0], va[2], cmin, csz, bmin, bmax);
+        const ImVec2 pb = World2D(vb[0], vb[2], cmin, csz, bmin, bmax);
+        const ImVec2 pc = World2D(vc[0], vc[2], cmin, csz, bmin, bmax);
+        dl->AddTriangleFilled(pa, pb, pc, col);
+        return;
+    }
+    float mab[3], mbc[3], mca[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        mab[i] = 0.5f * (va[i] + vb[i]);
+        mbc[i] = 0.5f * (vb[i] + vc[i]);
+        mca[i] = 0.5f * (vc[i] + va[i]);
+    }
+    DrawGroundTriFootprint2D(dl, cmin, csz, bmin, bmax, obstacles, col, va, mab, mca, depth + 1);
+    DrawGroundTriFootprint2D(dl, cmin, csz, bmin, bmax, obstacles, col, vb, mbc, mab, depth + 1);
+    DrawGroundTriFootprint2D(dl, cmin, csz, bmin, bmax, obstacles, col, vc, mca, mbc, depth + 1);
+    DrawGroundTriFootprint2D(dl, cmin, csz, bmin, bmax, obstacles, col, mab, mbc, mca, depth + 1);
+}
+
 // =============================================================================
 // 主绘制函数
 // =============================================================================
@@ -102,6 +165,30 @@ Map2D DrawCanvas2D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
 
     // 像素 / 世界单位（X 方向）
     const float pxPerWorld = csz.x / (bmax[0] - bmin[0]);
+
+    // -------------------------------------------------------------------------
+    // 碰撞地面：输入三角网 XZ 投影填充（先于网格，避免盖住辅助线）
+    // -------------------------------------------------------------------------
+    if (p.View && p.View->bShowCollisionTint && !p.Geom->Triangles.empty())
+    {
+        const ImU32 col = Renderer2D::ColU32(p.View->GroundCollisionTint);
+        // 仅遍历"纯地面"三角，障碍 footprint 由下方 obstacle pass 用障碍色单独绘制
+        const int   totalTris  = static_cast<int>(p.Geom->Triangles.size() / 3);
+        const int   triCount   = (p.Geom->GroundTriCount >= 0)
+                                 ? std::min(p.Geom->GroundTriCount, totalTris)
+                                 : totalTris;
+        const int   stride     = (triCount > 40000) ? (triCount / 40000 + 1) : 1;
+        const std::vector<Obstacle>* obsPtr =
+            p.Geom->Obstacles.empty() ? nullptr : &p.Geom->Obstacles;
+        for (int t = 0; t < triCount; t += stride)
+        {
+            const int*   tri = &p.Geom->Triangles[t * 3];
+            const float* va  = &p.Geom->Vertices[tri[0] * 3];
+            const float* vb  = &p.Geom->Vertices[tri[1] * 3];
+            const float* vc  = &p.Geom->Vertices[tri[2] * 3];
+            DrawGroundTriFootprint2D(dl, cmin, csz, bmin, bmax, obsPtr, col, va, vb, vc, 0);
+        }
+    }
 
     // -------------------------------------------------------------------------
     // 网格辅助线
@@ -156,8 +243,21 @@ Map2D DrawCanvas2D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             const Obstacle& o = p.Geom->Obstacles[i];
             const bool selected = (p.SelectedObstacle == (int)i);
             const bool dragging = (p.MoveStateIndex   == (int)i);
-            const ImU32 fill = IM_COL32(180, 80, 80, dragging ? 240 : (selected ? 220 : 180));
-            const ImU32 edge = selected ? IM_COL32(255, 230, 100, 255) : IM_COL32(120, 50, 50, 255);
+            ImU32      fill;
+            ImU32      edge;
+            if (p.View->bShowCollisionTint)
+            {
+                ImVec4 fc = p.View->ObstacleTopTint;
+                if (dragging) fc.w = std::min(1.0f, fc.w * 1.12f + 0.06f);
+                else if (selected) fc.w = std::min(1.0f, fc.w * 1.06f + 0.04f);
+                fill = ColU32(fc);
+                edge = selected ? IM_COL32(255, 235, 120, 255) : ColU32(p.View->ObstacleCollisionEdge);
+            }
+            else
+            {
+                fill = IM_COL32(220, 105, 95, dragging ? 245 : (selected ? 225 : 195));
+                edge = selected ? IM_COL32(255, 235, 120, 255) : IM_COL32(255, 150, 130, 255);
+            }
             const float lw   = selected ? 2.0f : 1.0f;
             if (o.Shape == ObstacleShape::Box)
             {

@@ -9,8 +9,10 @@
  *   - CreateDraftBox：鼠标拖拽创建 Box 障碍的临时状态
  *   - MoveBoxState  ：鼠标拖拽移动 Box 障碍的临时状态
  *
- * 依赖：无（不依赖 Nav/、Render/、ImGui）
+ * 依赖：imgui.h（ViewSettings 中的 ImVec4 颜色）
  */
+
+#include "imgui.h"
 
 // =============================================================================
 // 视图模式
@@ -37,12 +39,37 @@ enum class EditMode
 };
 
 // =============================================================================
+// 3D 画布合成方式（仅 Orbit3D）
+// =============================================================================
+enum class View3DDepthMode : uint8_t
+{
+    None        = 0, ///< 直接 ImDrawList，无全局深度/排序
+    CpuZBuffer  = 1, ///< CPU 深度缓冲 + OpenGL 纹理
+    PainterSort = 2, ///< 按三角重心距相机排序后绘制（画家算法）
+};
+
+// =============================================================================
 // 视图渲染可见性设置
 // =============================================================================
 struct ViewSettings
 {
     bool bShowGrid         = true;   ///< 显示网格辅助线
+    /// 与 PhysX/Recast 输入一致的碰撞体着色：三角网地面 + 障碍棱柱
+    bool          bShowCollisionTint     = true;
+    ImVec4        GroundCollisionTint     = { 0.28f, 0.52f, 0.40f, 0.48f };
+    ImVec4        ObstacleTopTint         = { 0.86f, 0.38f, 0.32f, 0.72f };   ///< 顶面（及 2D 俯视 footprint）
+    ImVec4        ObstacleSideTint        = { 0.62f, 0.28f, 0.42f, 0.88f };  ///< 侧面朝向相机
+    ImVec4        ObstacleSideBackTint    = { 0.38f, 0.16f, 0.24f, 0.88f };  ///< 侧面背向相机（与正面同不透明显示；无 Z 缓冲时远侧面已剔除）
+    ImVec4        ObstacleCollisionEdge   = { 1.00f, 0.55f, 0.42f, 0.95f };
     bool bShowObstacles    = true;   ///< 显示障碍物轮廓
+    /// 默认 None：ImDrawList 直接走 GPU，1800 三角的默认场景轻松 60 FPS。
+    /// CpuZBuffer 是软件光栅化，大场景下会到 10 FPS 量级（仅作演示/对比用，请按需开启）。
+    /// Windows D3D12 版未接 Z-Buffer 纹理上传，CpuZBuffer 也不会显示。
+    View3DDepthMode DepthMode3D = View3DDepthMode::None;
+    /// CpuZBuffer 模式的内部缓冲降采样系数：rw = panel.x / N, rh = panel.y / N。
+    /// N=1 原生分辨率（最清晰，最慢）；N=2 半分辨率（默认，质量/速度平衡）；
+    /// N=3、4 进一步降采样以换 FPS。仅 CpuZBuffer 生效，None / PainterSort 走 GPU 不受影响。
+    int             CpuZBufferDownscale = 2;
     bool bShowInputMesh    = true;   ///< 显示输入几何线框（地面/OBJ）
     bool bFillPolygons     = true;   ///< 填充 NavMesh 多边形
     bool bRegionColors     = true;   ///< 使用区域哈希色区分多边形
