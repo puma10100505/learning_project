@@ -35,3 +35,7 @@ cmake-build-debug
 build
 Include/CommonDefines.h
 *.log
+*.cmake
+/cmake-build-local
+/cmake-build-release
+/cmake-build-x64-release
