@@ -46,7 +46,6 @@ bool DirectX::CreateDeviceD3D(HWND hWnd)
         g_pd3dDevice->QueryInterface(IID_PPV_ARGS(&pInfoQueue));
         pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
         pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
-        pInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
         pInfoQueue->Release();
         pdx12Debug->Release();
     }

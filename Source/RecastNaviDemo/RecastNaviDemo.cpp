@@ -51,6 +51,7 @@
 // ---------------------------------------------------------------------------
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <string>
 
 #include "loguru.hpp"
@@ -102,8 +103,17 @@ static void FrameCameraToBounds()
 int main(int argc, char** argv)
 {
     loguru::init(argc, argv);
-    loguru::add_file(__FILE__ ".log", loguru::Append, loguru::Verbosity_MAX);
     loguru::g_stderr_verbosity = 1;
+    if (!loguru::add_file(__FILE__ ".log", loguru::Append, loguru::Verbosity_MAX))
+    {
+        const std::filesystem::path fallback =
+            std::filesystem::current_path() / "RecastNaviDemo.runtime.log";
+        const std::string fallbackUtf8 = fallback.string();
+        if (loguru::add_file(fallbackUtf8.c_str(), loguru::Append, loguru::Verbosity_MAX))
+            LOG_F(WARNING, "Primary log file unavailable, fallback to: %s", fallbackUtf8.c_str());
+        else
+            LOG_F(ERROR, "Both primary and fallback log file setup failed");
+    }
     LOG_F(INFO, "Entry of RecastNaviDemo");
 
     // -----------------------------------------------------------------------

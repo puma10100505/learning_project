@@ -395,14 +395,14 @@ bool EnsureTargets(int rw, int rh, int shadowSz)
     if (!EnsureRtvDsvHeaps(dev)) return false;
 
     CD3DX12_HEAP_PROPERTIES def(D3D12_HEAP_TYPE_DEFAULT);
-    float clearC[4]       = { 0, 0, 0, 0 };
-    CD3DX12_CLEAR_VALUE   cv(DXGI_FORMAT_R8G8B8A8_UNORM, clearC);
     CD3DX12_RESOURCE_DESC cr =
         CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, static_cast<UINT64>(rw),
                                    static_cast<UINT>(rh));
     cr.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+    // color RT clear color can vary per-frame (g_ClearC), so do not bind an optimized clear value here.
+    // Otherwise debug layer can raise CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE (ID 820).
     if (FAILED(dev->CreateCommittedResource(&def, D3D12_HEAP_FLAG_NONE, &cr, D3D12_RESOURCE_STATE_COMMON,
-                                            &cv, IID_PPV_ARGS(&g_ColorTex))))
+                                            nullptr, IID_PPV_ARGS(&g_ColorTex))))
         return false;
     g_ColorState = D3D12_RESOURCE_STATE_COMMON;
 
@@ -439,6 +439,22 @@ bool EnsureTargets(int rw, int rh, int shadowSz)
 
     ID3D12DescriptorHeap* srvH = DirectX::GetD3D12SrvHeap();
     UINT                  inc  = DirectX::GetD3D12SrvDescriptorStride();
+    if (!srvH || inc == 0)
+    {
+        std::fprintf(stderr, "[GpuRenderer D3D12] SRV heap unavailable\n");
+        return false;
+    }
+    const D3D12_DESCRIPTOR_HEAP_DESC srvDesc = srvH->GetDesc();
+    if (DirectX::kGpuRendererShadowSrvHeapIndex >= srvDesc.NumDescriptors
+        || DirectX::kGpuRendererColorSrvHeapIndex >= srvDesc.NumDescriptors)
+    {
+        std::fprintf(stderr,
+                     "[GpuRenderer D3D12] SRV heap too small: need slots %u/%u, total=%u\n",
+                     DirectX::kGpuRendererColorSrvHeapIndex,
+                     DirectX::kGpuRendererShadowSrvHeapIndex,
+                     srvDesc.NumDescriptors);
+        return false;
+    }
     D3D12_CPU_DESCRIPTOR_HANDLE sc = srvH->GetCPUDescriptorHandleForHeapStart();
     sc.ptr += DirectX::kGpuRendererShadowSrvHeapIndex * inc;
     D3D12_SHADER_RESOURCE_VIEW_DESC sv{};
@@ -542,7 +558,7 @@ void Begin(int rw, int rh, ImU32 clearColor, const Mat4& vp, float fovyRad, cons
     g_ClearC[3] = ca;
 
     ID3D12Device* dev = DirectX::GetD3D12Device();
-    if (!dev || !BuildPipelinesOnce()) return;
+    if (!dev || !EnsureInfra() || !BuildPipelinesOnce()) return;
     if (!EnsureCbUpload(dev)) return;
 
     if (samples > 1) g_SamplesIgnored = samples;
@@ -620,9 +636,11 @@ void End()
     if (!g_InFrame) return;
     g_InFrame = false;
 
-    ID3D12Device*       dev   = DirectX::GetD3D12Device();
-    ID3D12CommandQueue* queue = DirectX::GetD3D12CommandQueue();
-    if (!dev || !queue || !g_ShaderOk || !g_ColorTex) return;
+    ID3D12Device*          dev      = DirectX::GetD3D12Device();
+    ID3D12CommandQueue*    queue    = DirectX::GetD3D12CommandQueue();
+    ID3D12DescriptorHeap*  srvHeap  = DirectX::GetD3D12SrvHeap();
+    const UINT             srvStride = DirectX::GetD3D12SrvDescriptorStride();
+    if (!dev || !queue || !srvHeap || srvStride == 0 || !g_ShaderOk || !g_ColorTex) return;
 
     const bool shadowPass = !g_Verts.empty() && g_L.shadowsOn && g_L.type == 0 && g_ShadowMap;
     const bool hasGeom    = !g_Verts.empty();
@@ -650,10 +668,23 @@ void End()
     g_UploadCB->Unmap(0, nullptr);
     const D3D12_GPU_VIRTUAL_ADDRESS cbAddr = g_UploadCB->GetGPUVirtualAddress();
 
-    g_UploadAlloc->Reset();
-    g_UploadList->Reset(g_UploadAlloc.Get(), nullptr);
+    if (!g_UploadAlloc || !g_UploadList)
+    {
+        std::fprintf(stderr, "[GpuRenderer D3D12] upload command infra missing\n");
+        return;
+    }
+    if (FAILED(g_UploadAlloc->Reset()))
+    {
+        std::fprintf(stderr, "[GpuRenderer D3D12] upload allocator reset failed\n");
+        return;
+    }
+    if (FAILED(g_UploadList->Reset(g_UploadAlloc.Get(), nullptr)))
+    {
+        std::fprintf(stderr, "[GpuRenderer D3D12] upload command list reset failed\n");
+        return;
+    }
     ID3D12GraphicsCommandList* cmd = g_UploadList.Get();
-    ID3D12DescriptorHeap*      heaps[] = { DirectX::GetD3D12SrvHeap() };
+    ID3D12DescriptorHeap*      heaps[] = { srvHeap };
     cmd->SetDescriptorHeaps(1, heaps);
 
     UINT64 vbGpu = 0;
@@ -725,9 +756,8 @@ void End()
 
     if (hasGeom)
     {
-        ID3D12DescriptorHeap* shSrv = DirectX::GetD3D12SrvHeap();
-        D3D12_GPU_DESCRIPTOR_HANDLE tbl = shSrv->GetGPUDescriptorHandleForHeapStart();
-        tbl.ptr += UINT64(DirectX::kGpuRendererShadowSrvHeapIndex) * DirectX::GetD3D12SrvDescriptorStride();
+        D3D12_GPU_DESCRIPTOR_HANDLE tbl = srvHeap->GetGPUDescriptorHandleForHeapStart();
+        tbl.ptr += UINT64(DirectX::kGpuRendererShadowSrvHeapIndex) * srvStride;
 
         cmd->SetPipelineState(g_PsoMain.Get());
         cmd->SetGraphicsRootSignature(g_RootSig.Get());
@@ -758,7 +788,11 @@ void End()
         g_ShadowState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
     }
 
-    cmd->Close();
+    if (FAILED(cmd->Close()))
+    {
+        std::fprintf(stderr, "[GpuRenderer D3D12] command list close failed\n");
+        return;
+    }
     ID3D12CommandList* const cls[] = { cmd };
     queue->ExecuteCommandLists(1, cls);
     GpuWait(queue);

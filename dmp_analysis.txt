@@ -1,0 +1,800 @@
+Opened log file 'h:\Development\Projects\learning_project\dmp_analysis.txt'
+
+Microsoft (R) Windows Debugger Version 10.0.18362.1 AMD64
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\atlmfc.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\concurrency.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\cpp_rest.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\stl.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Data.Json.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Devices.Geolocation.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Devices.Sensors.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Media.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\windows.natvis'
+NatVis script successfully loaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\winrt.natvis'
+
+Loading Dump File [C:\Users\billypu\AppData\Local\CrashDumps\RecastNaviDemo.exe_260506_154024.dmp]
+User Mini Dump File with Full Memory: Only application data is available
+
+Comment: '
+*** "H:\Development\Projects\learning_project\Tools\procdump\procdump64.exe" -accepteula -e -ma -w RecastNaviDemo.exe C:\Users\billypu\AppData\Local\CrashDumps
+*** Unhandled exception: 0000087A'
+Symbol search path is: srv*
+Executable search path is: 
+Windows 10 Version 26100 MP (24 procs) Free x64
+Product: WinNt, suite: SingleUserTS
+26100.1.amd64fre.ge_release.240331-1435
+Machine Name:
+Debug session time: Wed May  6 15:40:24.000 2026 (UTC + 8:00)
+System Uptime: 6 days 22:13:21.297
+Process Uptime: 0 days 0:00:04.000
+................................................................
+................................................
+Loading unloaded module list
+..
+This dump file has an exception of interest stored in it.
+The stored exception information can be accessed via .ecxr.
+(1508.baf4): Unknown exception - code 0000087a (first/second chance not available)
+For analysis of this file, run !analyze -v
+KERNELBASE!RaiseException+0x8a:
+00007ffc`f78179da 0f1f440000      nop     dword ptr [rax+rax]
+0:000> .symfix; .reload; !analyze -v; kv; ~*k; lm; q
+................................................................
+................................................
+Loading unloaded module list
+..
+*******************************************************************************
+*                                                                             *
+*                        Exception Analysis                                   *
+*                                                                             *
+*******************************************************************************
+
+*** WARNING: Unable to verify checksum for RecastNaviDemo.exe
+*** WARNING: Unable to verify checksum for PhysXFoundation_64.dll
+
+KEY_VALUES_STRING: 1
+
+    Key  : Timeline.OS.Boot.DeltaSec
+    Value: 598401
+
+    Key  : Timeline.Process.Start.DeltaSec
+    Value: 4
+
+
+PROCESSES_ANALYSIS: 1
+
+SERVICE_ANALYSIS: 1
+
+STACKHASH_ANALYSIS: 1
+
+TIMELINE_ANALYSIS: 1
+
+Timeline: !analyze.Start
+    Name: <blank>
+    Time: 2026-05-06T07:57:06.974Z
+    Diff: 1002974 mSec
+
+Timeline: Dump.Current
+    Name: <blank>
+    Time: 2026-05-06T07:40:24.0Z
+    Diff: 0 mSec
+
+Timeline: Process.Start
+    Name: <blank>
+    Time: 2026-05-06T07:40:20.0Z
+    Diff: 4000 mSec
+
+Timeline: OS.Boot
+    Name: <blank>
+    Time: 2026-04-29T09:27:03.0Z
+    Diff: 598401000 mSec
+
+
+DUMP_CLASS: 2
+
+DUMP_QUALIFIER: 400
+
+CONTEXT:  (.ecxr)
+.ecxr
+rax=0000000000000000 rbx=000000b3472f8780 rcx=fffffffffffffffe
+rdx=0000000000000bb7 rsi=0000000000000000 rdi=000000000000087a
+rip=00007ffcf78179da rsp=000000b3472f8580 rbp=0000000000000003
+ r8=000000b3472f87a0  r9=0000000000055c00 r10=0000000000000000
+r11=000000b3472f8826 r12=000000b3472f9400 r13=000001d59873ee50
+r14=0000000000000002 r15=0000000000000001
+iopl=0         nv up ei pl nz na po nc
+cs=0033  ss=002b  ds=002b  es=002b  fs=0053  gs=002b             efl=00000204
+KERNELBASE!RaiseException+0x8a:
+00007ffc`f78179da 0f1f440000      nop     dword ptr [rax+rax]
+.cxr
+Resetting default scope
+
+FAULTING_IP: 
+KERNELBASE!RaiseException+8a
+00007ffc`f78179da 0f1f440000      nop     dword ptr [rax+rax]
+
+EXCEPTION_RECORD:  (.exr -1)
+.exr -1
+ExceptionAddress: 00007ffcf78179da (KERNELBASE!RaiseException+0x000000000000008a)
+   ExceptionCode: 0000087a
+  ExceptionFlags: 00000080
+NumberParameters: 3
+   Parameter[0]: 0000000000000002
+   Parameter[1]: 000000b3472f86d8
+   Parameter[2]: 000000b3472f9480
+
+DEFAULT_BUCKET_ID:  APPLICATION_FAULT
+
+PROCESS_NAME:  RecastNaviDemo.exe
+
+ERROR_CODE: (NTSTATUS) 0x87a - <Unable to get error code text>
+
+EXCEPTION_CODE: (NetAPI) 0x87a (2170) - <Unable to get error code text>
+
+EXCEPTION_CODE_STR:  87a
+
+EXCEPTION_PARAMETER1:  0000000000000002
+
+EXCEPTION_PARAMETER2:  000000b3472f86d8
+
+EXCEPTION_PARAMETER3:  000000b3472f9480
+
+WATSON_BKT_PROCSTAMP:  69fae65b
+
+WATSON_BKT_MODULE:  KERNELBASE.dll
+
+WATSON_BKT_MODSTAMP:  208e0cb7
+
+WATSON_BKT_MODOFFSET:  c79da
+
+WATSON_BKT_MODVER:  6.2.26100.8246
+
+MODULE_VER_PRODUCT:  Microsoft? Windows? Operating System
+
+BUILD_VERSION_STRING:  26100.1.amd64fre.ge_release.240331-1435
+
+MODLIST_WITH_TSCHKSUM_HASH:  ef6a7121278c8db95ae4d42364977b209dc052a4
+
+MODLIST_SHA1_HASH:  d094d1a2c639ac923f0c8c5b6abd73d2a3de5d9a
+
+COMMENT:  
+*** "H:\Development\Projects\learning_project\Tools\procdump\procdump64.exe" -accepteula -e -ma -w RecastNaviDemo.exe C:\Users\billypu\AppData\Local\CrashDumps
+*** Unhandled exception: 0000087A
+
+NTGLOBALFLAG:  0
+
+PROCESS_BAM_CURRENT_THROTTLED: 0
+
+PROCESS_BAM_PREVIOUS_THROTTLED: 0
+
+APPLICATION_VERIFIER_FLAGS:  0
+
+PRODUCT_TYPE:  1
+
+SUITE_MASK:  272
+
+DUMP_FLAGS:  8020c07
+
+DUMP_TYPE:  3
+
+ANALYSIS_SESSION_HOST:  BILLYPU-PC6
+
+ANALYSIS_SESSION_TIME:  05-06-2026 15:57:06.0974
+
+ANALYSIS_VERSION: 10.0.18362.1 amd64fre
+
+THREAD_ATTRIBUTES: 
+OS_LOCALE:  CHS
+
+BUGCHECK_STR:  APPLICATION_FAULT
+
+PRIMARY_PROBLEM_CLASS:  APPLICATION_FAULT
+
+PROBLEM_CLASSES: 
+
+    ID:     [0n320]
+    Type:   [APPLICATION_FAULT]
+    Class:  Primary
+    Scope:  DEFAULT_BUCKET_ID (Failure Bucket ID prefix)
+            BUCKET_ID
+    Name:   Add
+    Data:   Omit
+    PID:    [Unspecified]
+    TID:    [Unspecified]
+    Frame:  [0]
+
+LAST_CONTROL_TRANSFER:  from 00007ffcd3e64f4f to 00007ffcf78179da
+
+STACK_TEXT:  
+000000b3`472f8580 00007ffc`d3e64f4f : 000001d5`95ff7e20 000001d5`9606cba8 00007ffb`fe989b79 00007ffb`fe927e54 : KERNELBASE!RaiseException+0x8a
+000000b3`472f8680 00007ffb`fe6d36f8 : 000000b3`472f9480 000000b3`472fb600 000000b3`472fb5d8 00007ffb`fe620ecf : DXGIDebug!CInfoQueue::AddMessage+0xacf
+000000b3`472f93c0 00007ffb`fe61c506 : 00000000`00000002 000000b3`472fb600 00000000`00000334 000001d5`a10dfea0 : D3D12SDKLayers!CD3D12InfoQueue::AddMessage+0xc8
+000000b3`472f9430 00007ffb`fe600827 : 000001d5`a110db30 000000b3`472fb600 000001d5`a110db30 000001d5`a114d6e0 : D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::ReportMessageImpl+0xf2
+000000b3`472fb4b0 00007ffb`fe679edc : 000001d5`a114d6e0 000001d5`a110db30 00007ffb`fe9528a0 00007ffb`fe952840 : D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::operator()+0x1f
+000000b3`472fb500 00007ff7`86c756c8 : 00000000`00000000 00000000`00000000 000000b3`472fbc38 fffffedd`00000004 : D3D12SDKLayers!NDebug::CGraphicsCommandList::ClearRenderTargetView+0x24c
+000000b3`472fb700 00007ff7`86c968bd : 00007ff7`86f1ba00 000000b3`472fc320 42180000`43d10000 4404c000`446e8000 : RecastNaviDemo!GpuRenderer::End+0xba8
+000000b3`472fc050 00007ff7`86ca5676 : 000000b3`472fe7b0 000001d5`9f056a78 42180000`43d10000 4404c000`446e8000 : RecastNaviDemo!Renderer3D::DrawCanvas3D+0x774d
+000000b3`472fe390 00007ff7`86ca5f8f : 00007ff7`86f1b630 000000b3`472ff310 00000000`0000000c 41400000`4448c000 : RecastNaviDemo!MainLayout::DrawCanvasPanel+0x4e6
+000000b3`472fe8d0 00007ff7`86c350ab : 00007ff7`86f1b630 000000b3`472ff310 cccccccc`41d2076b 000001d5`9eed3738 : RecastNaviDemo!MainLayout::OnGUI+0x69f
+000000b3`472fea30 00007ff7`86c399d2 : 000000b3`472ffa78 bf800000`3d426ca7 000000b3`472fefc8 00007ff7`86c3d6f4 : RecastNaviDemo!`main'::`2'::<lambda_15>::operator()+0x3b
+000000b3`472fea60 00007ff7`86c35365 : 000000b3`472ffa78 000000b3`472feb08 cccccccc`00000000 cccccccc`cccccccc : RecastNaviDemo!std::invoke<`main'::`2'::<lambda_15> &,float>+0x22
+000000b3`472fea90 00007ff7`86cad674 : 000000b3`472ffa70 000000b3`472feb08 000001d5`9eed3708 cccccccc`cccccccc : RecastNaviDemo!std::_Func_impl_no_alloc<`main'::`2'::<lambda_15>,void,float>::_Do_call+0x25
+000000b3`472feac0 00007ff7`86cbde11 : 000000b3`472ffa70 00000000`3d426ca7 000000b3`472ff058 000000b3`472fefc8 : RecastNaviDemo!std::_Func_class<void,float>::operator()+0x54
+000000b3`472feb00 00007ff7`86c3450b : 000000b3`472ff988 00007ff7`00000578 000000b3`00000384 000000b3`00000000 : RecastNaviDemo!DirectX::CreateWindowInstance+0xbf1
+000000b3`472ff1e0 00007ff7`86e48089 : 00000000`00000001 000001d5`95fac940 00000000`00000000 00007ff7`86e46d7d : RecastNaviDemo!main+0x6bb
+000000b3`472ffba0 00007ff7`86e47f6e : 00007ff7`86e5b000 00007ff7`86e5b720 00000000`00000000 00000000`00000000 : RecastNaviDemo!invoke_main+0x39
+000000b3`472ffbf0 00007ff7`86e47e2e : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!__scrt_common_main_seh+0x12e
+000000b3`472ffc60 00007ff7`86e4811e : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!__scrt_common_main+0xe
+000000b3`472ffc90 00007ffc`f8fee8d7 : 000000b3`4718a000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!mainCRTStartup+0xe
+000000b3`472ffcc0 00007ffc`f9f0c3fc : 00000000`00000000 00000000`00000000 000004f0`fffffb30 000004d0`fffffb30 : kernel32!BaseThreadInitThunk+0x17
+000000b3`472ffcf0 00000000`00000000 : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : ntdll!RtlUserThreadStart+0x2c
+
+
+THREAD_SHA1_HASH_MOD_FUNC:  1bb4a36b94bc17da0b6f1a29cc1f472a2c1c5552
+
+THREAD_SHA1_HASH_MOD_FUNC_OFFSET:  a4fa04eb7d2d6a22a45cd2d75af1244e93f86c31
+
+THREAD_SHA1_HASH_MOD:  609bbd620f9072eea30764f14a526977f91fb7e5
+
+FOLLOWUP_IP: 
+DXGIDebug!CInfoQueue::AddMessage+acf
+00007ffc`d3e64f4f 0f1f440000      nop     dword ptr [rax+rax]
+
+FAULT_INSTR_CODE:  441f0f
+
+SYMBOL_STACK_INDEX:  1
+
+SYMBOL_NAME:  dxgidebug!CInfoQueue::AddMessage+acf
+
+FOLLOWUP_NAME:  MachineOwner
+
+MODULE_NAME: DXGIDebug
+
+IMAGE_NAME:  DXGIDebug.dll
+
+DEBUG_FLR_IMAGE_TIMESTAMP:  3ef0515c
+
+STACK_COMMAND:  ~0s ; .ecxr ; kb
+
+BUCKET_ID:  APPLICATION_FAULT_dxgidebug!CInfoQueue::AddMessage+acf
+
+FAILURE_EXCEPTION_CODE:  87a
+
+FAILURE_IMAGE_NAME:  DXGIDebug.dll
+
+BUCKET_ID_IMAGE_STR:  DXGIDebug.dll
+
+FAILURE_MODULE_NAME:  DXGIDebug
+
+BUCKET_ID_MODULE_STR:  DXGIDebug
+
+FAILURE_FUNCTION_NAME:  CInfoQueue::AddMessage
+
+BUCKET_ID_FUNCTION_STR:  CInfoQueue::AddMessage
+
+BUCKET_ID_OFFSET:  acf
+
+BUCKET_ID_MODTIMEDATESTAMP:  3ef0515c
+
+BUCKET_ID_MODCHECKSUM:  2ed33
+
+BUCKET_ID_MODVER_STR:  6.2.26100.1882
+
+BUCKET_ID_PREFIX_STR:  APPLICATION_FAULT_
+
+FAILURE_PROBLEM_CLASS:  APPLICATION_FAULT
+
+FAILURE_SYMBOL_NAME:  DXGIDebug.dll!CInfoQueue::AddMessage
+
+FAILURE_BUCKET_ID:  APPLICATION_FAULT_87a_DXGIDebug.dll!CInfoQueue::AddMessage
+
+TARGET_TIME:  2026-05-06T07:40:24.000Z
+
+OSBUILD:  26100
+
+OSSERVICEPACK:  8246
+
+SERVICEPACK_NUMBER: 0
+
+OS_REVISION: 0
+
+OSPLATFORM_TYPE:  x64
+
+OSNAME:  Windows 10
+
+OSEDITION:  Windows 10 WinNt SingleUserTS
+
+USER_LCID:  0
+
+OSBUILD_TIMESTAMP:  2032-11-05 02:33:51
+
+BUILDDATESTAMP_STR:  240331-1435
+
+BUILDLAB_STR:  ge_release
+
+BUILDOSVER_STR:  10.0.26100.1.amd64fre.ge_release.240331-1435
+
+ANALYSIS_SESSION_ELAPSED_TIME:  13004
+
+ANALYSIS_SOURCE:  UM
+
+FAILURE_ID_HASH_STRING:  um:application_fault_87a_dxgidebug.dll!cinfoqueue::addmessage
+
+FAILURE_ID_HASH:  {1788c2a4-f501-c252-6b30-e9852278fece}
+
+Followup:     MachineOwner
+---------
+
+Child-SP          RetAddr           : Args to Child                                                           : Call Site
+000000b3`472f8580 00007ffc`d3e64f4f : 000001d5`95ff7e20 000001d5`9606cba8 00007ffb`fe989b79 00007ffb`fe927e54 : KERNELBASE!RaiseException+0x8a
+000000b3`472f8680 00007ffb`fe6d36f8 : 000000b3`472f9480 000000b3`472fb600 000000b3`472fb5d8 00007ffb`fe620ecf : DXGIDebug!CInfoQueue::AddMessage+0xacf
+000000b3`472f93c0 00007ffb`fe61c506 : 00000000`00000002 000000b3`472fb600 00000000`00000334 000001d5`a10dfea0 : D3D12SDKLayers!CD3D12InfoQueue::AddMessage+0xc8
+000000b3`472f9430 00007ffb`fe600827 : 000001d5`a110db30 000000b3`472fb600 000001d5`a110db30 000001d5`a114d6e0 : D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::ReportMessageImpl+0xf2
+000000b3`472fb4b0 00007ffb`fe679edc : 000001d5`a114d6e0 000001d5`a110db30 00007ffb`fe9528a0 00007ffb`fe952840 : D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::operator()+0x1f
+000000b3`472fb500 00007ff7`86c756c8 : 00000000`00000000 00000000`00000000 000000b3`472fbc38 fffffedd`00000004 : D3D12SDKLayers!NDebug::CGraphicsCommandList::ClearRenderTargetView+0x24c
+000000b3`472fb700 00007ff7`86c968bd : 00007ff7`86f1ba00 000000b3`472fc320 42180000`43d10000 4404c000`446e8000 : RecastNaviDemo!GpuRenderer::End+0xba8 [H:\Development\Projects\learning_project\Source\RecastNaviDemo\Render\GpuRendererD3D12.inl @ 747]
+000000b3`472fc050 00007ff7`86ca5676 : 000000b3`472fe7b0 000001d5`9f056a78 42180000`43d10000 4404c000`446e8000 : RecastNaviDemo!Renderer3D::DrawCanvas3D+0x774d [H:\Development\Projects\learning_project\Source\RecastNaviDemo\Render\Renderer3D.cpp @ 873]
+000000b3`472fe390 00007ff7`86ca5f8f : 00007ff7`86f1b630 000000b3`472ff310 00000000`0000000c 41400000`4448c000 : RecastNaviDemo!MainLayout::DrawCanvasPanel+0x4e6 [H:\Development\Projects\learning_project\Source\RecastNaviDemo\UI\MainLayout.cpp @ 81]
+000000b3`472fe8d0 00007ff7`86c350ab : 00007ff7`86f1b630 000000b3`472ff310 cccccccc`41d2076b 000001d5`9eed3738 : RecastNaviDemo!MainLayout::OnGUI+0x69f [H:\Development\Projects\learning_project\Source\RecastNaviDemo\UI\MainLayout.cpp @ 200]
+000000b3`472fea30 00007ff7`86c399d2 : 000000b3`472ffa78 bf800000`3d426ca7 000000b3`472fefc8 00007ff7`86c3d6f4 : RecastNaviDemo!`main'::`2'::<lambda_15>::operator()+0x3b [H:\Development\Projects\learning_project\Source\RecastNaviDemo\RecastNaviDemo.cpp @ 365]
+000000b3`472fea60 00007ff7`86c35365 : 000000b3`472ffa78 000000b3`472feb08 cccccccc`00000000 cccccccc`cccccccc : RecastNaviDemo!std::invoke<`main'::`2'::<lambda_15> &,float>+0x22 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\type_traits @ 1756]
+000000b3`472fea90 00007ff7`86cad674 : 000000b3`472ffa70 000000b3`472feb08 000001d5`9eed3708 cccccccc`cccccccc : RecastNaviDemo!std::_Func_impl_no_alloc<`main'::`2'::<lambda_15>,void,float>::_Do_call+0x25 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\functional @ 812]
+000000b3`472feac0 00007ff7`86cbde11 : 000000b3`472ffa70 00000000`3d426ca7 000000b3`472ff058 000000b3`472fefc8 : RecastNaviDemo!std::_Func_class<void,float>::operator()+0x54 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\functional @ 855]
+000000b3`472feb00 00007ff7`86c3450b : 000000b3`472ff988 00007ff7`00000578 000000b3`00000384 000000b3`00000000 : RecastNaviDemo!DirectX::CreateWindowInstance+0xbf1 [H:\Development\Projects\learning_project\Source\LearningFoundation\DirectX\DirectX12Window.cpp @ 410]
+000000b3`472ff1e0 00007ff7`86e48089 : 00000000`00000001 000001d5`95fac940 00000000`00000000 00007ff7`86e46d7d : RecastNaviDemo!main+0x6bb [H:\Development\Projects\learning_project\Source\RecastNaviDemo\RecastNaviDemo.cpp @ 357]
+000000b3`472ffba0 00007ff7`86e47f6e : 00007ff7`86e5b000 00007ff7`86e5b720 00000000`00000000 00000000`00000000 : RecastNaviDemo!invoke_main+0x39 [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 79]
+000000b3`472ffbf0 00007ff7`86e47e2e : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!__scrt_common_main_seh+0x12e [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 288]
+000000b3`472ffc60 00007ff7`86e4811e : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!__scrt_common_main+0xe [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 331]
+000000b3`472ffc90 00007ffc`f8fee8d7 : 000000b3`4718a000 00000000`00000000 00000000`00000000 00000000`00000000 : RecastNaviDemo!mainCRTStartup+0xe [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_main.cpp @ 17]
+000000b3`472ffcc0 00007ffc`f9f0c3fc : 00000000`00000000 00000000`00000000 000004f0`fffffb30 000004d0`fffffb30 : kernel32!BaseThreadInitThunk+0x17
+000000b3`472ffcf0 00000000`00000000 : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`00000000 : ntdll!RtlUserThreadStart+0x2c
+
+.  0  Id: 1508.baf4 Suspend: 0 Teb: 000000b3`4718b000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`472f8580 00007ffc`d3e64f4f KERNELBASE!RaiseException+0x8a
+000000b3`472f8680 00007ffb`fe6d36f8 DXGIDebug!CInfoQueue::AddMessage+0xacf
+000000b3`472f93c0 00007ffb`fe61c506 D3D12SDKLayers!CD3D12InfoQueue::AddMessage+0xc8
+000000b3`472f9430 00007ffb`fe600827 D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::ReportMessageImpl+0xf2
+000000b3`472fb4b0 00007ffb`fe679edc D3D12SDKLayers!NDebug::CInterfaceSentinel::CFunctionSentinel::operator()+0x1f
+000000b3`472fb500 00007ff7`86c756c8 D3D12SDKLayers!NDebug::CGraphicsCommandList::ClearRenderTargetView+0x24c
+000000b3`472fb700 00007ff7`86c968bd RecastNaviDemo!GpuRenderer::End+0xba8 [H:\Development\Projects\learning_project\Source\RecastNaviDemo\Render\GpuRendererD3D12.inl @ 747]
+000000b3`472fc050 00007ff7`86ca5676 RecastNaviDemo!Renderer3D::DrawCanvas3D+0x774d [H:\Development\Projects\learning_project\Source\RecastNaviDemo\Render\Renderer3D.cpp @ 873]
+000000b3`472fe390 00007ff7`86ca5f8f RecastNaviDemo!MainLayout::DrawCanvasPanel+0x4e6 [H:\Development\Projects\learning_project\Source\RecastNaviDemo\UI\MainLayout.cpp @ 81]
+000000b3`472fe8d0 00007ff7`86c350ab RecastNaviDemo!MainLayout::OnGUI+0x69f [H:\Development\Projects\learning_project\Source\RecastNaviDemo\UI\MainLayout.cpp @ 200]
+000000b3`472fea30 00007ff7`86c399d2 RecastNaviDemo!`main'::`2'::<lambda_15>::operator()+0x3b [H:\Development\Projects\learning_project\Source\RecastNaviDemo\RecastNaviDemo.cpp @ 365]
+000000b3`472fea60 00007ff7`86c35365 RecastNaviDemo!std::invoke<`main'::`2'::<lambda_15> &,float>+0x22 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\type_traits @ 1756]
+000000b3`472fea90 00007ff7`86cad674 RecastNaviDemo!std::_Func_impl_no_alloc<`main'::`2'::<lambda_15>,void,float>::_Do_call+0x25 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\functional @ 812]
+000000b3`472feac0 00007ff7`86cbde11 RecastNaviDemo!std::_Func_class<void,float>::operator()+0x54 [C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\include\functional @ 855]
+000000b3`472feb00 00007ff7`86c3450b RecastNaviDemo!DirectX::CreateWindowInstance+0xbf1 [H:\Development\Projects\learning_project\Source\LearningFoundation\DirectX\DirectX12Window.cpp @ 410]
+000000b3`472ff1e0 00007ff7`86e48089 RecastNaviDemo!main+0x6bb [H:\Development\Projects\learning_project\Source\RecastNaviDemo\RecastNaviDemo.cpp @ 357]
+000000b3`472ffba0 00007ff7`86e47f6e RecastNaviDemo!invoke_main+0x39 [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 79]
+000000b3`472ffbf0 00007ff7`86e47e2e RecastNaviDemo!__scrt_common_main_seh+0x12e [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 288]
+000000b3`472ffc60 00007ff7`86e4811e RecastNaviDemo!__scrt_common_main+0xe [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl @ 331]
+000000b3`472ffc90 00007ffc`f8fee8d7 RecastNaviDemo!mainCRTStartup+0xe [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_main.cpp @ 17]
+000000b3`472ffcc0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`472ffcf0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   1  Id: 1508.bb70 Suspend: 0 Teb: 000000b3`4718d000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`473ff9d8 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`473ff9e0 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`473ffd40 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`473ffd70 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   2  Id: 1508.bb60 Suspend: 0 Teb: 000000b3`4718f000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`474ff868 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`474ff870 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`474ffbd0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`474ffc00 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   3  Id: 1508.2098 Suspend: 0 Teb: 000000b3`47191000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`475ff568 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`475ff570 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`475ff8d0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`475ff900 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   4  Id: 1508.b230 Suspend: 0 Teb: 000000b3`47195000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`477ff158 00007ffc`f9e8c37b ntdll!NtWaitForAlertByThreadId+0x14
+000000b3`477ff160 00007ffc`f7792de8 ntdll!RtlSleepConditionVariableCS+0x14b
+000000b3`477ff1d0 00007ffc`e7d582f5 KERNELBASE!SleepConditionVariableCS+0x38
+000000b3`477ff200 00007ffc`e7d5abae Txumon64!GetInstance+0x2c445
+000000b3`477ff250 00007ffc`e7d5ac59 Txumon64!GetInstance+0x2ecfe
+000000b3`477ff920 00007ffc`e7d6b40f Txumon64!GetInstance+0x2eda9
+000000b3`477ff950 00007ffc`e7d6b4a3 Txumon64!GetInstance+0x3f55f
+000000b3`477ff980 00007ffc`f8fee8d7 Txumon64!GetInstance+0x3f5f3
+000000b3`477ff9b0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`477ff9e0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   5  Id: 1508.ade4 Suspend: 0 Teb: 000000b3`4719b000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`476ff9f8 00007ffc`f778b1bf ntdll!NtWaitForSingleObject+0x14
+000000b3`476ffa00 00007ffc`d45bbc23 KERNELBASE!WaitForSingleObjectEx+0xaf
+000000b3`476ffaa0 00007ff7`86dc968f PhysXFoundation_64!physx::shdfnd::SyncImpl::wait+0x33
+000000b3`476ffae0 00007ff7`86dc96bf RecastNaviDemo!physx::shdfnd::SyncT<physx::shdfnd::ReflectionAllocator<physx::shdfnd::SyncImpl> >::wait+0x1f [D:\Development\OpenSource\PhysX-4.1\physx\source\foundation\include\PsSync.h @ 113]
+000000b3`476ffb10 00007ff7`86dc900f RecastNaviDemo!physx::Ext::DefaultCpuDispatcher::waitForWork+0x1f [D:\Development\OpenSource\PhysX-4.1\physx\source\physxextensions\src\ExtDefaultCpuDispatcher.h @ 100]
+000000b3`476ffb40 00007ffc`d45bc88b RecastNaviDemo!physx::Ext::CpuWorkerThread::execute+0xaf [D:\Development\OpenSource\PhysX-4.1\physx\source\physxextensions\src\ExtCpuWorkerThread.cpp @ 103]
+000000b3`476ffb80 00007ffc`f8fee8d7 PhysXFoundation_64!physx::shdfnd::TlsSetValue+0xab
+000000b3`476ffbc0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`476ffbf0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   6  Id: 1508.1444 Suspend: 0 Teb: 000000b3`4719d000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47aff868 00007ffc`f778b1bf ntdll!NtWaitForSingleObject+0x14
+000000b3`47aff870 00007ffc`d45bbc23 KERNELBASE!WaitForSingleObjectEx+0xaf
+000000b3`47aff910 00007ff7`86dc968f PhysXFoundation_64!physx::shdfnd::SyncImpl::wait+0x33
+000000b3`47aff950 00007ff7`86dc96bf RecastNaviDemo!physx::shdfnd::SyncT<physx::shdfnd::ReflectionAllocator<physx::shdfnd::SyncImpl> >::wait+0x1f [D:\Development\OpenSource\PhysX-4.1\physx\source\foundation\include\PsSync.h @ 113]
+000000b3`47aff980 00007ff7`86dc900f RecastNaviDemo!physx::Ext::DefaultCpuDispatcher::waitForWork+0x1f [D:\Development\OpenSource\PhysX-4.1\physx\source\physxextensions\src\ExtDefaultCpuDispatcher.h @ 100]
+000000b3`47aff9b0 00007ffc`d45bc88b RecastNaviDemo!physx::Ext::CpuWorkerThread::execute+0xaf [D:\Development\OpenSource\PhysX-4.1\physx\source\physxextensions\src\ExtCpuWorkerThread.cpp @ 103]
+000000b3`47aff9f0 00007ffc`f8fee8d7 PhysXFoundation_64!physx::shdfnd::TlsSetValue+0xab
+000000b3`47affa30 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47affa60 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   7  Id: 1508.d198 Suspend: 0 Teb: 000000b3`4719f000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47bff8a8 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`47bff8b0 00007ffc`f694e6c7 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`47bffba0 00007ffc`f8fee8d7 crypt32!ILS_WaitForThreadProc+0x37
+000000b3`47bffbe0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47bffc10 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   8  Id: 1508.37f4 Suspend: 0 Teb: 000000b3`471a1000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`478ffc88 00007ffc`f9f51014 ntdll!NtDelayExecution+0x14
+000000b3`478ffc90 00007ffc`f7796f01 ntdll!RtlDelayExecution+0x34
+000000b3`478ffcc0 00007ffc`e7d2b3f9 KERNELBASE!SleepEx+0x91
+000000b3`478ffd50 00007ffc`e7d6b40f Txumon64+0xb3f9
+000000b3`478ffd80 00007ffc`e7d6b4a3 Txumon64!GetInstance+0x3f55f
+000000b3`478ffdb0 00007ffc`f8fee8d7 Txumon64!GetInstance+0x3f5f3
+000000b3`478ffde0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`478ffe10 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+   9  Id: 1508.d618 Suspend: 0 Teb: 000000b3`471a7000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`479ffb88 00007ffc`f778b1bf ntdll!NtWaitForSingleObject+0x14
+000000b3`479ffb90 00007ffc`dbc1775b KERNELBASE!WaitForSingleObjectEx+0xaf
+000000b3`479ffc30 00007ffc`dc1f72f6 nvwgf2umx!NVDEV_Thunk+0x2332b
+000000b3`479ffc70 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`479ffca0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`479ffcd0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  10  Id: 1508.9a5c Suspend: 0 Teb: 000000b3`471a9000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47cff5e8 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`47cff5f0 00007ffc`f7791961 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`47cff8e0 00007ffc`db40bf96 KERNELBASE!WaitForMultipleObjects+0x11
+000000b3`47cff920 00007ffc`dc1f72f6 nvwgf2umx!NVAPI_DirectMethods+0x2ea56
+000000b3`47cff9b0 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`47cff9e0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47cffa10 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  11  Id: 1508.24c Suspend: 0 Teb: 000000b3`471ab000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47dff548 00007ffc`f778b1bf ntdll!NtWaitForSingleObject+0x14
+000000b3`47dff550 00007ffc`dbc7b6ef KERNELBASE!WaitForSingleObjectEx+0xaf
+000000b3`47dff5f0 00007ffc`dc1f72f6 nvwgf2umx!NVDEV_Thunk+0x872bf
+000000b3`47dff750 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`47dff780 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47dff7b0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  12  Id: 1508.2a58 Suspend: 0 Teb: 000000b3`471ad000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47effb28 00007ffc`f9f14c0e ntdll!NtWaitForAlertByThreadId+0x14
+000000b3`47effb30 00007ffc`f7791d78 ntdll!RtlSleepConditionVariableSRW+0x1de
+000000b3`47effbd0 00007ffc`f6d03d2d KERNELBASE!SleepConditionVariableSRW+0x38
+000000b3`47effc10 00007ffc`f6cff4a9 msvcp_win!Concurrency::details::stl_condition_variable_win7::wait+0x19
+000000b3`47effc40 00007ffb`fee2cf0a msvcp_win!Cnd_wait+0x19
+000000b3`47effc70 00007ffb`fee2ce24 D3D12Core!BackgroundTaskScheduler::Scheduler::TaskThread+0xb6
+000000b3`47effda0 00007ffc`f6d937b0 D3D12Core!std::thread::_Invoke<std::tuple<<lambda_d1dcd43984ff6503e4a6a4b61a501ad9> >,0>+0x14
+000000b3`47effdd0 00007ffc`f8fee8d7 ucrtbase!thread_start<unsigned int (__cdecl*)(void *),1>+0x30
+000000b3`47effe00 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47effe30 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  13  Id: 1508.4c5c Suspend: 0 Teb: 000000b3`471af000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`47fff658 00007ffc`f9f14c0e ntdll!NtWaitForAlertByThreadId+0x14
+000000b3`47fff660 00007ffc`f7791d78 ntdll!RtlSleepConditionVariableSRW+0x1de
+000000b3`47fff700 00007ffc`f6d03d2d KERNELBASE!SleepConditionVariableSRW+0x38
+000000b3`47fff740 00007ffc`f6cff4a9 msvcp_win!Concurrency::details::stl_condition_variable_win7::wait+0x19
+000000b3`47fff770 00007ffb`fee2cf0a msvcp_win!Cnd_wait+0x19
+000000b3`47fff7a0 00007ffb`fee2ce24 D3D12Core!BackgroundTaskScheduler::Scheduler::TaskThread+0xb6
+000000b3`47fff8d0 00007ffc`f6d937b0 D3D12Core!std::thread::_Invoke<std::tuple<<lambda_d1dcd43984ff6503e4a6a4b61a501ad9> >,0>+0x14
+000000b3`47fff900 00007ffc`f8fee8d7 ucrtbase!thread_start<unsigned int (__cdecl*)(void *),1>+0x30
+000000b3`47fff930 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`47fff960 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  14  Id: 1508.287c Suspend: 0 Teb: 000000b3`471b1000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`480ffc28 00007ffc`f9f14c0e ntdll!NtWaitForAlertByThreadId+0x14
+000000b3`480ffc30 00007ffc`f7791d78 ntdll!RtlSleepConditionVariableSRW+0x1de
+000000b3`480ffcd0 00007ffc`f6d03d2d KERNELBASE!SleepConditionVariableSRW+0x38
+000000b3`480ffd10 00007ffc`f6cff4a9 msvcp_win!Concurrency::details::stl_condition_variable_win7::wait+0x19
+000000b3`480ffd40 00007ffb`fee2cf0a msvcp_win!Cnd_wait+0x19
+000000b3`480ffd70 00007ffb`fee2ce24 D3D12Core!BackgroundTaskScheduler::Scheduler::TaskThread+0xb6
+000000b3`480ffea0 00007ffc`f6d937b0 D3D12Core!std::thread::_Invoke<std::tuple<<lambda_d1dcd43984ff6503e4a6a4b61a501ad9> >,0>+0x14
+000000b3`480ffed0 00007ffc`f8fee8d7 ucrtbase!thread_start<unsigned int (__cdecl*)(void *),1>+0x30
+000000b3`480fff00 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`480fff30 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  15  Id: 1508.b544 Suspend: 0 Teb: 000000b3`471b3000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`481ffa78 00007ffc`f9f14c0e ntdll!NtWaitForAlertByThreadId+0x14
+000000b3`481ffa80 00007ffc`f7791d78 ntdll!RtlSleepConditionVariableSRW+0x1de
+000000b3`481ffb20 00007ffc`f6d03d2d KERNELBASE!SleepConditionVariableSRW+0x38
+000000b3`481ffb60 00007ffc`f6cff4a9 msvcp_win!Concurrency::details::stl_condition_variable_win7::wait+0x19
+000000b3`481ffb90 00007ffb`fee2cf0a msvcp_win!Cnd_wait+0x19
+000000b3`481ffbc0 00007ffb`fee2ce24 D3D12Core!BackgroundTaskScheduler::Scheduler::TaskThread+0xb6
+000000b3`481ffcf0 00007ffc`f6d937b0 D3D12Core!std::thread::_Invoke<std::tuple<<lambda_d1dcd43984ff6503e4a6a4b61a501ad9> >,0>+0x14
+000000b3`481ffd20 00007ffc`f8fee8d7 ucrtbase!thread_start<unsigned int (__cdecl*)(void *),1>+0x30
+000000b3`481ffd50 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`481ffd80 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  16  Id: 1508.a488 Suspend: 0 Teb: 000000b3`471b5000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`482ff528 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`482ff530 00007ffc`f7791961 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`482ff820 00007ffc`db40bf96 KERNELBASE!WaitForMultipleObjects+0x11
+000000b3`482ff860 00007ffc`dc1f72f6 nvwgf2umx!NVAPI_DirectMethods+0x2ea56
+000000b3`482ff8f0 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`482ff920 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`482ff950 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  17  Id: 1508.cbfc Suspend: 0 Teb: 000000b3`471b7000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`483ff498 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`483ff4a0 00007ffc`f7791961 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`483ff790 00007ffc`db40bf96 KERNELBASE!WaitForMultipleObjects+0x11
+000000b3`483ff7d0 00007ffc`dc1f72f6 nvwgf2umx!NVAPI_DirectMethods+0x2ea56
+000000b3`483ff860 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`483ff890 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`483ff8c0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  18  Id: 1508.bc30 Suspend: 0 Teb: 000000b3`471bb000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`485ff9e8 00007ffc`f9f51014 ntdll!NtDelayExecution+0x14
+000000b3`485ff9f0 00007ffc`f7796f01 ntdll!RtlDelayExecution+0x34
+000000b3`485ffa20 00007ffc`7867abd6 KERNELBASE!SleepEx+0x91
+000000b3`485ffab0 00007ffc`7867adb8 QQWubi!ImeSetCompositionString+0xea0d2
+000000b3`485ffb30 00007ffc`f8fee8d7 QQWubi!ImeSetCompositionString+0xea2b4
+000000b3`485ffb60 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`485ffb90 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  19  Id: 1508.2c6c Suspend: 0 Teb: 000000b3`471bf000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`486ffa88 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`486ffa90 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`486ffdf0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`486ffe20 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  20  Id: 1508.693c Suspend: 0 Teb: 000000b3`471c1000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`487feec8 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`487feed0 00007ffc`f2cae5d8 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`487ff1c0 00007ffc`f2cae2b3 CoreMessaging!Microsoft::CoreUI::Dispatch::WaitController::Callback_WaitAny+0xc8
+000000b3`487ff2b0 00007ffc`f2cadf0e CoreMessaging!Microsoft::CoreUI::Dispatch::Win32EventLoopBridge::Callback_DoWait+0x123
+000000b3`487ff380 00007ffc`f2ca15dc CoreMessaging!Microsoft::CoreUI::Dispatch::Win32EventLoopBridge::Callback_Wait+0x5e
+000000b3`487ff440 00007ffc`f2ca0b67 CoreMessaging!Microsoft::CoreUI::Dispatch::WaitCollection::Callback_DoGeneralWait+0x1ec
+000000b3`487ff510 00007ffc`f2c9f194 CoreMessaging!Microsoft::CoreUI::Dispatch::WaitController::Callback_OnDispatch+0xf7
+000000b3`487ff600 00007ffc`f2c9ed2d CoreMessaging!Microsoft::CoreUI::Dispatch::Dispatcher::Callback_DispatchLoop+0x334
+000000b3`487ff700 00007ffc`f2ca2058 CoreMessaging!Microsoft::CoreUI::Dispatch::EventLoop::Callback_RunCoreLoop+0x11d
+000000b3`487ff770 00007ffc`f2d1d6ae CoreMessaging!Microsoft::CoreUI::Dispatch::Win32EventLoopBridge::Callback_Run+0xd8
+000000b3`487ff850 00007ffc`f2d169af CoreMessaging!Microsoft::CoreUI::Dispatch::EventLoop::Callback_Run+0x156
+000000b3`487ff8e0 00007ffc`f2cf4a4b CoreMessaging!Microsoft::CoreUI::Messaging::MessageSession::Microsoft_CoreUI_IExportMessageSession_Run$+0x33
+000000b3`487ff910 00007ffc`c427a4dd CoreMessaging!Microsoft::CoreUI::IExportMessageSession::ExportAdapter$::Run+0x5b
+000000b3`487ff950 00007ffc`c4270eb9 inputhost!MessagingThread::ThreadProc+0xb5
+000000b3`487ff9a0 00007ffc`f8fee8d7 inputhost!<lambda_376318154f061e76a4fa5387c7eed0ca>::<lambda_invoker_cdecl>+0x9
+000000b3`487ff9d0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`487ffa00 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  21  Id: 1508.cc60 Suspend: 0 Teb: 000000b3`471c3000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`488ffab8 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`488ffac0 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`488ffe20 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`488ffe50 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  22  Id: 1508.34d0 Suspend: 0 Teb: 000000b3`471c5000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`489ff9c8 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`489ff9d0 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`489ffd30 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`489ffd60 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  23  Id: 1508.a2b0 Suspend: 0 Teb: 000000b3`471c7000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48aff408 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`48aff410 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`48aff770 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48aff7a0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  24  Id: 1508.8b14 Suspend: 0 Teb: 000000b3`471c9000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`484ff168 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`484ff170 00007ffc`f8afffce KERNELBASE!WaitForMultipleObjectsEx+0x123
+(Inline Function) --------`-------- combase!WaitCoalesced+0x79 [onecore\com\published\comutils\coalescedwait.cxx @ 70]
+000000b3`484ff460 00007ffc`f8af5eaf combase!CROIDTable::WorkerThreadLoop+0xae [onecore\com\combase\dcomrem\refcache.cxx @ 1716]
+000000b3`484ff6d0 00007ffc`f8af5dbf combase!CRpcThread::WorkerLoop+0x5b [onecore\com\combase\dcomrem\threads.cxx @ 283]
+000000b3`484ff740 00007ffc`f8fee8d7 combase!CRpcThreadCache::RpcWorkerThreadEntry+0x4f [onecore\com\combase\dcomrem\threads.cxx @ 77]
+000000b3`484ff770 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`484ff7a0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  25  Id: 1508.c25c Suspend: 0 Teb: 000000b3`471cb000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48bffbe8 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`48bffbf0 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`48bfff50 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48bfff80 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  26  Id: 1508.1604 Suspend: 0 Teb: 000000b3`471cd000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48cffab8 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`48cffac0 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`48cffe20 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48cffe50 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  27  Id: 1508.cca8 Suspend: 0 Teb: 000000b3`471cf000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48dff768 00007ffc`f8ecb1f6 win32u!NtUserMsgWaitForMultipleObjectsEx+0x14
+000000b3`48dff770 00007ffc`f8eca60e SHCore!WorkThreadManager::CThread::WaitForWork+0x7a
+000000b3`48dff7f0 00007ffc`f8ec99c7 SHCore!WorkThreadManager::CThread::ThreadProc+0xda
+000000b3`48dff890 00007ffc`f8fee8d7 SHCore!<lambda_9844335fc14345151eefcc3593dd6895>::<lambda_invoker_cdecl>+0x17
+000000b3`48dff8c0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48dff8f0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  28  Id: 1508.1750 Suspend: 0 Teb: 000000b3`471d3000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48effaa8 00007ffc`f778b1bf ntdll!NtWaitForSingleObject+0x14
+000000b3`48effab0 00007ffc`dba39f12 KERNELBASE!WaitForSingleObjectEx+0xaf
+000000b3`48effb50 00007ffc`dc1f72f6 nvwgf2umx!OpenAdapter10+0x141ea2
+000000b3`48effb80 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`48effbb0 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48effbe0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  29  Id: 1508.aa70 Suspend: 0 Teb: 000000b3`471d5000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`46f5f4f8 00007ffc`f7791a93 ntdll!NtWaitForMultipleObjects+0x14
+000000b3`46f5f500 00007ffc`f7791961 KERNELBASE!WaitForMultipleObjectsEx+0x123
+000000b3`46f5f7f0 00007ffc`dbc77c67 KERNELBASE!WaitForMultipleObjects+0x11
+000000b3`46f5f830 00007ffc`dbd4ed7a nvwgf2umx!NVDEV_Thunk+0x83837
+000000b3`46f5f920 00007ffc`dc1f72f6 nvwgf2umx!NVDEV_Thunk+0x15a94a
+000000b3`46f5f950 00007ffc`f8fee8d7 nvwgf2umx!NVDEV_Thunk+0x602ec6
+000000b3`46f5f980 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`46f5f9b0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+
+  30  Id: 1508.d568 Suspend: 0 Teb: 000000b3`47016000 Unfrozen
+Child-SP          RetAddr           Call Site
+000000b3`48fff818 00007ffc`f9ef5dfe ntdll!NtWaitForWorkViaWorkerFactory+0x14
+000000b3`48fff820 00007ffc`f8fee8d7 ntdll!TppWorkerThread+0x37e
+000000b3`48fffb80 00007ffc`f9f0c3fc kernel32!BaseThreadInitThunk+0x17
+000000b3`48fffbb0 00000000`00000000 ntdll!RtlUserThreadStart+0x2c
+start             end                 module name
+00007ff7`86c20000 00007ff7`86f4c000   RecastNaviDemo C (private pdb symbols)  C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\RecastNaviDemo.pdb\9CF90A55139F41C78D1A6E5CF899EE413\RecastNaviDemo.pdb
+00007ffb`fe5e0000 00007ffb`fea79000   D3D12SDKLayers   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\d3d12SDKLayers.pdb\267FD7A7672C8C20F18218FF2CB7031A1\d3d12SDKLayers.pdb
+00007ffb`fedf0000 00007ffb`ff148000   D3D12Core   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\d3d12core.pdb\B21BF700879C0AADAC3D9FE9D931B2051\d3d12core.pdb
+00007ffb`ff150000 00007ffb`ff5aa000   PhysX_64   (deferred)             
+00007ffc`331d0000 00007ffc`331ee000   xinput1_4   (deferred)             
+00007ffc`3ba60000 00007ffc`3bc69000   PhysXCommon_64   (deferred)             
+00007ffc`3c130000 00007ffc`3c351000   ucrtbased   (deferred)             
+00007ffc`42910000 00007ffc`42a74000   dxilconv   (deferred)             
+00007ffc`783c0000 00007ffc`78577000   nvppex     (deferred)             
+00007ffc`78580000 00007ffc`78be4000   QQWubi     (export symbols)       QQWubi.ime
+00007ffc`78bf0000 00007ffc`78c6c000   QQWubiTSF   (deferred)             
+00007ffc`9aba0000 00007ffc`9ac85000   D3DSCache   (deferred)             
+00007ffc`9bdb0000 00007ffc`9be91000   MSVCP140D   (deferred)             
+00007ffc`ad8f0000 00007ffc`ada37000   nvspcap64   (deferred)             
+00007ffc`be900000 00007ffc`be923000   D3D12      (deferred)             
+00007ffc`bfa60000 00007ffc`bfb24000   Windows_StateRepositoryPS   (deferred)             
+00007ffc`c10f0000 00007ffc`c1385000   wininet    (deferred)             
+00007ffc`c4060000 00007ffc`c40be000   ApplicationTargetedFeatureDatabase   (deferred)             
+00007ffc`c40d0000 00007ffc`c4218000   textinputframework   (deferred)             
+00007ffc`c4220000 00007ffc`c4403000   inputhost   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\InputHost.pdb\8354F0391FE5FB2CAF47B0601DD3B6631\InputHost.pdb
+00007ffc`c4ed0000 00007ffc`c4ef9000   edputil    (deferred)             
+00007ffc`c5210000 00007ffc`c52c3000   TextShaping   (deferred)             
+00007ffc`c7e20000 00007ffc`c7ed5000   comctl32   (deferred)             
+00007ffc`c9bd0000 00007ffc`c9c46000   oleacc     (deferred)             
+00007ffc`d07f0000 00007ffc`d0856000   PhysXCooking_64   (deferred)             
+00007ffc`d2bd0000 00007ffc`d2c81000   winspool   (deferred)             
+00007ffc`d3e60000 00007ffc`d3e85000   DXGIDebug   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\DXGIDebug.pdb\95A873D83BC532B44F5B636A4E1F60151\DXGIDebug.pdb
+00007ffc`d4340000 00007ffc`d436e000   VCRUNTIME140D   (deferred)             
+00007ffc`d45b0000 00007ffc`d45cd000   PhysXFoundation_64 C (export symbols)       PhysXFoundation_64.dll
+00007ffc`d4be0000 00007ffc`d4bfa000   netapi32   (deferred)             
+00007ffc`d4fc0000 00007ffc`d4fe9000   srvcli     (deferred)             
+00007ffc`d5210000 00007ffc`d54d4000   iertutil   (deferred)             
+00007ffc`d56c0000 00007ffc`d589f000   urlmon     (deferred)             
+00007ffc`d6690000 00007ffc`d669b000   ktmw32     (deferred)             
+00007ffc`d6800000 00007ffc`d680c000   fltLib     (deferred)             
+00007ffc`d6810000 00007ffc`d6827000   virtdisk   (deferred)             
+00007ffc`db300000 00007ffc`e0b35000   nvwgf2umx   (export symbols)       nvwgf2umx.dll
+00007ffc`e1480000 00007ffc`e1488000   msimg32    (deferred)             
+00007ffc`e1510000 00007ffc`e1546000   winmm      (deferred)             
+00007ffc`e15f0000 00007ffc`e16ce000   NvMemMapStoragex   (deferred)             
+00007ffc`e21d0000 00007ffc`e5f64000   nvgpucomp64   (deferred)             
+00007ffc`e61f0000 00007ffc`e622b000   cryptnet   (deferred)             
+00007ffc`e63a0000 00007ffc`e6464000   nvldumdx   (deferred)             
+00007ffc`e6a30000 00007ffc`e6c7d000   twinapi_appcore   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\twinapi.appcore.pdb\94EE44CA5BB5F3E0705A2301B27A6F3D1\twinapi.appcore.pdb
+00007ffc`e6cc0000 00007ffc`e6fa2000   CoreUIComponents   (deferred)             
+00007ffc`e7520000 00007ffc`e752f000   VCRUNTIME140_1D   (deferred)             
+00007ffc`e7880000 00007ffc`e78e1000   directxdatabasehelper   (deferred)             
+00007ffc`e7950000 00007ffc`e796b000   wkscli     (deferred)             
+00007ffc`e79b0000 00007ffc`e79bb000   version    (deferred)             
+00007ffc`e7d20000 00007ffc`e7def000   Txumon64   (export symbols)       Txumon64.dll
+00007ffc`e7fe0000 00007ffc`e800c000   msvfw32    (deferred)             
+00007ffc`e81b0000 00007ffc`e81cb000   avicap32   (deferred)             
+00007ffc`e91f0000 00007ffc`e966f000   D3DCOMPILER_47   (deferred)             
+00007ffc`e9a80000 00007ffc`e9a99000   Microsoft_Internal_WarpPal   (deferred)             
+00007ffc`eb0b0000 00007ffc`eb1b3000   propsys    (deferred)             
+00007ffc`eb320000 00007ffc`eb542000   dcomp      (deferred)             
+00007ffc`f2c90000 00007ffc`f2db7000   CoreMessaging   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\CoreMessaging.pdb\81854DFD09B7D1C781EFAC3B9766A6481\CoreMessaging.pdb
+00007ffc`f3120000 00007ffc`f31c9000   uxtheme    (deferred)             
+00007ffc`f3200000 00007ffc`f3341000   dxgi       (deferred)             
+00007ffc`f3370000 00007ffc`f339f000   dwmapi     (deferred)             
+00007ffc`f3ab0000 00007ffc`f3af3000   DXCore     (deferred)             
+00007ffc`f3f00000 00007ffc`f3f29000   wtsapi32   (deferred)             
+00007ffc`f4530000 00007ffc`f453d000   netutils   (deferred)             
+00007ffc`f45e0000 00007ffc`f4612000   IPHLPAPI   (deferred)             
+00007ffc`f4b70000 00007ffc`f4b8b000   kernel_appcore   (deferred)             
+00007ffc`f4dd0000 00007ffc`f4e19000   sspicli    (deferred)             
+00007ffc`f50f0000 00007ffc`f5123000   userenv    (deferred)             
+00007ffc`f5330000 00007ffc`f5398000   wldp       (deferred)             
+00007ffc`f5540000 00007ffc`f554c000   cryptbase   (deferred)             
+00007ffc`f5550000 00007ffc`f5589000   rsaenh     (deferred)             
+00007ffc`f5590000 00007ffc`f55a3000   msasn1     (deferred)             
+00007ffc`f5600000 00007ffc`f5778000   drvstore   (deferred)             
+00007ffc`f5810000 00007ffc`f5872000   winsta     (deferred)             
+00007ffc`f5f30000 00007ffc`f5f66000   ntmarta    (deferred)             
+00007ffc`f62e0000 00007ffc`f62fb000   cryptsp    (deferred)             
+00007ffc`f6320000 00007ffc`f6371000   cfgmgr32   (deferred)             
+00007ffc`f6380000 00007ffc`f63ad000   devobj     (deferred)             
+00007ffc`f63e0000 00007ffc`f63f4000   umpdc      (deferred)             
+00007ffc`f6400000 00007ffc`f645e000   powrprof   (deferred)             
+00007ffc`f6640000 00007ffc`f666a000   bcrypt     (deferred)             
+00007ffc`f6670000 00007ffc`f6699000   profapi    (deferred)             
+00007ffc`f6750000 00007ffc`f687b000   gdi32full   (deferred)             
+00007ffc`f6880000 00007ffc`f68a7000   win32u     (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\win32u.pdb\AD5C7A53399F01EF9A51D20899BA03FD1\win32u.pdb
+00007ffc`f68b0000 00007ffc`f6a27000   crypt32    (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\crypt32.pdb\004EFEFD047BF1F3176B0087DF2661291\crypt32.pdb
+00007ffc`f6a30000 00007ffc`f6ad5000   bcryptPrimitives   (deferred)             
+00007ffc`f6ae0000 00007ffc`f6b62000   wintrust   (deferred)             
+00007ffc`f6b70000 00007ffc`f6cda000   WinTypes   (deferred)             
+00007ffc`f6ce0000 00007ffc`f6d83000   msvcp_win   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\msvcp_win.pdb\992A8D5E0DD3789086C0F3A72C9DFEE11\msvcp_win.pdb
+00007ffc`f6d90000 00007ffc`f6edb000   ucrtbase   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\ucrtbase.pdb\8E82F0808E200FB5C370B7C417D0C8351\ucrtbase.pdb
+00007ffc`f6ee0000 00007ffc`f7748000   Windows_Storage   (deferred)             
+00007ffc`f7750000 00007ffc`f7b44000   KERNELBASE   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\kernelbase.pdb\101BD3C89F4205B322B2E69A02E23BDB1\kernelbase.pdb
+00007ffc`f7c30000 00007ffc`f7df5000   user32     (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\user32.pdb\FAA1C064D759004E64E08ACEC153C0DE1\user32.pdb
+00007ffc`f7e00000 00007ffc`f7e20000   imagehlp   (deferred)             
+00007ffc`f7e30000 00007ffc`f7f1f000   comdlg32   (deferred)             
+00007ffc`f85a0000 00007ffc`f8649000   msvcrt     (deferred)             
+00007ffc`f8650000 00007ffc`f87e7000   ole32      (private pdb symbols)  C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\ole32.pdb\15B959512048851E8953F4E11715C67E1\ole32.pdb
+00007ffc`f87f0000 00007ffc`f88c8000   oleaut32   (deferred)             
+00007ffc`f88e0000 00007ffc`f88e8000   psapi      (deferred)             
+00007ffc`f88f0000 00007ffc`f891b000   gdi32      (deferred)             
+00007ffc`f8920000 00007ffc`f89ce000   clbcatq    (deferred)             
+00007ffc`f89e0000 00007ffc`f8d62000   combase    (private pdb symbols)  C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\combase.pdb\989144430DDEF2E2D96F99E1E1C466A11\combase.pdb
+00007ffc`f8d70000 00007ffc`f8e26000   advapi32   (deferred)             
+00007ffc`f8ec0000 00007ffc`f8fb8000   SHCore     (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\shcore.pdb\E37FE2E109A2D70011B556CD9B508C671\shcore.pdb
+00007ffc`f8fc0000 00007ffc`f9089000   kernel32   (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\kernel32.pdb\3793FC137439CF05281960D0AC2979DC1\kernel32.pdb
+00007ffc`f9090000 00007ffc`f9110000   ws2_32     (deferred)             
+00007ffc`f9120000 00007ffc`f9152000   imm32      (deferred)             
+00007ffc`f9160000 00007ffc`f9207000   sechost    (deferred)             
+00007ffc`f92c0000 00007ffc`f9326000   shlwapi    (deferred)             
+00007ffc`f9350000 00007ffc`f9468000   rpcrt4     (deferred)             
+00007ffc`f9470000 00007ffc`f95cc000   msctf      (deferred)             
+00007ffc`f96d0000 00007ffc`f9e37000   shell32    (deferred)             
+00007ffc`f9e80000 00007ffc`fa0e7000   ntdll      (pdb symbols)          C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\sym\ntdll.pdb\4FE96AFC99BB2AEBCC1F4B164354A6F51\ntdll.pdb
+
+Unloaded modules:
+00007ffc`f3eb0000 00007ffc`f3ec4000   resourcepolicyclient.dll
+00007ffc`42910000 00007ffc`42a74000   dxilconv.dll
+quit:
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\atlmfc.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\concurrency.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\cpp_rest.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\stl.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Data.Json.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Devices.Geolocation.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Devices.Sensors.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\Windows.Media.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\windows.natvis'
+NatVis script unloaded from 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\Visualizers\winrt.natvis'
