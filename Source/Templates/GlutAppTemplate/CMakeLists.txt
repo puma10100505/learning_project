@@ -6,19 +6,14 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 # After invoking project, the context will change to 'gl_model'
 project(GlutAppTemplate VERSION 1.0)
 
-option(USE_PHYSX "Use physx library" OFF)
-option(USE_D3D "Use windows d3d library" ON)
-option(USE_FREEGLUT "Use Freeglut library" ON)
-option(USE_IMGUI "Use imgui library" OFF)
-option(USE_NETIMGUI "Use netimgui library" OFF)
-option(USE_IMPLOT "Use implot library" ON)
-option(USE_IMNODES "Use imnodes library" ON)
-option(USE_IMGUIZMO "Use imguizmo library" OFF)
-option(USE_LOGURU "Use loguru library" OFF)
-option(USE_NODEEDITOR "Use node-editor library" OFF)
-option(USE_GLFW "Use GLFW library" OFF)
-option(USE_NAV "Use navigation library" OFF)
-
+learning_demo_reset_link_flags()
+set(USE_FREEGLUT ON)
+set(USE_IMGUI ON)
+set(USE_PHYSX ON)
+set(USE_NETIMGUI ON)
+set(USE_IMPLOT ON)
+set(USE_IMNODES ON)
+set(USE_NODEEDITOR ON)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)

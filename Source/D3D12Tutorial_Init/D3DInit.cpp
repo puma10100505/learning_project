@@ -18,9 +18,13 @@ void D3DInit::InitializeDevice()
     }
     #endif
 
-    if (FAILED(CreateDXGIFactory4(IID_PPV_ARGS(&DXGIFactory))))
+    UINT dxgi_factory_flags = 0;
+#if defined(DEBUG) || defined(_DEBUG)
+    dxgi_factory_flags |= DXGI_CREATE_FACTORY_DEBUG;
+#endif
+    if (FAILED(CreateDXGIFactory2(dxgi_factory_flags, IID_PPV_ARGS(&DXGIFactory))))
     {
-        PLOGD << "Create dxgi factory \failed";
+        PLOGD << "Create dxgi factory failed";
         return;
     }
 
@@ -30,7 +34,7 @@ void D3DInit::InitializeDevice()
         ComPtr<IDXGIAdapter> pWarpAdapter;
         if (SUCCEEDED(DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&pWarpAdapter))))
         {
-            D3D12CreateDevice(pWarpAdapter.Get(), D3D_FEATURE_LEVEL_11_0， IID_PPV_ARGS(&MainDevice));
+            D3D12CreateDevice(pWarpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&MainDevice));
         }
         else
         {
@@ -93,7 +97,7 @@ void D3DInit::CreateCommandObjects()
     }
 
     if (FAILED(MainDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, 
-        IID_PPV_ARGS(DirectCommandAllocator.GetAddressOf())))
+        IID_PPV_ARGS(DirectCommandAllocator.GetAddressOf()))))
     {
         PLOGD << "Create command allocator failed";
         return;
@@ -196,13 +200,15 @@ void D3DInit::CreateDepthStencilView()
     OptClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     OptClear.DepthStencil.Depth = 1.f;
     OptClear.DepthStencil.Stencil = 0;
-    MainDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, 
+    const CD3DX12_HEAP_PROPERTIES heap_default(D3D12_HEAP_TYPE_DEFAULT);
+    MainDevice->CreateCommittedResource(&heap_default, D3D12_HEAP_FLAG_NONE,
         &DepthStencilDesc, D3D12_RESOURCE_STATE_COMMON, &OptClear, IID_PPV_ARGS(DepthStencilBuffer.GetAddressOf()));
 
     MainDevice->CreateDepthStencilView(DepthStencilBuffer.Get(), nullptr, DepthStencilView());
 
-    CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(DepthStencilBuffer.Get(), 
-        D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    const auto ds_barrier = CD3DX12_RESOURCE_BARRIER::Transition(DepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    CommandList->ResourceBarrier(1, &ds_barrier);
 }
 
 void D3DInit::SetScissorRectangles()

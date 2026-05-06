@@ -1,5 +1,18 @@
 cmake_minimum_required(VERSION 3.0...3.21)
 
+# 各 demo 在 project() 之后、写入 USE_* 与 link_extra_libs() 之前调用。
+# 子目录里的 option(USE_* ...) 会写入 CMakeCache，后续 add_subdirectory 的工程会误用缓存
+#（例如 USE_FREEGLUT 仍为 ON 时，纯 GLFW 工程会去链接 freeglutd.lib 而找不到符号或库路径混乱）。
+macro(learning_demo_reset_link_flags)
+    foreach(_demo_link_flag IN ITEMS
+            USE_IMPLOT USE_NETIMGUI USE_FREEGLUT USE_IMNODES USE_NODEEDITOR
+            USE_LOGURU USE_IMGUIZMO USE_IMGUI USE_PHYSX USE_GLFW USE_D3D
+            USE_NAV USE_BOX2D USE_OGRE USE_PERFETTO USE_BOOST_FILESYSTEM)
+        unset(${_demo_link_flag} CACHE)
+        set(${_demo_link_flag} OFF)
+    endforeach()
+endmacro()
+
 # 构造Include目录列表
 macro(generate_include_directories param_project_name)
 
@@ -209,6 +222,10 @@ macro(link_extra_libs param_project_name)
             )
             
     elseif (WIN32)
+        # LearningFoundation.h 在 Windows 下会包含 freeglut 头，其 pragma comment(lib,"freeglutd.lib")
+        # 会在链接期拉入该库；此处统一加入目录，避免纯 GLFW 工程出现 LNK1104。
+        target_link_directories(${param_project_name} PRIVATE ${SOLUTION_ROOT}/Libraries/Windows/freeglut)
+
         list(APPEND EXTRA_LIBS 
             IrrXMLd.lib 
             zlibstaticd.lib

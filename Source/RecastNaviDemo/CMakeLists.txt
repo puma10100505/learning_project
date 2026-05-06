@@ -5,6 +5,8 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 
 project(RecastNaviDemo VERSION 1.0)
 
+learning_demo_reset_link_flags()
+
 # 本 demo 依赖：
 #   - Windows : D3D12 + ImGui (DirectX12Window)
 #   - macOS/Linux: GLFW + OpenGL + ImGui (GlfwWindows, learning_foundation/OpenGL)
@@ -16,9 +18,9 @@ endif()
 # 注意：本 demo 不开启 USE_NAV, 因为 SharedDef.cmake 里 USE_NAV 会 link 一个并不存在的
 # `recastnavigation` 目标。Recast/Detour 的子库（Recast / Detour / DetourCrowd / ...) 直接
 # 在下面用 target_link_libraries 显式链接。
-option(USE_D3D    "Use windows d3d library" ON)
-option(USE_IMGUI  "Use imgui library"        ON)
-option(USE_LOGURU "Use loguru library"       ON)
+set(USE_D3D ON)
+set(USE_IMGUI ON)
+set(USE_LOGURU ON)
 
 # 收集源文件
 aux_source_directory(${PROJECT_SOURCE_DIR}         SRC)

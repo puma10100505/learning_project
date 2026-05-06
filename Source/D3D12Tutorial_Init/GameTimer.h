@@ -17,7 +17,7 @@ class GameTimer
 
     private:
         double SecondsPerCount;
-        double DeltaTime;
+        double mDeltaTime;
 
         __int64 BaseTime;
         __int64 PausedTime;

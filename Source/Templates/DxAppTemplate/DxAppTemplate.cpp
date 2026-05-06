@@ -45,6 +45,6 @@ int main(int argc, char** argv)
 
     LOG_F(INFO, "entry of app");
 
-    return dx::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, 
+    return DirectX::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, 
         OnTick, OnGUI, OnPostGUI,OnInput);
 }

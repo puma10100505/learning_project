@@ -6,13 +6,10 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 # After invoking project, the context will change to 'gl_model'
 project(DxImGuiWindowDemo VERSION 1.0)
 
-option(USE_IMGUI "USE IMGUI" ON)
-option(USE_D3D "USE D3D" ON)
-option(USE_LOGURU "USE LOGURU" ON)
-
-#option(USE_IMNODES "USE IMNODES" ON)
-#option(USE_IMGUIZMO "USE_IMGUIZMO" ON)
-#option(USE_IMPLOT "USE IMPLOT" ON)
+learning_demo_reset_link_flags()
+set(USE_IMGUI ON)
+set(USE_D3D ON)
+set(USE_LOGURU ON)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)

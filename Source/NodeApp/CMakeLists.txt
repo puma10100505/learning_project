@@ -6,10 +6,12 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 # After invoking project, the context will change to 'gl_model'
 project(NodeApp VERSION 1.0)
 
-option(USE_IMNODES "Use imnodes library" ON)
-option(USE_D3D "Use D3D library" ON)
-option(USE_IMPLOT "Use freeglut" ON)
-option(USE_LOGURU "Use loguru" ON)
+learning_demo_reset_link_flags()
+set(USE_IMNODES ON)
+set(USE_D3D ON)
+set(USE_IMPLOT ON)
+set(USE_LOGURU ON)
+set(USE_IMGUI ON)
 
 # 收集用于生成目标的源代码目录(可替代file(GLOB ...)), Should be before add_executable
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)

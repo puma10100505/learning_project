@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include <dxgi1_4.h>
 #include "d3dx12.h"
 #include <Windows.h>
 #include <cstdio>
@@ -40,22 +41,22 @@ namespace D3DInit
     UINT CBVSRVDescSize = 0;
     UINT MSAA4XQuality = 0;  
 
-    RECT ScissorRect = {0, 0, ClientWidth / 2, ClientHeight / 2};
+    RECT ScissorRect = {0, 0, static_cast<LONG>(ClientWidth / 2), static_cast<LONG>(ClientHeight / 2)};
 
     void InitializeDevice();
     void CreateFence();
     void CheckForMSAA();
     void CreateCommandObjects();
-    void CreateSwapChain();
-    void CreateRTVAndDSVDescriptorHeap();
+    void CreateSwapChain(UINT InBufferCount, HWND InWnd);
+    void CreateRTVAndDSVDescriptorHeap(UINT InBufferCount);
     
-    inline D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const 
+    inline D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()
     {
         return CD3DX12_CPU_DESCRIPTOR_HANDLE(RTVHeap->GetCPUDescriptorHandleForHeapStart(), 
             CurrentBackBuffer, RTVDescSize);
     }
 
-    inline D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const 
+    inline D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()
     {
         return DSVHeap->GetCPUDescriptorHandleForHeapStart();
     }

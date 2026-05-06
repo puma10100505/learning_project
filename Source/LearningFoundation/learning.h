@@ -21,6 +21,7 @@
 #include "utility.h"
 #include "defines.h"
 #include "LearningFoundation.h"
+#include "LegacyGlfwApi.h"
 
 #include "GLMesh.h"
 #include "GLModel.h"

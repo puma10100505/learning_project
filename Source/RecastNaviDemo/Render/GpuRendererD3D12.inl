@@ -78,7 +78,7 @@ Mat4 ComputeDirectionalLightVP(Vec3 lightDirWorld, Vec3 sceneCenter, float scene
 {
     Vec3 dir = Normalize(lightDirWorld);
     if (Length(dir) < 1e-6f) dir = V3(0, 1, 0);
-    const float r        = std::max(sceneRadius, 1.0f);
+    const float r        = (std::max)(sceneRadius, 1.0f);
     const Vec3  lightPos = sceneCenter + dir * (r * 1.5f);
     Vec3        up       = (std::fabs(dir.y) > 0.95f) ? V3(0, 0, 1) : V3(0, 1, 0);
     const Mat4 view = MakeLookAtRH(lightPos, sceneCenter, up);
@@ -383,7 +383,7 @@ bool EnsureTargets(int rw, int rh, int shadowSz)
 {
     ID3D12Device* dev = DirectX::GetD3D12Device();
     if (!dev || rw <= 0 || rh <= 0) return false;
-    shadowSz = std::max(4, shadowSz);
+    shadowSz = (std::max)(4, shadowSz);
 
     if (g_Rw == rw && g_Rh == rh && g_ShadowSize == shadowSz && g_ColorTex) return true;
 
@@ -563,8 +563,8 @@ void Begin(int rw, int rh, ImU32 clearColor, const Mat4& vp, float fovyRad, cons
 
     if (samples > 1) g_SamplesIgnored = samples;
 
-    rw = std::max(1, rw);
-    rh = std::max(1, rh);
+    rw = (std::max)(1, rw);
+    rh = (std::max)(1, rh);
     const int shSz =
         (light.shadowsOn && light.type == 0) ? std::clamp(light.shadowMapSize, 64, 4096) : 256;
     if (!EnsureTargets(rw, rh, shSz)) return;
@@ -573,7 +573,7 @@ void Begin(int rw, int rh, ImU32 clearColor, const Mat4& vp, float fovyRad, cons
     g_Vp        = vp;
     g_Eye       = eyeWorld;
     g_Fovy      = fovyRad;
-    g_WorldDiag = std::max(worldBoundsDiagonal, 1.f);
+    g_WorldDiag = (std::max)(worldBoundsDiagonal, 1.f);
     g_L         = light;
     g_LightVp   = (light.shadowsOn && light.type == 0)
                     ? ComputeDirectionalLightVP(light.vec, light.sceneCenter, light.sceneRadius)
@@ -607,13 +607,13 @@ void DrawLineWorld(const Mat4&, Vec3 a, Vec3 b, ImU32 col, float thicknessPixels
     const float len = Length(ab);
     if (len < 1e-6f) return;
     // 每端各算 halfWidth，绘制成梯形，确保屏幕宽度与线长无关（恒定 thicknessPixels）。
-    const float distA = std::max(Length(a - g_Eye), 0.1f);
-    const float distB = std::max(Length(b - g_Eye), 0.1f);
-    const float halfH = static_cast<float>(std::max(g_Rh, 1));
-    const float k     = (2.0f * std::tan(g_Fovy * 0.5f)) / std::max(halfH, 1.0f);
+    const float distA = (std::max)(Length(a - g_Eye), 0.1f);
+    const float distB = (std::max)(Length(b - g_Eye), 0.1f);
+    const float halfH = static_cast<float>((std::max)(g_Rh, 1));
+    const float k     = (2.0f * std::tan(g_Fovy * 0.5f)) / (std::max)(halfH, 1.0f);
     const float floorW   = g_WorldDiag * 1e-4f;
-    const float halfWidA = std::max(thicknessPixels * k * 0.5f * distA, floorW);
-    const float halfWidB = std::max(thicknessPixels * k * 0.5f * distB, floorW);
+    const float halfWidA = (std::max)(thicknessPixels * k * 0.5f * distA, floorW);
+    const float halfWidB = (std::max)(thicknessPixels * k * 0.5f * distB, floorW);
     const Vec3 eab = ab * (1.0f / len);
     Vec3       toEye = g_Eye - (a + b) * 0.5f;
     if (Length(toEye) < 1e-4f) toEye = V3(0, 1, 0);

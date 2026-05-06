@@ -7,6 +7,8 @@
 #include "CommonDefines.h"
 #include "learning.h"
 
+extern glm::vec4 BackgroundColor;
+
 int main() {
     int iRet = 0;
 
@@ -53,7 +55,7 @@ int main() {
         }, 
         
         [&]() -> void {
-            ImGui::Begin(u8"Material & Light & Camera");                          // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Material & Light & Camera");                          // Create a window called "Hello, world!" and append into it.
 
             ImGui::Text("Material:");               // Display some text (you can use a format strings too)
             ImGui::SliderFloat("material.shininess", &(cube->material.shininess), 0.0f, 256.0f);

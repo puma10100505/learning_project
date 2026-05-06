@@ -39,3 +39,4 @@ Include/CommonDefines.h
 /cmake-build-local
 /cmake-build-release
 /cmake-build-x64-release
+/build_win

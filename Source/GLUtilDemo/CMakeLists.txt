@@ -4,6 +4,11 @@ include(${SOLUTION_ROOT}/SharedDef.cmake)
 
 project(GLUtilDemo VERSION 0.1)
 
+learning_demo_reset_link_flags()
+set(USE_GLFW ON)
+set(USE_IMGUI ON)
+set(USE_PHYSX ON)
+
 aux_source_directory(${PROJECT_SOURCE_DIR} SRC)
 add_executable(${PROJECT_NAME} ${SRC})
 include_directories(${PROJECT_NAME})

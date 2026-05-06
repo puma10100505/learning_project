@@ -155,6 +155,6 @@ int main(int argc, char** argv)
     BPNode_End;
     BPNode_Fire;
     
-    return dx::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, 
+    return DirectX::CreateWindowInstance("Hello dx window", 900, 600, 0, 0, 
         WinTick, WinGUI, WinPostGUI, WinInput);
 }
