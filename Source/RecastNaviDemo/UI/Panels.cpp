@@ -164,7 +164,8 @@ void DrawViewPanel(AppState& app, const PanelCallbacks& cb)
     if (app.CurrentViewMode == ViewMode::Orbit3D)
     {
         ImGui::Separator();
-        ImGui::TextUnformatted("Orbit Camera (Right-drag to rotate, wheel to zoom)");
+        ImGui::TextUnformatted("Orbit Camera (UE viewport-style, pivot @ Eye)");
+        ImGui::TextDisabled("RMB drag: look (pivot at Eye) | Wheel: zoom Distance | RMB+Wheel: fly speed | MMB: pan | RMB+WASD/QE: fly");
         ImGui::SliderFloat("Yaw",      &app.Cam.Yaw,      -3.14f, 3.14f);
         ImGui::SliderFloat("Pitch",    &app.Cam.Pitch,    -1.50f, 1.50f);
         ImGui::SliderFloat("Distance", &app.Cam.Distance,  2.00f, 800.0f);
@@ -414,12 +415,13 @@ void DrawEditPanel(AppState& app, const PanelCallbacks& cb)
     // 快捷键提示
     if (ImGui::TreeNode("Hotkeys / 快捷键"))
     {
-        ImGui::TextDisabled("--- 场景导航 (3D) ---");
-        ImGui::BulletText("W/A/S/D : 沿相机方向 前/左/后/右 平移");
-        ImGui::BulletText("Q / E   : 下降 / 上升 (Y 轴)");
-        ImGui::BulletText("Shift   : 加速 ×3   |   Ctrl: 慢速 ×0.3");
-        ImGui::BulletText("右键拖拽: 旋转视角  |   滚轮: 缩放");
-        ImGui::BulletText("Home    : 重置 Camera (拉到包围盒)");
+        ImGui::TextDisabled("--- 场景导航 (3D，对齐 UE Level Editor 视口) ---");
+        ImGui::BulletText("按住右键 + WASD：前后/左右平移（视线空间，与 UE 一致）");
+        ImGui::BulletText("按住右键 + Q / E：沿世界竖轴下 / 上（本工程 Y 轴）");
+        ImGui::BulletText("按住右键 + 滚轮：调节飞行速度倍率；仅滚轮：缩放距离");
+        ImGui::BulletText("Shift / Ctrl：加速 ×3 / 慢速 ×0.3");
+        ImGui::BulletText("右键拖拽：旋转视角 | 中键拖拽：平移（不旋转）");
+        ImGui::BulletText("Home：重置 Camera（拉到包围盒）");
         ImGui::TextDisabled("--- 编辑 / 操作 ---");
         ImGui::BulletText("1 / 2   : Place Start / End");
         ImGui::BulletText("T       : Select & Move (原 S, 让位 WASD)");

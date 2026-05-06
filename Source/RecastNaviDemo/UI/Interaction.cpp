@@ -49,6 +49,28 @@ bool BuildOrbit3DViewRay(const AppState& app, const ImVec2& mp, Vec3& outEye, Ve
     return true;
 }
 
+/// Eye→Target 视线（与 Renderer3D 轨道公式一致，单位向量）
+inline Vec3 OrbitViewForward(const OrbitCamera& cam)
+{
+    const float cy = std::cos(cam.Yaw), sy = std::sin(cam.Yaw);
+    const float cp = std::cos(cam.Pitch), sp = std::sin(cam.Pitch);
+    return V3(-cy * cp, -sp, -sy * cp);
+}
+
+/// 与 MakeLookAtRH 一致：right = normalize(cross(fwd, worldUp))，近平行时用 Yaw 退化
+inline Vec3 OrbitViewRight(Vec3 fwd, float yawFallbackRad)
+{
+    Vec3 r = Cross(fwd, V3(0.0f, 1.0f, 0.0f));
+    if (Dot(r, r) < 1e-12f)
+    {
+        const float c = std::cos(yawFallbackRad), s = std::sin(yawFallbackRad);
+        return V3(s, 0.0f, -c);
+    }
+    return Normalize(r);
+}
+
+inline Vec3 OrbitViewUp(Vec3 right, Vec3 fwd) { return Normalize(Cross(right, fwd)); }
+
 } // namespace
 
 // =============================================================================
@@ -233,13 +255,22 @@ void HandleCanvasInteraction(AppState& app,
     const ImGuiIO&   io      = ImGui::GetIO();
     const ImVec2     mp      = ImGui::GetMousePos();
 
-    // 3D 相机操作 (右键拖拽旋转, 滚轮缩放) — 优先处理, 不被编辑模式拦截
+    // 3D 相机 — 对齐 UE Level Editor 视口：右键拖拽旋转；未按住右键时滚轮缩放距离；
+    // 按住右键时滚轮调节飞行速度倍率 (NavSpeedScale)；中键拖拽平移 Target（无旋转）。
     if (app.CurrentViewMode == ViewMode::Orbit3D)
     {
         if (hovered && io.MouseWheel != 0.0f)
         {
-            app.Cam.Distance *= std::pow(1.1f, -io.MouseWheel);
-            app.Cam.Distance = std::max(2.0f, std::min(800.0f, app.Cam.Distance));
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+            {
+                app.Cam.NavSpeedScale *= std::pow(1.08f, io.MouseWheel);
+                app.Cam.NavSpeedScale = std::clamp(app.Cam.NavSpeedScale, 0.08f, 32.0f);
+            }
+            else
+            {
+                app.Cam.Distance *= std::pow(1.1f, -io.MouseWheel);
+                app.Cam.Distance = std::max(2.0f, std::min(800.0f, app.Cam.Distance));
+            }
         }
         if (hovered && ImGui::IsMouseDragging(ImGuiMouseButton_Right, 0.0f))
         {
@@ -248,6 +279,16 @@ void HandleCanvasInteraction(AppState& app,
             app.Cam.Pitch += d.y * 0.005f;
             app.Cam.Pitch  = std::max(-1.5f, std::min(1.5f, app.Cam.Pitch));
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+        }
+        if (hovered && ImGui::IsMouseDragging(ImGuiMouseButton_Middle, 0.0f))
+        {
+            const ImVec2 d = ImGui::GetMouseDragDelta(ImGuiMouseButton_Middle, 0.0f);
+            const Vec3 fwd   = OrbitViewForward(app.Cam);
+            const Vec3 right = OrbitViewRight(fwd, app.Cam.Yaw);
+            const Vec3 up    = OrbitViewUp(right, fwd);
+            const float panK = 0.003f * std::max(2.0f, app.Cam.Distance);
+            app.Cam.Eye = app.Cam.Eye + right * (-d.x * panK) + up * (d.y * panK);
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Middle);
         }
     }
 
@@ -447,18 +488,16 @@ void HandleHotkeys(AppState& app, const InteractionCallbacks& cb)
 
     auto Pressed = [](int k) { return ImGui::IsKeyPressed(k, false); };
 
-    // ---- WASD/QE 连续平移 (仅 3D 视角) ----
+    // ---- WASD/QE：UE Level Editor 约定 —— 须按住右键同时按键才移动视点 ----
     if (app.CurrentViewMode == ViewMode::Orbit3D)
     {
         const float dt = std::max(0.0f, io.DeltaTime);
-        if (dt > 0.0f)
+        if (dt > 0.0f && ImGui::IsMouseDown(ImGuiMouseButton_Right))
         {
-            const float cyaw = std::cos(app.Cam.Yaw);
-            const float syaw = std::sin(app.Cam.Yaw);
-            const Vec3  fwd  = V3(-cyaw, 0.0f, -syaw);
-            const Vec3  right = V3(syaw, 0.0f, -cyaw);
+            const Vec3 fwd   = OrbitViewForward(app.Cam);
+            const Vec3 right = OrbitViewRight(fwd, app.Cam.Yaw);
 
-            float speed = std::max(2.0f, app.Cam.Distance * 1.2f);
+            float speed = std::max(2.0f, app.Cam.Distance * 1.2f) * app.Cam.NavSpeedScale;
             if (io.KeyShift) speed *= 3.0f;
             if (io.KeyCtrl)  speed *= 0.3f;
 
@@ -468,8 +507,8 @@ void HandleHotkeys(AppState& app, const InteractionCallbacks& cb)
             if (ImGui::IsKeyDown('S')) move = move - fwd;
             if (ImGui::IsKeyDown('D')) move = move + right;
             if (ImGui::IsKeyDown('A')) move = move - right;
-            if (ImGui::IsKeyDown('E')) move.y += 1.0f;
-            if (ImGui::IsKeyDown('Q')) move.y -= 1.0f;
+            if (ImGui::IsKeyDown('E')) move.y += 1.0f; // UE：全局上移（此处 Y 为世界竖轴）
+            if (ImGui::IsKeyDown('Q')) move.y -= 1.0f; // UE：全局下移
 #else
             if (ImGui::IsKeyDown(GLFW_KEY_W)) move = move + fwd;
             if (ImGui::IsKeyDown(GLFW_KEY_S)) move = move - fwd;
@@ -479,9 +518,9 @@ void HandleHotkeys(AppState& app, const InteractionCallbacks& cb)
             if (ImGui::IsKeyDown(GLFW_KEY_Q)) move.y -= 1.0f;
 #endif
 
-            app.Cam.Target.x += move.x * speed * dt;
-            app.Cam.Target.y += move.y * speed * dt;
-            app.Cam.Target.z += move.z * speed * dt;
+            app.Cam.Eye.x += move.x * speed * dt;
+            app.Cam.Eye.y += move.y * speed * dt;
+            app.Cam.Eye.z += move.z * speed * dt;
         }
     }
 

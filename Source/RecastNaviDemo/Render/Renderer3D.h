@@ -86,7 +86,7 @@ struct Draw3DParams
 // =============================================================================
 
 /// 将 3D 场景绘制到 [panelMin, panelMin+panelSize] 的 ImDrawList 区域。
-/// @param cam  轨道相机（const：本函数不修改相机状态）
+/// @param cam  已同步 Target 的相机（Eye 枢轴旋转；参见 OrbitCamSyncLookAtFromEye）
 /// @return     本帧的视口/矩阵缓存（bValid=true 表示已成功写入）
 Map3D DrawCanvas3D(ImDrawList*          dl,
                    ImVec2               panelMin,

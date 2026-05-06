@@ -56,12 +56,8 @@ void DrawWorldAxisGizmo(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     // MakeLookAtRH 的 m[0..2][0..2] 行向量 = 视空间基的世界坐标分量。
     // 把世界基(1,0,0)/(0,1,0)/(0,0,1)用 view 旋转后取 (x,y) 即可投影到屏幕：
     //   screen.x =  view_x（向右为正）；screen.y = -view_y（屏幕 y 向下为正）
-    const float cy   = std::cos(cam.Pitch);
-    const float sy   = std::sin(cam.Pitch);
-    const float cx   = std::cos(cam.Yaw);
-    const float sx   = std::sin(cam.Yaw);
-    const Vec3  eye  = cam.Target + V3(cx * cy, sy, sx * cy) * cam.Distance;
-    const Mat4  view = MakeLookAtRH(eye, cam.Target, V3(0, 1, 0));
+    const Vec3 eye  = cam.Eye;
+    const Mat4 view = MakeLookAtRH(eye, cam.Target, V3(0, 1, 0));
 
     struct Axis
     {
@@ -224,11 +220,7 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
     // -------------------------------------------------------------------------
     // 摄像机变换
     // -------------------------------------------------------------------------
-    const float cy = std::cos(cam.Pitch);
-    const float sy = std::sin(cam.Pitch);
-    const float cx = std::cos(cam.Yaw);
-    const float sx = std::sin(cam.Yaw);
-    const Vec3  eye    = cam.Target + V3(cx * cy, sy, sx * cy) * cam.Distance;
+    const Vec3  eye    = cam.Eye;
     const float aspect = panelSize.x / std::max(1.0f, panelSize.y);
     const Mat4  view   = MakeLookAtRH(eye, cam.Target, V3(0, 1, 0));
     const Mat4  proj   = MakePerspectiveRH(cam.Fovy, aspect, 0.1f, 5000.0f);

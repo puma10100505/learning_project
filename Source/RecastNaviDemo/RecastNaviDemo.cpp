@@ -95,6 +95,7 @@ static void FrameCameraToBounds()
     g_State.Cam.Distance = std::max(2.0f, std::min(800.0f, fitD));
     g_State.Cam.Yaw   = 0.7f;
     g_State.Cam.Pitch = 0.9f;
+    OrbitCamSyncEyeFromPivot(g_State.Cam);
 }
 
 // ---------------------------------------------------------------------------

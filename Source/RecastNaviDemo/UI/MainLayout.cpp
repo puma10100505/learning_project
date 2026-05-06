@@ -6,6 +6,8 @@
 
 #include "MainLayout.h"
 
+#include "../Render/RenderTypes.h"
+
 #include <algorithm>    // std::max / std::min
 #include <cstdio>
 
@@ -77,6 +79,9 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
         p3.DefaultObstacleHeight  = app.DefaultObstacleHeight;
         p3.BV                     = &app.BV;
         p3.AutoNavLinks           = &app.AutoNavLinks;
+
+        // 右键旋转绕 Eye：每帧根据 Eye/Yaw/Pitch/Distance 刷新视线落脚点 Target
+        OrbitCamSyncLookAtFromEye(app.Cam);
 
         app.LastMap3D = Renderer3D::DrawCanvas3D(dl, panelMin, panelSize, app.Cam, p3);
     }
