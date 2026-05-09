@@ -504,25 +504,45 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
                 fill = IM_COL32(220, 105, 95, dragging ? 235 : (selected ? 215 : 175));
                 edge = selected ? IM_COL32(255, 235, 120, 255) : IM_COL32(255, 160, 140, 245);
             }
-            const float H = o.Height;
+            const float H    = o.Height;
+            const float yBot = o.BaseY;
+            const float yTop = o.BaseY + H;
 
             if (o.Shape == ObstacleShape::Box)
             {
-                const float minX = o.CX - o.SX, maxX = o.CX + o.SX;
-                const float minZ = o.CZ - o.SZ, maxZ = o.CZ + o.SZ;
-                Vec3        c000{ minX, 0, minZ }, c100{ maxX, 0, minZ };
-                Vec3        c110{ maxX, 0, maxZ }, c010{ minX, 0, maxZ };
-                Vec3        c001{ minX, H, minZ }, c101{ maxX, H, minZ };
-                Vec3        c111{ maxX, H, maxZ }, c011{ minX, H, maxZ };
+                // 4 个底面角的世界坐标（考虑 YawDeg）
+                auto worldCorner = [&](float lx, float lz, float y) -> Vec3 {
+                    float wx, wz;
+                    ObstacleLocalToWorldXZ(lx, lz, o, wx, wz);
+                    return Vec3{ wx, y, wz };
+                };
+                const Vec3 c000 = worldCorner(-o.SX, -o.SZ, yBot);
+                const Vec3 c100 = worldCorner(+o.SX, -o.SZ, yBot);
+                const Vec3 c110 = worldCorner(+o.SX, +o.SZ, yBot);
+                const Vec3 c010 = worldCorner(-o.SX, +o.SZ, yBot);
+                const Vec3 c001 = worldCorner(-o.SX, -o.SZ, yTop);
+                const Vec3 c101 = worldCorner(+o.SX, -o.SZ, yTop);
+                const Vec3 c111 = worldCorner(+o.SX, +o.SZ, yTop);
+                const Vec3 c011 = worldCorner(-o.SX, +o.SZ, yTop);
+
+                // 旋转后的轴向法线（用于光照着色）
+                const float rad = o.YawDeg * 3.14159265358979323846f / 180.0f;
+                const float cy_ = std::cos(rad);
+                const float sy_ = std::sin(rad);
+                const Vec3 nXp =  V3( cy_, 0.0f,  sy_);
+                const Vec3 nXn =  V3(-cy_, 0.0f, -sy_);
+                const Vec3 nZp =  V3(-sy_, 0.0f,  cy_);
+                const Vec3 nZn =  V3( sy_, 0.0f, -cy_);
+                (void)nXp; (void)nXn; (void)nZp; (void)nZn; // 仅在 shadedQuad 分支需要
 
                 if (p.View->bShowCollisionTint)
                 {
-                    shadedQuad(c000, c010, c011, c001, V3(-1, 0, 0), topU, sideFU, sideBU, false); // -X
-                    shadedQuad(c100, c101, c111, c110, V3(1, 0, 0), topU, sideFU, sideBU, false); // +X
-                    shadedQuad(c000, c001, c101, c100, V3(0, 0, -1), topU, sideFU, sideBU, false); // -Z
-                    shadedQuad(c010, c110, c111, c011, V3(0, 0, 1), topU, sideFU, sideBU, false);  // +Z
-                    shadedQuad(c000, c100, c110, c010, V3(0, -1, 0), topU, sideFU, sideBU, false); // bottom
-                    shadedQuad(c001, c011, c111, c101, V3(0, 1, 0), topU, sideFU, sideBU, true);  // top
+                    shadedQuad(c000, c010, c011, c001, nXn,             topU, sideFU, sideBU, false); // -X 局部
+                    shadedQuad(c100, c101, c111, c110, nXp,             topU, sideFU, sideBU, false); // +X 局部
+                    shadedQuad(c000, c001, c101, c100, nZn,             topU, sideFU, sideBU, false); // -Z 局部
+                    shadedQuad(c010, c110, c111, c011, nZp,             topU, sideFU, sideBU, false); // +Z 局部
+                    shadedQuad(c000, c100, c110, c010, V3(0, -1, 0),    topU, sideFU, sideBU, false); // bottom
+                    shadedQuad(c001, c011, c111, c101, V3(0,  1, 0),    topU, sideFU, sideBU, true);  // top
                 }
                 else
                 {
@@ -548,12 +568,14 @@ Map3D DrawCanvas3D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
                 {
                     Render3D::DrawCylinderObstacleShaded3D(dl, vp, panelMin, panelSize, eye,
                                                            o.CX, o.CZ, o.Radius, H,
-                                                           topU, sideFU, sideBU, edge);
+                                                           topU, sideFU, sideBU, edge,
+                                                           yBot);
                 }
                 else
                 {
                     Render3D::DrawCylinderObstacle3D(dl, vp, panelMin, panelSize,
-                                                     o.CX, o.CZ, o.Radius, H, fill, edge);
+                                                     o.CX, o.CZ, o.Radius, H, fill, edge,
+                                                     yBot);
                 }
             }
         }

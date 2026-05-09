@@ -119,12 +119,16 @@ void AddObstacleActor(int index, const Obstacle& o)
     PxRigidStatic* body = nullptr;
     PxShape*       sh   = nullptr;
 
+    const float centerY = o.BaseY + o.Height * 0.5f;
     if (o.Shape == ObstacleShape::Box)
     {
         const PxVec3 he(o.SX, std::max(1e-4f, o.Height * 0.5f), o.SZ);
         PxBoxGeometry box(he);
-        body = gPhysics->createRigidStatic(PxTransform(PxVec3(o.CX, o.Height * 0.5f, o.CZ)));
-        sh     = gPhysics->createShape(box, *gMaterial, true);
+        // 绕 Y 轴 yaw 旋转
+        const float yaw = o.YawDeg * 3.14159265358979323846f / 180.0f;
+        const PxQuat q  = PxQuat(yaw, PxVec3(0.f, 1.f, 0.f));
+        body = gPhysics->createRigidStatic(PxTransform(PxVec3(o.CX, centerY, o.CZ), q));
+        sh   = gPhysics->createShape(box, *gMaterial, true);
     }
     else
     {
@@ -132,7 +136,7 @@ void AddObstacleActor(int index, const Obstacle& o)
         const float halfH = std::max(1e-4f, o.Height * 0.5f - o.Radius);
         PxCapsuleGeometry cap(o.Radius, halfH);
         const PxQuat      q = PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f));
-        body                = gPhysics->createRigidStatic(PxTransform(PxVec3(o.CX, o.Height * 0.5f, o.CZ), q));
+        body                = gPhysics->createRigidStatic(PxTransform(PxVec3(o.CX, centerY, o.CZ), q));
         sh                  = gPhysics->createShape(cap, *gMaterial, true);
     }
 

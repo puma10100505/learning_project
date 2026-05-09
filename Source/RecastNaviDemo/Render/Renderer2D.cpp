@@ -261,12 +261,19 @@ Map2D DrawCanvas2D(ImDrawList* dl, ImVec2 panelMin, ImVec2 panelSize,
             const float lw   = selected ? 2.0f : 1.0f;
             if (o.Shape == ObstacleShape::Box)
             {
-                const ImVec2 p0 = World2D(o.CX - o.SX, o.CZ - o.SZ, cmin, csz, bmin, bmax);
-                const ImVec2 p1 = World2D(o.CX + o.SX, o.CZ + o.SZ, cmin, csz, bmin, bmax);
-                const ImVec2 a(std::min(p0.x, p1.x), std::min(p0.y, p1.y));
-                const ImVec2 b(std::max(p0.x, p1.x), std::max(p0.y, p1.y));
-                dl->AddRectFilled(a, b, fill);
-                dl->AddRect(a, b, edge, 0.0f, 0, lw);
+                // 4 个旋转后的角点（XZ 平面）
+                ImVec2 corners[4];
+                const float lx[4] = { -o.SX, +o.SX, +o.SX, -o.SX };
+                const float lz[4] = { -o.SZ, -o.SZ, +o.SZ, +o.SZ };
+                for (int i = 0; i < 4; ++i)
+                {
+                    float wx, wz;
+                    ObstacleLocalToWorldXZ(lx[i], lz[i], o, wx, wz);
+                    corners[i] = World2D(wx, wz, cmin, csz, bmin, bmax);
+                }
+                dl->AddConvexPolyFilled(corners, 4, fill);
+                for (int i = 0; i < 4; ++i)
+                    dl->AddLine(corners[i], corners[(i + 1) & 3], edge, lw);
             }
             else
             {

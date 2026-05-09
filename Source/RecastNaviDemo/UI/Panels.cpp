@@ -447,17 +447,68 @@ void DrawEditPanel(AppState& app, const PanelCallbacks& cb)
     if (app.SelectedObstacle >= 0 &&
         app.SelectedObstacle < static_cast<int>(app.Geom.Obstacles.size()))
     {
-        const Obstacle& o = app.Geom.Obstacles[app.SelectedObstacle];
+        Obstacle& o = app.Geom.Obstacles[app.SelectedObstacle];
         ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.4f, 1.0f),
-                           "Selected: #%d [%s]  center=(%.2f, %.2f)  h=%.2f",
+                           "Selected: #%d [%s]  pos=(%.2f, %.2f, %.2f)  h=%.2f  yaw=%.1f°",
                            app.SelectedObstacle,
                            o.Shape == ObstacleShape::Box ? "Box" : "Cylinder",
-                           o.CX, o.CZ, o.Height);
+                           o.CX, o.BaseY, o.CZ, o.Height, o.YawDeg);
+
+        // ---- 选中障碍的 XYZ 编辑（DragFloat3，单位 m）----
+        ImGui::PushItemWidth(-FLT_MIN);
+        float pos[3] = { o.CX, o.BaseY, o.CZ };
+        if (ImGui::DragFloat3("Pos (X, BaseY, Z)##sel_xyz", pos, 0.05f, -1000.f, 1000.f, "%.2f"))
+        {
+            o.CX    = pos[0];
+            o.BaseY = pos[1];
+            o.CZ    = pos[2];
+            if (cb.RebuildProceduralInputGeometry) cb.RebuildProceduralInputGeometry();
+            app.bGeomDirty = true;
+            if (cb.TryAutoRebuild) cb.TryAutoRebuild();
+        }
+        if (o.Shape == ObstacleShape::Box)
+        {
+            if (ImGui::DragFloat("Yaw (deg)##sel_yaw", &o.YawDeg, 1.0f, -180.f, 180.f, "%.1f°"))
+            {
+                if (cb.RebuildProceduralInputGeometry) cb.RebuildProceduralInputGeometry();
+                app.bGeomDirty = true;
+                if (cb.TryAutoRebuild) cb.TryAutoRebuild();
+            }
+        }
+        ImGui::PopItemWidth();
+
+        // ---- 三轴 Widget (ImGuizmo) ----
+        ImGui::Separator();
+        ImGui::TextDisabled("Gizmo (3D view): W=Move  E=Rotate-Y  R=Scale  Q=Hide");
+        const char* opNames[] = { "Hide", "Translate", "Rotate-Y", "Scale" };
+        for (int i = 0; i < 4; ++i)
+        {
+            if (i > 0) ImGui::SameLine();
+            const bool sel = app.GizmoOp == i;
+            if (sel) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.55f, 0.85f, 1.0f));
+            if (ImGui::SmallButton(opNames[i])) app.GizmoOp = i;
+            if (sel) ImGui::PopStyleColor();
+        }
+        ImGui::Checkbox("Local##gz_local", &app.bGizmoLocal); ImGui::SameLine();
+        ImGui::Checkbox("Snap##gz_snap",   &app.bGizmoSnap);
+        if (app.bGizmoSnap)
+        {
+            ImGui::SetNextItemWidth(80);
+            ImGui::DragFloat("Move##gz_sm", &app.GizmoSnapMove,  0.05f, 0.05f, 10.0f, "%.2f m");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80);
+            ImGui::DragFloat("Rot##gz_sr",  &app.GizmoSnapRot,   1.0f,  1.0f, 90.0f, "%.0f°");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(80);
+            ImGui::DragFloat("Scale##gz_ss",&app.GizmoSnapScale, 0.05f, 0.01f, 5.00f, "x%.2f");
+        }
     }
     else
     {
         ImGui::TextDisabled("Selected: (none)");
     }
+    ImGui::TextDisabled(
+        "Hint: Move 模式下 LMB 拖拽 = XZ 平面 / Shift+LMB 拖拽 = 仅 Y 轴 (悬浮/下沉)");
 
     // 新建障碍属性
     const char* shapeItems[] = { "Box", "Cylinder" };
@@ -501,14 +552,25 @@ void DrawEditPanel(AppState& app, const PanelCallbacks& cb)
                 ImGui::PushID(static_cast<int>(i));
                 const char* tag = (o.Shape == ObstacleShape::Box) ? "B" : "C";
                 if (o.Shape == ObstacleShape::Box)
-                    ImGui::Text("%02d [%s] (%.1f,%.1f) sx=%.1f sz=%.1f",
-                                static_cast<int>(i), tag, o.CX, o.CZ, o.SX, o.SZ);
+                    ImGui::Text("%02d [%s] (%.1f,%.1f,%.1f) sx=%.1f sz=%.1f yaw=%.1f",
+                                static_cast<int>(i), tag, o.CX, o.BaseY, o.CZ, o.SX, o.SZ, o.YawDeg);
                 else
-                    ImGui::Text("%02d [%s] (%.1f,%.1f) r=%.2f",
-                                static_cast<int>(i), tag, o.CX, o.CZ, o.Radius);
-                ImGui::SetNextItemWidth(140);
+                    ImGui::Text("%02d [%s] (%.1f,%.1f,%.1f) r=%.2f",
+                                static_cast<int>(i), tag, o.CX, o.BaseY, o.CZ, o.Radius);
+                ImGui::SetNextItemWidth(110);
+                if (ImGui::DragFloat("y##by", &o.BaseY, 0.05f, -1000.f, 1000.f, "y=%.2f"))
+                    listChanged = true;
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(110);
                 if (ImGui::SliderFloat("h", &o.Height, 0.20f, 8.00f, "%.2f"))
                     listChanged = true;
+                if (o.Shape == ObstacleShape::Box)
+                {
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(110);
+                    if (ImGui::DragFloat("yaw", &o.YawDeg, 1.0f, -180.f, 180.f, "%.1f°"))
+                        listChanged = true;
+                }
                 ImGui::SameLine();
                 if (ImGui::SmallButton("del")) toDelete = static_cast<int>(i);
                 ImGui::PopID();
@@ -707,6 +769,173 @@ void DrawBuildPanel(AppState& app, const PanelCallbacks& cb)
     }
     if (app.bGeomDirty)
         ImGui::TextColored(ImVec4(1, 0.7f, 0.2f, 1), "Geometry dirty - rebuild needed");
+}
+
+// =============================================================================
+// DrawStepBuildPanel
+//   将 NavMesh 构建 10 步流水线拆解为可单步执行 / 回退 / 一键运行的教学面板。
+//   每一步完成后 Render/NavStepDebug 会在 3D 画布叠绘阶段中间数据。
+// =============================================================================
+void DrawStepBuildPanel(AppState& app, const PanelCallbacks& cb)
+{
+    if (!ImGui::CollapsingHeader("Step Build / 分步构建", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    using namespace NavStepBuilder;
+    StepBuilder& sb = app.StepBuild;
+
+    const Step lastDone = sb.LastCompleted;
+    const Step nextStep = PeekNextStep(sb);
+    const bool active   = IsActive(sb);
+    const bool tcMode   = app.Config.bUseTileCache;
+
+    if (tcMode)
+    {
+        ImGui::TextColored(ImVec4(1.0f, 0.55f, 0.35f, 1.0f),
+                           "TileCache 模式不支持分步构建 (请关闭 Use TileCache)");
+    }
+
+    // ---- 状态行 ----
+    if (lastDone == Step::None)
+        ImGui::TextDisabled("Status: 未开始 (Idle)");
+    else
+        ImGui::Text("Status: completed [%s]", GetStepName(lastDone));
+
+    if (sb.bFailed)
+        ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1), "  ERROR: %s", sb.FailMsg.c_str());
+
+    // 进度条
+    {
+        const float frac = static_cast<float>(static_cast<int>(lastDone)) /
+                           static_cast<float>(kStepCount);
+        ImGui::ProgressBar(frac, ImVec2(-FLT_MIN, 0.0f),
+                           (std::string(GetStepName(lastDone)) + "  " +
+                            std::to_string(static_cast<int>(lastDone)) + "/" +
+                            std::to_string(kStepCount)).c_str());
+    }
+
+    // 当前/下一步说明
+    ImGui::TextWrapped("Current: %s", GetStepDescription(lastDone));
+    if (nextStep != Step::None)
+        ImGui::TextDisabled("Next:    %s — %s",
+                            GetStepName(nextStep),
+                            GetStepDescription(nextStep));
+    else
+        ImGui::TextDisabled("Next:    (流水线已完成)");
+
+    // ---- 操作按钮 ----
+    ImGui::Spacing();
+    const bool canFwd = !tcMode && nextStep != Step::None;
+    const bool canBwd = lastDone != Step::None;
+
+    const float w = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * 3.0f) * 0.25f;
+
+    if (!canBwd) ImGui::BeginDisabled();
+    if (ImGui::Button("<- Back##sb", ImVec2(w, 0)))
+        if (cb.StepBack) cb.StepBack();
+    if (!canBwd) ImGui::EndDisabled();
+    ImGui::SameLine();
+
+    if (!canFwd) ImGui::BeginDisabled();
+    if (ImGui::Button("Step ->##sb", ImVec2(w, 0)))
+        if (cb.StepForward) cb.StepForward();
+    if (!canFwd) ImGui::EndDisabled();
+    ImGui::SameLine();
+
+    if (!canFwd) ImGui::BeginDisabled();
+    if (ImGui::Button("Run All##sb", ImVec2(w, 0)))
+        if (cb.StepRunAll) cb.StepRunAll();
+    if (!canFwd) ImGui::EndDisabled();
+    ImGui::SameLine();
+
+    if (ImGui::Button("Reset##sb", ImVec2(w, 0)))
+        if (cb.StepReset) cb.StepReset();
+
+    if (active)
+    {
+        ImGui::TextDisabled(
+            "提示: 在分步会话中修改场景/参数后, 点击 Reset 重新开始 (新快照)。");
+    }
+    else
+    {
+        ImGui::TextDisabled(
+            "提示: 点击 Reset 用当前几何/参数开启新会话, 然后 Step ->/Run All。");
+    }
+
+    // ---- 可视化开关 ----
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Checkbox("Show step debug overlay (3D)##sb_dbg", &app.bStepDebugDraw);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(仅 3D 视图)");
+    if (app.bStepDebugDraw)
+    {
+        ImGui::SetNextItemWidth(140.0f);
+        ImGui::SliderInt("Cell budget##sb_budget",
+                         &app.StepDebugMaxCells, 1000, 200000, "%d cells");
+        ImGui::TextDisabled("超过预算时自动 stride 抽样, 维持流畅帧率");
+    }
+
+    // ---- Step Inspector 浮动窗口开关 ----
+    ImGui::Checkbox("Show Step Inspector window##sb_insp", &app.bShowStepInspector);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(浮动 / 可调大小; 显示算法说明 + 输出数据)");
+
+    // ---- 各步骤数据快照（只读展示） ----
+    if (active && ImGui::TreeNodeEx("Intermediate data##sb_data",
+                                    ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (sb.Cfg.cs > 0.0f)
+        {
+            ImGui::Text("rcConfig: cs=%.2f ch=%.2f, grid=%dx%d, walkable h=%d climb=%d r=%d",
+                        sb.Cfg.cs, sb.Cfg.ch, sb.Cfg.width, sb.Cfg.height,
+                        sb.Cfg.walkableHeight, sb.Cfg.walkableClimb, sb.Cfg.walkableRadius);
+        }
+        if (sb.Solid)
+            ImGui::Text("rcHeightfield: %d x %d cells (spans in pools)",
+                        sb.Solid->width, sb.Solid->height);
+        if (sb.Chf)
+            ImGui::Text("rcCompactHeightfield: %d cells, %d spans, maxDist=%u, maxRegs=%u",
+                        sb.Chf->width * sb.Chf->height, sb.Chf->spanCount,
+                        static_cast<unsigned>(sb.Chf->maxDistance),
+                        static_cast<unsigned>(sb.Chf->maxRegions));
+        if (sb.Cset)
+            ImGui::Text("rcContourSet: %d contours", sb.Cset->nconts);
+        if (sb.Pmesh)
+            ImGui::Text("rcPolyMesh: %d polys, %d verts (nvp=%d)",
+                        sb.Pmesh->npolys, sb.Pmesh->nverts, sb.Pmesh->nvp);
+        if (sb.Dmesh)
+            ImGui::Text("rcPolyMeshDetail: %d submeshes, %d tris, %d verts",
+                        sb.Dmesh->nmeshes, sb.Dmesh->ntris, sb.Dmesh->nverts);
+        ImGui::TreePop();
+    }
+
+    // ---- 阶段耗时（已完成步骤为非零） ----
+    if (active && ImGui::TreeNode("Per-step timings (ms)##sb_t"))
+    {
+        ImGui::BeginTable("##sbtm", 2,
+                          ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH);
+        auto Row = [](const char* k, double v, bool hi) {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (hi) ImGui::TextColored(ImVec4(1.0f, 0.95f, 0.55f, 1.0f), "%s", k);
+            else    ImGui::TextUnformatted(k);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.3f", v);
+        };
+        Row("Rasterize (Step2)",     sb.Timings.RasterizeMs,    static_cast<int>(lastDone) >= 2);
+        Row("Filter (Step3)",        sb.Timings.FilterMs,       static_cast<int>(lastDone) >= 3);
+        Row("CompactHF (Step4)",     sb.Timings.CompactMs,      static_cast<int>(lastDone) >= 4);
+        Row("Erode (Step5a)",        sb.Timings.ErodeMs,        static_cast<int>(lastDone) >= 5);
+        Row("DistField (Step5b)",    sb.Timings.DistFieldMs,    static_cast<int>(lastDone) >= 5);
+        Row("Regions (Step6)",       sb.Timings.RegionsMs,      static_cast<int>(lastDone) >= 6);
+        Row("Contours (Step7)",      sb.Timings.ContoursMs,     static_cast<int>(lastDone) >= 7);
+        Row("PolyMesh (Step8)",      sb.Timings.PolyMeshMs,     static_cast<int>(lastDone) >= 8);
+        Row("DetailMesh (Step9)",    sb.Timings.DetailMeshMs,   static_cast<int>(lastDone) >= 9);
+        Row("DetourCreate (Step10)", sb.Timings.DetourCreateMs, static_cast<int>(lastDone) >= 10);
+        ImGui::EndTable();
+        ImGui::TreePop();
+    }
 }
 
 // =============================================================================

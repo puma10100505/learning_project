@@ -158,9 +158,26 @@ struct CreateDraftBox
 // =============================================================================
 // 移动障碍的临时状态（鼠标拖拽）
 // =============================================================================
+
+/// 拖拽时锁定到的轴模式（按下时由修饰键决定，整次拖拽期间保持不变）。
+/// XZ      = 默认；地面平面平移
+/// Y       = 仅纵向 (Shift+LMB)；用世界 Y 轴的 ray-axis closest-point 计算
+enum class MoveAxisMode : uint8_t
+{
+    XZ = 0,
+    Y  = 1,
+};
+
 struct MoveBoxState
 {
-    int   Index   = -1;    ///< 被拖拽的障碍索引（-1 = 无）
-    float OffsetX = 0.0f;  ///< 鼠标按下时相对障碍中心 CX 的 X 偏移
-    float OffsetZ = 0.0f;  ///< 鼠标按下时相对障碍中心 CZ 的 Z 偏移
+    int          Index    = -1;            ///< 被拖拽的障碍索引（-1 = 无）
+    MoveAxisMode Axis     = MoveAxisMode::XZ;
+    // ---- XZ 模式：鼠标→世界落点的偏移 ----
+    float        OffsetX  = 0.0f;
+    float        OffsetZ  = 0.0f;
+    // ---- Y 模式：起始 BaseY 与抓取点 Y 的差值 ----
+    float        InitBaseY = 0.0f;          ///< 拖拽开始时的 BaseY 快照
+    float        GrabY     = 0.0f;          ///< 拖拽开始时世界 Y 抓取点
+    // 2D 顶视图下 Y 模式的累计像素 → 世界 Y（每像素 = (bmaxY-bminY) / 200 大致）
+    float        Pix2WorldY = 0.05f;        ///< Y 拖拽像素映射到世界 Y 的系数
 };

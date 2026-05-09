@@ -72,16 +72,20 @@ void RingXZ(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
 void DiscXZFilled(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                   float cx, float cz, float y, float r, int segs, ImU32 col);
 
-/// 绘制圆柱障碍物（从 y=0 到 y=h）：顶面填充圆盘 + 顶底圆环 + 8 条立柱
+/// 绘制圆柱障碍物（从 y=yBase 到 y=yBase+h）：顶面填充圆盘 + 顶底圆环 + 8 条立柱。
+/// yBase 默认 0 = "贴地"语义，向下兼容。
 void DrawCylinderObstacle3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                              float cx, float cz, float r, float h,
-                             ImU32 fillTop, ImU32 edgeCol);
+                             ImU32 fillTop, ImU32 edgeCol,
+                             float yBase = 0.0f);
 
-/// 圆柱障碍：顶面 + 分段的侧面（有深度缓冲时远侧也填充；否则仅朝相机一侧）+ 边线
+/// 圆柱障碍：顶面 + 分段的侧面（有深度缓冲时远侧也填充；否则仅朝相机一侧）+ 边线。
+/// yBase 默认 0 = "贴地"语义，向下兼容。
 void DrawCylinderObstacleShaded3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                                   const Vec3& eyeWorld,
                                   float cx, float cz, float r, float h,
-                                  ImU32 topCol, ImU32 sideFrontCol, ImU32 sideBackCol, ImU32 edgeCol);
+                                  ImU32 topCol, ImU32 sideFrontCol, ImU32 sideBackCol, ImU32 edgeCol,
+                                  float yBase = 0.0f);
 
 /// 绘制胶囊体：圆柱段 + 顶/底半球经线弧
 /// @param cx, cz   水平中心

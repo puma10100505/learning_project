@@ -95,9 +95,12 @@ bool TriCenterInsideAnyObstacle(const float v0[3], const float v1[3], const floa
                                  const std::vector<Obstacle>& obs)
 {
     const float cx = (v0[0] + v1[0] + v2[0]) / 3.0f;
+    const float cy = (v0[1] + v1[1] + v2[1]) / 3.0f;
     const float cz = (v0[2] + v1[2] + v2[2]) / 3.0f;
     for (const Obstacle& o : obs)
     {
+        // 仅贴地障碍才"挖掉"下方地面三角；悬浮障碍 (BaseY > 0) 保留下方可走面。
+        if (!ObstacleSitsOnGround(o, cy)) continue;
         if (PointInsideObstacle(cx, cz, o)) return true;
     }
     return false;
@@ -185,25 +188,28 @@ void AppendObstacleSolidMesh(InputGeometry& geom)
 
     for (const Obstacle& o : geom.Obstacles)
     {
-        const float y0 = 0.0f;
-        const float y1 = o.Height;
+        const float y0 = o.BaseY;
+        const float y1 = o.BaseY + o.Height;
 
         if (o.Shape == ObstacleShape::Box)
         {
-            // 8 个角顶点
-            const float x0 = o.CX - o.SX, x1 = o.CX + o.SX;
-            const float z0 = o.CZ - o.SZ, z1 = o.CZ + o.SZ;
+            // 4 个底角的世界坐标（绕中心 YawDeg 旋转）
+            float wx[4], wz[4];
+            const float lx[4] = { -o.SX, +o.SX, +o.SX, -o.SX };
+            const float lz[4] = { -o.SZ, -o.SZ, +o.SZ, +o.SZ };
+            for (int i = 0; i < 4; ++i)
+                ObstacleLocalToWorldXZ(lx[i], lz[i], o, wx[i], wz[i]);
 
             // 底部四角
-            const int b00 = PushVert(geom, x0, y0, z0);
-            const int b10 = PushVert(geom, x1, y0, z0);
-            const int b11 = PushVert(geom, x1, y0, z1);
-            const int b01 = PushVert(geom, x0, y0, z1);
+            const int b00 = PushVert(geom, wx[0], y0, wz[0]);
+            const int b10 = PushVert(geom, wx[1], y0, wz[1]);
+            const int b11 = PushVert(geom, wx[2], y0, wz[2]);
+            const int b01 = PushVert(geom, wx[3], y0, wz[3]);
             // 顶部四角
-            const int t00 = PushVert(geom, x0, y1, z0);
-            const int t10 = PushVert(geom, x1, y1, z0);
-            const int t11 = PushVert(geom, x1, y1, z1);
-            const int t01 = PushVert(geom, x0, y1, z1);
+            const int t00 = PushVert(geom, wx[0], y1, wz[0]);
+            const int t10 = PushVert(geom, wx[1], y1, wz[1]);
+            const int t11 = PushVert(geom, wx[2], y1, wz[2]);
+            const int t01 = PushVert(geom, wx[3], y1, wz[3]);
 
             const unsigned char W = RC_WALKABLE_AREA;
 

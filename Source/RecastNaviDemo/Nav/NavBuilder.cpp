@@ -864,14 +864,17 @@ dtObstacleRef AddObstacleToTileCache(NavRuntime& runtime, const Obstacle& o)
     dtObstacleRef ref = 0;
     if (o.Shape == ObstacleShape::Cylinder)
     {
-        const float pos[3] = { o.CX, 0.0f, o.CZ };
+        // Detour TileCache: 圆柱原点 = 底部中心, 高度沿 +Y 拉伸
+        const float pos[3] = { o.CX, o.BaseY, o.CZ };
         runtime.TileCache->addObstacle(pos, o.Radius, o.Height, &ref);
     }
     else
     {
-        const float bmin[3] = { o.CX - o.SX, 0.0f,     o.CZ - o.SZ };
-        const float bmax[3] = { o.CX + o.SX, o.Height, o.CZ + o.SZ };
-        runtime.TileCache->addBoxObstacle(bmin, bmax, &ref);
+        // 旋转版重载：center + halfExtents + yRadians（绕 Y 轴）
+        const float center[3]      = { o.CX, o.BaseY + o.Height * 0.5f, o.CZ };
+        const float halfExtents[3] = { o.SX, std::max(1e-4f, o.Height * 0.5f), o.SZ };
+        const float yRadians       = o.YawDeg * 3.14159265358979323846f / 180.0f;
+        runtime.TileCache->addBoxObstacle(center, halfExtents, yRadians, &ref);
     }
     return ref;
 }

@@ -7,6 +7,9 @@
 #include "MainLayout.h"
 
 #include "../Render/RenderTypes.h"
+#include "../Render/NavStepDebug.h"
+#include "StepInspector.h"
+#include "Gizmo.h"
 
 #include <algorithm>    // std::max / std::min
 #include <cstdio>
@@ -84,6 +87,34 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
         OrbitCamSyncLookAtFromEye(app.Cam);
 
         app.LastMap3D = Renderer3D::DrawCanvas3D(dl, panelMin, panelSize, app.Cam, p3);
+
+        // ---- 分步骤构建调试可视化叠绘（仅 3D；作为屏幕空间叠加层） ----
+        if (app.bStepDebugDraw && NavStepBuilder::IsActive(app.StepBuild))
+        {
+            NavStepDebug::DrawParams dp;
+            dp.Map            = &app.LastMap3D;
+            dp.Step           = &app.StepBuild;
+            dp.bEnabled       = true;
+            dp.MaxCellsToDraw = std::max(1000, app.StepDebugMaxCells);
+            NavStepDebug::Draw3D(dl, panelMin, panelSize, dp);
+        }
+
+        // ---- 选中障碍中心的 ImGuizmo 三轴 Widget ----
+        const bool wasUsingGizmo = Gizmo::IsUsingGizmo();
+        Gizmo::Draw(app, panelMin, panelSize);
+        const bool nowUsingGizmo = Gizmo::IsUsingGizmo();
+
+        // gizmo 拖拽进行中 -> 同步几何（procedural 模式下需要重新生成实体网格）
+        if (nowUsingGizmo && app.bGeomDirty)
+        {
+            if (icb.RebuildProceduralInputGeometry)
+                icb.RebuildProceduralInputGeometry();
+        }
+        // gizmo 拖拽结束 -> 触发 NavMesh 自动重建（按用户 bAutoRebuild 设置）
+        if (wasUsingGizmo && !nowUsingGizmo)
+        {
+            if (icb.TryAutoRebuild) icb.TryAutoRebuild();
+        }
     }
 
     // ---- 主场景 HUD：FPS（左上角叠绘，与场景同层不被任何 ImGui 控件挤掉） ----
@@ -100,8 +131,9 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
         dl->AddText(ImVec2(tl.x + pad.x, tl.y + pad.y), IM_COL32(255, 255, 255, 235), buf);
     }
 
-    // 处理鼠标交互
-    Interaction::HandleCanvasInteraction(app, icb, panelMin, panelSize);
+    // 处理鼠标交互（如果鼠标命中 ImGuizmo 或正在拖拽 gizmo, 让位给它）
+    if (!Gizmo::IsOverGizmo() && !Gizmo::IsUsingGizmo())
+        Interaction::HandleCanvasInteraction(app, icb, panelMin, panelSize);
 }
 
 // =============================================================================
@@ -109,12 +141,22 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
 // =============================================================================
 void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
 {
-    // 全局快捷键（键盘）
+    // ImGuizmo: 必须在 ImGui::NewFrame 之后、所有 Manipulate 调用之前调用。
+    Gizmo::OnFrameBegin();
+
+    // 全局快捷键（键盘 + Gizmo 操作切换）
     Interaction::HandleHotkeys(app, cb.Interaction);
+    Gizmo::HandleHotkeys(app);
 
     const ImGuiViewport* vp = ImGui::GetMainViewport();
     ImVec2 mainPos  = vp->WorkPos;
     ImVec2 mainSize = vp->WorkSize;
+
+    // 窗口最小化时 vp->WorkSize ≈ 0, 此时跳过整套布局, 既能避免 InvisibleButton
+    // 的 size==0 断言, 也能保住 app.LeftPaneWidth / StatsLegendWidth 等持久化值。
+    if (mainSize.x < 50.0f || mainSize.y < 50.0f)
+        return;
+
     if (app.bShowStatsWindow)
         mainSize.y = std::max(120.0f, mainSize.y - app.StatsDockHeight);
     ImGui::SetNextWindowPos (mainPos);
@@ -163,6 +205,8 @@ void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
             ImGui::Separator();
             Panels::DrawBuildPanel (app, cb.Panels);
             ImGui::Separator();
+            Panels::DrawStepBuildPanel(app, cb.Panels);
+            ImGui::Separator();
             Panels::DrawPathPanel  (app, cb.Panels);
             ImGui::Separator();
             Panels::DrawIOPanel    (app, cb.Panels);
@@ -210,6 +254,9 @@ void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
 
     // 浮动趋势图窗口（放在主窗口 End 之后，让它独立可拖拽）
     DrawBuildStatsWindow(app);
+
+    // 浮动 "Step Inspector" 详情窗口（独立可拖拽 + 可调大小）
+    StepInspector::Draw(app);
 }
 
 } // namespace MainLayout

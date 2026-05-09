@@ -22,6 +22,7 @@
  */
 
 #include "../Nav/NavTypes.h"
+#include "../Nav/NavStepBuilder.h"
 #include "../Shared/Profiling.h"
 #include "../Render/RenderTypes.h"
 #include "../UI/UITypes.h"
@@ -53,6 +54,13 @@ struct AppState
     BuildVolume    BV;      ///< 自定义 NavMesh 生成区域（可选 AABB）
     NavRuntime     Nav;     ///< 构建结果（PolyMesh、dtNavMesh、dtNavMeshQuery …）
     PhaseTimings   Timings; ///< 最近一次构建各阶段耗时
+
+    // -------------------------------------------------------------------------
+    // 分步骤构建（教学/演示）
+    // -------------------------------------------------------------------------
+    NavStepBuilder::StepBuilder StepBuild;          ///< 当前 Step 会话状态
+    bool                        bStepDebugDraw = true;   ///< 是否在 3D 视图叠绘步骤可视化
+    int                         StepDebugMaxCells = 60000; ///< 体素绘制上限（超出自动 stride）
 
     // -------------------------------------------------------------------------
     // 寻路结果
@@ -110,7 +118,20 @@ struct AppState
     // UI 可视状态
     // -------------------------------------------------------------------------
     bool   bShowStatsWindow   = true;
+    bool   bShowStepInspector = false;   ///< 是否显示 "Step Inspector" 浮动窗口
     float  LeftPaneWidth      = 400.0f;  ///< 左侧配置区宽度（像素，可拖动）
+
+    // -------------------------------------------------------------------------
+    // ImGuizmo（3D 选中障碍的 Translate / Rotate / Scale Widget）
+    // -------------------------------------------------------------------------
+    /// 0 = 隐藏 / 1 = TRANSLATE (W) / 2 = ROTATE_Y (E) / 3 = SCALE (R)
+    int    GizmoOp        = 1;
+    bool   bGizmoEnabled  = true;        ///< 总开关；关闭后选中也不显示
+    bool   bGizmoLocal    = true;        ///< true=LOCAL（沿障碍朝向）/ false=WORLD
+    bool   bGizmoSnap     = false;       ///< 是否启用栅格吸附
+    float  GizmoSnapMove  = 0.5f;        ///< 平移吸附（米）
+    float  GizmoSnapRot   = 15.0f;       ///< 旋转吸附（度）
+    float  GizmoSnapScale = 0.1f;        ///< 缩放吸附（倍）
     float  StatsDockHeight    = 280.0f;  ///< 底部性能窗口高度（像素，可拖动）
     float  StatsLegendWidth   = 200.0f;  ///< 性能图右侧图例宽度（像素，可拖动）
     ImVec4 PathColor          = { 1.00f, 0.86f, 0.24f, 1.00f };  ///< 路径折线颜色

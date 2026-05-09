@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <limits>
 
 // Recast & Detour
 #include "Recast.h"
@@ -56,13 +57,20 @@ enum class ObstacleShape : int
     Cylinder = 1,
 };
 
-/// 可编辑障碍（在 XZ 平面有形状，Y 方向从 0 拉伸到 Height）
+/// 可编辑障碍。
+/// 形状落在 XZ 平面，Y 方向从 BaseY 拉伸到 (BaseY + Height)。
+/// BaseY = 0 时与最初的"始终贴地"行为完全一致；
+/// BaseY > 0 表示障碍悬浮在空中（地面下方的导航网格仍可走）。
+/// YawDeg 是绕 Y 轴的水平朝向（度，逆时针正向 -- 与 Recast/Detour TileCache 旋转向一致）；
+/// 仅对 Box 形状有视觉/几何影响（Cylinder 关于 Y 轴对称，YawDeg 不改变其几何）。
 struct Obstacle
 {
     ObstacleShape Shape  = ObstacleShape::Box;
     float         CX     = 0.0f;   ///< 中心 X
     float         CZ     = 0.0f;   ///< 中心 Z
-    float         Height = 1.6f;   ///< 顶部 Y（底部 = 0）
+    float         BaseY  = 0.0f;   ///< 底部 Y（默认 0，向下兼容"贴地"语义）
+    float         Height = 1.6f;   ///< 自身高度（顶部 Y = BaseY + Height）
+    float         YawDeg = 0.0f;   ///< 绕 Y 轴的旋转（度）；正值=逆时针俯视
     // Box 半边长
     float         SX     = 1.0f;
     float         SZ     = 1.0f;
@@ -70,13 +78,52 @@ struct Obstacle
     float         Radius = 1.0f;
 };
 
-/// 计算障碍的 AABB（XZ 平面）
+/// 把世界坐标 (x, z) 变换到障碍局部坐标系（以 (CX, CZ) 为原点，YawDeg 反向旋转回轴对齐）。
+inline void WorldToObstacleLocalXZ(float x, float z, const Obstacle& o,
+                                   float& outLX, float& outLZ)
+{
+    const float dx = x - o.CX;
+    const float dz = z - o.CZ;
+    const float rad = -o.YawDeg * 3.14159265358979323846f / 180.0f; // 反向旋转
+    const float c = std::cos(rad);
+    const float s = std::sin(rad);
+    outLX = dx * c - dz * s;
+    outLZ = dx * s + dz * c;
+}
+
+/// 把障碍局部坐标 (lx, lz) 变换回世界坐标。
+inline void ObstacleLocalToWorldXZ(float lx, float lz, const Obstacle& o,
+                                   float& outX, float& outZ)
+{
+    const float rad = o.YawDeg * 3.14159265358979323846f / 180.0f;
+    const float c = std::cos(rad);
+    const float s = std::sin(rad);
+    outX = o.CX + lx * c - lz * s;
+    outZ = o.CZ + lx * s + lz * c;
+}
+
+/// 计算障碍的 AABB（XZ 平面，世界轴对齐）。
+/// 旋转的 Box 会膨胀为其 4 个角点的 AABB。
 inline void GetObstacleAABB(const Obstacle& o, float& minX, float& minZ, float& maxX, float& maxZ)
 {
     if (o.Shape == ObstacleShape::Box)
     {
-        minX = o.CX - o.SX; maxX = o.CX + o.SX;
-        minZ = o.CZ - o.SZ; maxZ = o.CZ + o.SZ;
+        const float rad = o.YawDeg * 3.14159265358979323846f / 180.0f;
+        const float c   = std::cos(rad);
+        const float s   = std::sin(rad);
+        const float lx[4] = { -o.SX, +o.SX, +o.SX, -o.SX };
+        const float lz[4] = { -o.SZ, -o.SZ, +o.SZ, +o.SZ };
+        minX = minZ = std::numeric_limits<float>::infinity();
+        maxX = maxZ = -std::numeric_limits<float>::infinity();
+        for (int i = 0; i < 4; ++i)
+        {
+            const float wx = o.CX + lx[i] * c - lz[i] * s;
+            const float wz = o.CZ + lx[i] * s + lz[i] * c;
+            if (wx < minX) minX = wx;
+            if (wx > maxX) maxX = wx;
+            if (wz < minZ) minZ = wz;
+            if (wz > maxZ) maxZ = wz;
+        }
     }
     else
     {
@@ -85,14 +132,34 @@ inline void GetObstacleAABB(const Obstacle& o, float& minX, float& minZ, float& 
     }
 }
 
-/// 判断点 (x, z) 是否在障碍内部
+/// 判断点 (x, z) 是否在障碍 XZ 投影内部（不考虑 Y）。
+/// Box: 先把 (x,z) 反向旋转回障碍局部空间再做轴对齐比较。
 inline bool PointInsideObstacle(float x, float z, const Obstacle& o)
 {
     if (o.Shape == ObstacleShape::Box)
-        return std::fabs(x - o.CX) <= o.SX && std::fabs(z - o.CZ) <= o.SZ;
+    {
+        float lx, lz;
+        WorldToObstacleLocalXZ(x, z, o, lx, lz);
+        return std::fabs(lx) <= o.SX && std::fabs(lz) <= o.SZ;
+    }
     const float dx = x - o.CX;
     const float dz = z - o.CZ;
     return dx * dx + dz * dz <= o.Radius * o.Radius;
+}
+
+/// 判断点 (x, y, z) 是否在障碍体内（含 BaseY..BaseY+Height 区间）
+inline bool PointInsideObstacle3D(float x, float y, float z, const Obstacle& o)
+{
+    if (y < o.BaseY || y > o.BaseY + o.Height) return false;
+    return PointInsideObstacle(x, z, o);
+}
+
+/// 判断障碍是否"贴地"（底部足够接近 y=0 的地平面）
+/// 用于 Procedural 模式：仅贴地障碍才把脚下三角形标记为不可走，
+/// 悬浮障碍不应破坏其下方地面 NavMesh。
+inline bool ObstacleSitsOnGround(const Obstacle& o, float groundY = 0.0f, float eps = 1e-3f)
+{
+    return o.BaseY <= groundY + eps;
 }
 
 // =============================================================================

@@ -78,7 +78,8 @@ inline bool RayYCylinderNearEnter(const Vec3& o, const Vec3& d,
     return true;
 }
 
-/// 线段 eye→p（世界空间）：若沿视线先进入任一障碍体再到达 p，则 p 被遮挡
+/// 线段 eye→p（世界空间）：若沿视线先进入任一障碍体再到达 p，则 p 被遮挡。
+/// 旋转 Box: 把射线变换到障碍局部空间 (XZ 反向旋转, Y 不变), 在局部 AABB 上求交。
 inline bool SegmentEyeToPointOccluded(const Vec3& eye, const Vec3& p,
                                       const std::vector<Obstacle>& obstacles)
 {
@@ -90,17 +91,25 @@ inline bool SegmentEyeToPointOccluded(const Vec3& eye, const Vec3& p,
     for (const Obstacle& o : obstacles)
     {
         float tObs = 0.0f;
+        const float yMin = o.BaseY;
+        const float yMax = o.BaseY + o.Height;
         if (o.Shape == ObstacleShape::Box)
         {
-            const float minX = o.CX - o.SX;
-            const float maxX = o.CX + o.SX;
-            const float minZ = o.CZ - o.SZ;
-            const float maxZ = o.CZ + o.SZ;
-            if (!RayAABBNearEnter(eye, dir, minX, 0.0f, minZ, maxX, o.Height, maxZ, tObs)) continue;
+            // 反向 yaw，把射线放进障碍局部空间
+            const float rad = -o.YawDeg * 3.14159265358979323846f / 180.0f;
+            const float c   = std::cos(rad);
+            const float s   = std::sin(rad);
+            const float ex  = eye.x - o.CX;
+            const float ez  = eye.z - o.CZ;
+            const Vec3  eyeL{ ex * c - ez * s, eye.y, ex * s + ez * c };
+            const Vec3  dirL{ dir.x * c - dir.z * s, dir.y, dir.x * s + dir.z * c };
+            if (!RayAABBNearEnter(eyeL, dirL,
+                                  -o.SX, yMin, -o.SZ,
+                                  +o.SX, yMax, +o.SZ, tObs)) continue;
         }
         else
         {
-            if (!RayYCylinderNearEnter(eye, dir, o.CX, o.CZ, o.Radius, 0.0f, o.Height, tObs)) continue;
+            if (!RayYCylinderNearEnter(eye, dir, o.CX, o.CZ, o.Radius, yMin, yMax, tObs)) continue;
         }
         if (tObs + eps < tP) return true;
     }

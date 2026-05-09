@@ -130,40 +130,44 @@ void DiscXZFilled(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
 
 void DrawCylinderObstacle3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                              float cx, float cz, float r, float h,
-                             ImU32 fillTop, ImU32 edgeCol)
+                             ImU32 fillTop, ImU32 edgeCol,
+                             float yBase)
 {
     constexpr int segs = 24;
+    const float yTop = yBase + h;
     // 顶面填充
-    DiscXZFilled(dl, vp, vMin, vSize, cx, cz, h, r, segs, fillTop);
+    DiscXZFilled(dl, vp, vMin, vSize, cx, cz, yTop, r, segs, fillTop);
     // 顶/底圆环
-    RingXZ(dl, vp, vMin, vSize, cx, cz, 0.0f, r, segs, edgeCol);
-    RingXZ(dl, vp, vMin, vSize, cx, cz, h,    r, segs, edgeCol);
+    RingXZ(dl, vp, vMin, vSize, cx, cz, yBase, r, segs, edgeCol);
+    RingXZ(dl, vp, vMin, vSize, cx, cz, yTop,  r, segs, edgeCol);
     // 8 条立柱
     for (int i = 0; i < 8; ++i)
     {
         const float a = (i / 8.0f) * 6.28318530718f;
         const float x = cx + r * std::cos(a);
         const float z = cz + r * std::sin(a);
-        Line3D(dl, vp, vMin, vSize, V3(x, 0, z), V3(x, h, z), edgeCol);
+        Line3D(dl, vp, vMin, vSize, V3(x, yBase, z), V3(x, yTop, z), edgeCol);
     }
 }
 
 void DrawCylinderObstacleShaded3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, ImVec2 vSize,
                                 const Vec3& eyeWorld,
                                 float cx, float cz, float r, float h,
-                                ImU32 topCol, ImU32 sideFrontCol, ImU32 sideBackCol, ImU32 edgeCol)
+                                ImU32 topCol, ImU32 sideFrontCol, ImU32 sideBackCol, ImU32 edgeCol,
+                                float yBase)
 {
     constexpr int segs = 24;
-    DiscXZFilled(dl, vp, vMin, vSize, cx, cz, h, r, segs, topCol);
+    const float yTop = yBase + h;
+    DiscXZFilled(dl, vp, vMin, vSize, cx, cz, yTop, r, segs, topCol);
 
     for (int i = 0; i < segs; ++i)
     {
         const float a0 = (i / (float)segs) * 6.28318530718f;
         const float a1 = ((i + 1) / (float)segs) * 6.28318530718f;
-        const Vec3  p00(cx + r * std::cos(a0), 0.0f, cz + r * std::sin(a0));
-        const Vec3  p01(cx + r * std::cos(a0), h, cz + r * std::sin(a0));
-        const Vec3  p10(cx + r * std::cos(a1), 0.0f, cz + r * std::sin(a1));
-        const Vec3  p11(cx + r * std::cos(a1), h, cz + r * std::sin(a1));
+        const Vec3  p00(cx + r * std::cos(a0), yBase, cz + r * std::sin(a0));
+        const Vec3  p01(cx + r * std::cos(a0), yTop,  cz + r * std::sin(a0));
+        const Vec3  p10(cx + r * std::cos(a1), yBase, cz + r * std::sin(a1));
+        const Vec3  p11(cx + r * std::cos(a1), yTop,  cz + r * std::sin(a1));
         const float amid = (a0 + a1) * 0.5f;
         const Vec3  n(std::cos(amid), 0.0f, std::sin(amid));
         const Vec3  ctr = (p00 + p01 + p10 + p11) * 0.25f;
@@ -175,14 +179,14 @@ void DrawCylinderObstacleShaded3D(ImDrawList* dl, const Mat4& vp, ImVec2 vMin, I
         TriFilled3D(dl, vp, vMin, vSize, p00, p11, p10, col);
     }
 
-    RingXZ(dl, vp, vMin, vSize, cx, cz, 0.0f, r, segs, edgeCol);
-    RingXZ(dl, vp, vMin, vSize, cx, cz, h, r, segs, edgeCol);
+    RingXZ(dl, vp, vMin, vSize, cx, cz, yBase, r, segs, edgeCol);
+    RingXZ(dl, vp, vMin, vSize, cx, cz, yTop,  r, segs, edgeCol);
     for (int i = 0; i < 8; ++i)
     {
         const float a = (i / 8.0f) * 6.28318530718f;
         const float x = cx + r * std::cos(a);
         const float z = cz + r * std::sin(a);
-        Line3D(dl, vp, vMin, vSize, V3(x, 0, z), V3(x, h, z), edgeCol);
+        Line3D(dl, vp, vMin, vSize, V3(x, yBase, z), V3(x, yTop, z), edgeCol);
     }
 }
 

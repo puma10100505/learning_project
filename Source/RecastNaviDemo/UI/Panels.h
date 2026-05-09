@@ -62,6 +62,16 @@ struct PanelCallbacks
 
     /// 根据当前 NavMesh 自动生成边界 NavLink（需先构建 NavMesh）
     std::function<void()> GenerateNavLinks;
+
+    // ---- 分步骤构建（教学/演示）回调 ----
+    /// 重置 / 开启分步骤构建会话（销毁 NavMesh、拷贝输入快照）
+    std::function<void()> StepReset;
+    /// 前进一步
+    std::function<void()> StepForward;
+    /// 回退到上一步（重放）
+    std::function<void()> StepBack;
+    /// 一直前进到结束
+    std::function<void()> StepRunAll;
 };
 
 // =============================================================================
@@ -84,6 +94,9 @@ void DrawEditPanel(AppState& app, const PanelCallbacks& cb);
 
 /// Recast 11 参数 + (Re)Build 按钮 + 构建状态（折叠头 "Build Config"）
 void DrawBuildPanel(AppState& app, const PanelCallbacks& cb);
+
+/// NavMesh 分步骤构建（折叠头 "Step Build"）：Reset / Step / Back / RunAll + 阶段说明
+void DrawStepBuildPanel(AppState& app, const PanelCallbacks& cb);
 
 /// 起终点 DragFloat + Find Path 按钮 + 路径统计（折叠头 "Path Query"）
 void DrawPathPanel(AppState& app, const PanelCallbacks& cb);

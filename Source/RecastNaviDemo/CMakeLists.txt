@@ -68,6 +68,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${SOLUTION_ROOT}/Thirdparty/recastnavigation/DetourCrowd/Include
     ${SOLUTION_ROOT}/Thirdparty/recastnavigation/DetourTileCache/Include
     ${SOLUTION_ROOT}/Thirdparty/recastnavigation/DebugUtils/Include
+    ${SOLUTION_ROOT}/Thirdparty/ImGuizmo
 )
 
 # 平台库 + LearningFoundation + ImGui 等（来自 SharedDef.cmake）
@@ -80,6 +81,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Detour
     DetourCrowd
     DetourTileCache
+    ImGuizmo
 )
 
 # 部署 dll/exe 到 Bin/

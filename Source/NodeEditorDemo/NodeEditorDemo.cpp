@@ -13,6 +13,7 @@
 #include <cstring>
 #include "GlfwWindows.h"
 #include "LearningStatics.h"
+#include "loguru.hpp"
 #include "CommonDefines.h"
 #include "imgui_node_editor.h"
 
@@ -217,15 +218,23 @@ static void OnGUI(float DeltaTime)
     
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    loguru::init(argc, argv);
+    loguru::g_stderr_verbosity = 1;
+
+    LOG_F(INFO, "Entry of app");
+
     FCreateWindowParameters Params = FCreateWindowParameters::DefaultWindowParameters();
     if (GLCreateWindow(Params) < 0)
     {
+        LOG_F(ERROR, "Failed to create window");
         return EXIT_FAILURE;
     }
 
     GLWindowTick(OnTick, OnGUI);
+
+    LOG_F(INFO, "after GLWindowTick");
 
     GLDestroyWindow();
 

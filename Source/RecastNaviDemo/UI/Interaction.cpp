@@ -71,6 +71,26 @@ inline Vec3 OrbitViewRight(Vec3 fwd, float yawFallbackRad)
 
 inline Vec3 OrbitViewUp(Vec3 right, Vec3 fwd) { return Normalize(Cross(right, fwd)); }
 
+/// 计算鼠标射线 (eye + s·dir) 与"过 (cx, *, cz) 的世界 Y 轴"的最近点 Y 值。
+///
+/// 推导：
+///   令 P = (cx, t, cz) 为 Y 轴上的点；M(s) = eye + s·dir 为鼠标射线上的点。
+///   最小化 |P - M(s)|²，对 t 求导：t = eye.y + s · dir.y
+///   对 s 求导（代入上式后 dir.y 项消去）：
+///     s = (dir.x·(cx - eye.x) + dir.z·(cz - eye.z)) / (dir.x² + dir.z²)
+///
+/// 若 dir.x² + dir.z² 接近 0（视线几乎垂直俯视），返回 false。
+bool ClosestYOnVerticalAxisToRay(const Vec3& eye, const Vec3& dir,
+                                 float cx, float cz, float& outY)
+{
+    const float denom = dir.x * dir.x + dir.z * dir.z;
+    if (denom < 1e-6f) return false;
+    const float s = (dir.x * (cx - eye.x) + dir.z * (cz - eye.z)) / denom;
+    if (s <= 0.0f) return false;          // 命中在相机背后
+    outY = eye.y + s * dir.y;
+    return true;
+}
+
 } // namespace
 
 // =============================================================================
@@ -416,27 +436,82 @@ void HandleCanvasInteraction(AppState& app,
     }
 
     // -------- Select & Move --------
+    //   默认 LMB 拖拽：XZ 平面平移
+    //   Shift + LMB 拖拽：仅纵向 (Y 轴)
+    //     · 3D：以"过障碍中心 (CX, *, CZ) 的世界 Y 轴"与鼠标射线最近点 Y
+    //       作为新 Y（标准的轴约束 gizmo 数学）
+    //     · 2D：用鼠标垂直像素增量映射到世界 Y
     if (app.CurrentEditMode == EditMode::MoveBox)
     {
         if (app.Geom.Source != GeomSource::Procedural) return;
-        if (hovered && havePick && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        if (hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
             const int idx        = PickObstacleIndex(app, mp);
             app.SelectedObstacle = idx;
             if (idx >= 0)
             {
-                app.MoveState.Index   = idx;
-                app.MoveState.OffsetX = wx - app.Geom.Obstacles[idx].CX;
-                app.MoveState.OffsetZ = wz - app.Geom.Obstacles[idx].CZ;
+                Obstacle& o = app.Geom.Obstacles[idx];
+                app.MoveState.Index = idx;
+
+                if (io.KeyShift)
+                {
+                    app.MoveState.Axis      = MoveAxisMode::Y;
+                    app.MoveState.InitBaseY = o.BaseY;
+                    // 3D：当前鼠标射线与中心立轴的最近 Y 作为抓取点
+                    Vec3 eye, dir;
+                    float yGrab = o.BaseY + o.Height * 0.5f;
+                    if (app.CurrentViewMode == ViewMode::Orbit3D &&
+                        BuildOrbit3DViewRay(app, mp, eye, dir))
+                    {
+                        float yHit = 0.0f;
+                        if (ClosestYOnVerticalAxisToRay(eye, dir, o.CX, o.CZ, yHit))
+                            yGrab = yHit;
+                    }
+                    app.MoveState.GrabY      = yGrab;
+                    // 2D 视图按场景 Y 跨度自动尺度（屏幕高 ~ 视场高度的近似）
+                    const float yRange = app.Geom.Bounds[4] - app.Geom.Bounds[1];
+                    app.MoveState.Pix2WorldY = std::max(0.005f, std::fabs(yRange) * 0.005f);
+                }
+                else
+                {
+                    app.MoveState.Axis    = MoveAxisMode::XZ;
+                    app.MoveState.OffsetX = wx - o.CX;
+                    app.MoveState.OffsetZ = wz - o.CZ;
+                }
             }
         }
         else if (app.MoveState.Index >= 0 && ImGui::IsMouseDown(ImGuiMouseButton_Left))
         {
-            if (havePick && app.MoveState.Index < (int)app.Geom.Obstacles.size())
+            if (app.MoveState.Index < (int)app.Geom.Obstacles.size())
             {
                 Obstacle& o = app.Geom.Obstacles[app.MoveState.Index];
-                o.CX = wx - app.MoveState.OffsetX;
-                o.CZ = wz - app.MoveState.OffsetZ;
+                if (app.MoveState.Axis == MoveAxisMode::XZ)
+                {
+                    if (havePick)
+                    {
+                        o.CX = wx - app.MoveState.OffsetX;
+                        o.CZ = wz - app.MoveState.OffsetZ;
+                    }
+                }
+                else // Y 轴
+                {
+                    if (app.CurrentViewMode == ViewMode::Orbit3D)
+                    {
+                        Vec3 eye, dir;
+                        if (BuildOrbit3DViewRay(app, mp, eye, dir))
+                        {
+                            float yHit;
+                            if (ClosestYOnVerticalAxisToRay(eye, dir, o.CX, o.CZ, yHit))
+                                o.BaseY = app.MoveState.InitBaseY + (yHit - app.MoveState.GrabY);
+                        }
+                    }
+                    else
+                    {
+                        // 2D：屏幕向上 = Y 升高（屏幕坐标 y 向下）
+                        const ImVec2 d = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
+                        o.BaseY = app.MoveState.InitBaseY - d.y * app.MoveState.Pix2WorldY;
+                    }
+                }
             }
         }
         else if (app.MoveState.Index >= 0 && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
@@ -444,6 +519,7 @@ void HandleCanvasInteraction(AppState& app,
             if (cb.RebuildProceduralInputGeometry) cb.RebuildProceduralInputGeometry();
             app.bGeomDirty = true;
             app.MoveState.Index = -1;
+            app.MoveState.Axis  = MoveAxisMode::XZ;
             if (cb.TryAutoRebuild) cb.TryAutoRebuild();
         }
         return;

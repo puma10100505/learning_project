@@ -235,9 +235,16 @@ void DrawStatsTabBody(const std::deque<Stat>& history,
 {
     const ImVec2 avail       = ImGui::GetContentRegionAvail();
     const float  kSplitterW  = 6.0f;
+    // 窗口最小化 -> avail.x ≈ 0; 直接 clamp 会把 legendWidth 永久压到 120, 还原时无法恢复。
+    // 因此仅在尺寸正常时回写 legendWidth, 退化时只用本帧 displayed 值做布局。
+    const bool   bDegenerate = avail.x < 320.0f;
     const float  maxLegendW  = std::max(120.0f, avail.x - 200.0f - kSplitterW);
-    legendWidth = std::max(120.0f, std::min(maxLegendW, legendWidth));
-    const ImVec2 chartSize(avail.x - legendWidth - kSplitterW, avail.y);
+    if (!bDegenerate)
+        legendWidth = std::max(120.0f, std::min(maxLegendW, legendWidth));
+    const float  displayedLegendW = bDegenerate
+        ? std::max(0.0f, std::min(legendWidth, avail.x - kSplitterW))
+        : legendWidth;
+    const ImVec2 chartSize(avail.x - displayedLegendW - kSplitterW, avail.y);
 
     DrawTrendChartT<Stat>(chartSize, history, series, seriesCount, visible,
                           emptyMsg, kindLabel, drawTooltipExtra);
@@ -245,7 +252,7 @@ void DrawStatsTabBody(const std::deque<Stat>& history,
     ImGui::SameLine(0.0f, 0.0f);
     Splitters::VSplitterRight(splitterId, &legendWidth, 120.0f, maxLegendW, kSplitterW);
     ImGui::SameLine(0.0f, 0.0f);
-    ImGui::BeginChild("##legend", ImVec2(legendWidth, avail.y), false);
+    ImGui::BeginChild("##legend", ImVec2(displayedLegendW, avail.y), false);
     ImGui::TextDisabled("Legend (click to toggle)");
     ImGui::Separator();
     for (int s = 0; s < seriesCount; ++s)

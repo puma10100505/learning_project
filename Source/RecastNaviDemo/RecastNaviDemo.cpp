@@ -58,6 +58,7 @@
 
 #include "App/AppState.h"
 #include "Nav/NavBuilder.h"
+#include "Nav/NavStepBuilder.h"
 #include "Nav/NavGeometry.h"
 #include "Nav/NavQuery.h"
 #include "Nav/NavPathSmooth.h"
@@ -319,6 +320,135 @@ int main(int argc, char** argv)
         return NavSerializer::LoadNavMesh(g_State.Nav, path, errOut);
     };
 
+    // -- StepBuild 系列 --
+    auto pickExtraLinks = [&]() -> const std::vector<OffMeshLink>* {
+        return (g_State.AutoNavLinkCfg.bEnabled && !g_State.AutoNavLinks.empty())
+                ? &g_State.AutoNavLinks : nullptr;
+    };
+
+    auto doStepReset = [&]()
+    {
+        NavStepBuilder::Reset(g_State.StepBuild, g_State.Nav,
+                              g_State.Geom, g_State.Config, g_State.BV);
+        g_State.BuildStatus = "StepBuild: reset";
+        LOG_F(INFO, "StepBuild reset");
+    };
+
+    auto doStepForward = [&]()
+    {
+        // 若处于全新会话（且 NavRuntime 不为空）则隐式 Reset，
+        // 这样用户首次点 "Step ->" 就会自动开启会话。
+        if (!NavStepBuilder::IsActive(g_State.StepBuild))
+        {
+            NavStepBuilder::Reset(g_State.StepBuild, g_State.Nav,
+                                  g_State.Geom, g_State.Config, g_State.BV);
+        }
+
+        const NavStepBuilder::Step before = g_State.StepBuild.LastCompleted;
+        const bool ok = NavStepBuilder::Forward(g_State.StepBuild, g_State.Nav,
+                                                pickExtraLinks());
+        const NavStepBuilder::Step after = g_State.StepBuild.LastCompleted;
+
+        if (ok)
+        {
+            // 同步阶段耗时到 AppState.Timings 用于趋势图（但不计入 BuildHistory，
+            // 仅在 Step10 完成时才视为一次完整构建）
+            g_State.Timings = g_State.StepBuild.Timings;
+            g_State.BuildStatus = std::string("StepBuild: ") +
+                                  NavStepBuilder::GetStepName(after);
+
+            // Step 10 完成 = 流水线收尾，把它当成一次成功的 Build
+            if (after == NavStepBuilder::Step::DetourNav)
+            {
+                g_State.bGeomDirty = false;
+                BuildStat snap;
+                snap.Index        = ++g_State.BuildCounter;
+                snap.T            = g_State.Timings;
+                snap.InputVerts   = static_cast<int>(g_State.Geom.Vertices.size()  / 3);
+                snap.InputTris    = static_cast<int>(g_State.Geom.Triangles.size() / 3);
+                snap.PolyCount    = g_State.Nav.PolyMesh       ? g_State.Nav.PolyMesh->npolys     : 0;
+                snap.PolyVerts    = g_State.Nav.PolyMesh       ? g_State.Nav.PolyMesh->nverts     : 0;
+                snap.DetailTris   = g_State.Nav.PolyMeshDetail ? g_State.Nav.PolyMeshDetail->ntris: 0;
+                snap.NavDataBytes = static_cast<int>(g_State.Nav.NavMeshData.size());
+                snap.bOk          = true;
+                g_State.BuildHistory.push_back(snap);
+                while (static_cast<int>(g_State.BuildHistory.size()) > kBuildHistoryMax)
+                    g_State.BuildHistory.pop_front();
+            }
+            LOG_F(INFO, "StepBuild forward: %s -> %s",
+                  NavStepBuilder::GetStepName(before),
+                  NavStepBuilder::GetStepName(after));
+        }
+        else
+        {
+            g_State.BuildStatus = std::string("StepBuild FAILED at next step: ") +
+                                  g_State.StepBuild.FailMsg;
+            LOG_F(ERROR, "StepBuild forward FAILED: %s",
+                  g_State.StepBuild.FailMsg.c_str());
+        }
+    };
+
+    auto doStepBack = [&]()
+    {
+        const NavStepBuilder::Step before = g_State.StepBuild.LastCompleted;
+        const bool ok = NavStepBuilder::Back(g_State.StepBuild, g_State.Nav,
+                                             pickExtraLinks());
+        if (ok)
+        {
+            g_State.Timings = g_State.StepBuild.Timings;
+            g_State.BuildStatus = std::string("StepBuild: <- ") +
+                                  NavStepBuilder::GetStepName(g_State.StepBuild.LastCompleted);
+            LOG_F(INFO, "StepBuild back: %s -> %s",
+                  NavStepBuilder::GetStepName(before),
+                  NavStepBuilder::GetStepName(g_State.StepBuild.LastCompleted));
+        }
+        else
+        {
+            g_State.BuildStatus = "StepBuild: 已是初始 (无上一步)";
+        }
+    };
+
+    auto doStepRunAll = [&]()
+    {
+        if (!NavStepBuilder::IsActive(g_State.StepBuild))
+        {
+            NavStepBuilder::Reset(g_State.StepBuild, g_State.Nav,
+                                  g_State.Geom, g_State.Config, g_State.BV);
+        }
+        const bool ok = NavStepBuilder::RunAll(g_State.StepBuild, g_State.Nav,
+                                               pickExtraLinks());
+        g_State.Timings = g_State.StepBuild.Timings;
+        if (ok)
+        {
+            g_State.BuildStatus = "StepBuild: completed (10/10)";
+            g_State.bGeomDirty  = false;
+            BuildStat snap;
+            snap.Index        = ++g_State.BuildCounter;
+            snap.T            = g_State.Timings;
+            snap.InputVerts   = static_cast<int>(g_State.Geom.Vertices.size()  / 3);
+            snap.InputTris    = static_cast<int>(g_State.Geom.Triangles.size() / 3);
+            snap.PolyCount    = g_State.Nav.PolyMesh       ? g_State.Nav.PolyMesh->npolys     : 0;
+            snap.PolyVerts    = g_State.Nav.PolyMesh       ? g_State.Nav.PolyMesh->nverts     : 0;
+            snap.DetailTris   = g_State.Nav.PolyMeshDetail ? g_State.Nav.PolyMeshDetail->ntris: 0;
+            snap.NavDataBytes = static_cast<int>(g_State.Nav.NavMeshData.size());
+            snap.bOk          = true;
+            g_State.BuildHistory.push_back(snap);
+            while (static_cast<int>(g_State.BuildHistory.size()) > kBuildHistoryMax)
+                g_State.BuildHistory.pop_front();
+
+            if (g_State.View.bAutoReplan && g_State.Nav.bBuilt)
+                doFindPath();
+            LOG_F(INFO, "StepBuild RunAll OK");
+        }
+        else
+        {
+            g_State.BuildStatus = std::string("StepBuild RunAll FAILED: ") +
+                                  g_State.StepBuild.FailMsg;
+            LOG_F(ERROR, "StepBuild RunAll FAILED: %s",
+                  g_State.StepBuild.FailMsg.c_str());
+        }
+    };
+
     // 装填 Panel 回调
     cbs.Panels.BuildNavMesh                   = doBuildNavMesh;
     cbs.Panels.FindPath                       = doFindPath;
@@ -333,6 +463,10 @@ int main(int argc, char** argv)
     cbs.Panels.SaveNavMesh                    = doSaveNavMesh;
     cbs.Panels.LoadNavMesh                    = doLoadNavMesh;
     cbs.Panels.GenerateNavLinks               = doGenerateNavLinks;
+    cbs.Panels.StepReset                      = doStepReset;
+    cbs.Panels.StepForward                    = doStepForward;
+    cbs.Panels.StepBack                       = doStepBack;
+    cbs.Panels.StepRunAll                     = doStepRunAll;
 
     // 装填 Interaction 回调（与 Panel 共享同一组操作）
     cbs.Interaction.BuildNavMesh                   = doBuildNavMesh;
@@ -389,6 +523,7 @@ int main(int argc, char** argv)
     // 清理
     // -----------------------------------------------------------------------
     PhysWorld::Shutdown();
+    NavStepBuilder::Clear(g_State.StepBuild);
     NavBuilder::DestroyNavRuntime(g_State.Nav);
     return rc;
 }
