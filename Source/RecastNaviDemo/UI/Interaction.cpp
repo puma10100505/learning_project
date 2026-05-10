@@ -7,8 +7,10 @@
 
 #include "Interaction.h"
 
-#include "../Nav/NavTypes.h"    // PointInsideObstacle
+#include "../Nav/NavTypes.h"            // PointInsideObstacle
 #include "../Phys/PhysWorld.h"
+#include "../Render/CollisionRender.h"  // RayAABBNearEnter / RayYCylinderNearEnter
+#include "../Render/Primitives.h"       // Render3D::Line3D_DrawImmediate
 
 #include <cmath>
 #include <limits>
@@ -89,6 +91,50 @@ bool ClosestYOnVerticalAxisToRay(const Vec3& eye, const Vec3& dir,
     if (s <= 0.0f) return false;          // 命中在相机背后
     outY = eye.y + s * dir.y;
     return true;
+}
+
+/// 解析法对所有障碍做射线相交，取最近命中。Box 走旋转 OBB（与 PointInsideObstacle 同源），
+/// Cylinder 走真正的 y 向有限圆柱（与可视形状完全一致，不像 PhysX 用 capsule 近似）。
+bool RaycastObstaclesNearest(const std::vector<Obstacle>& obs,
+                             const Vec3& eye, const Vec3& dir,
+                             int& outIdx, float& outT)
+{
+    outIdx = -1;
+    outT   = std::numeric_limits<float>::infinity();
+    constexpr float kPi = 3.14159265358979323846f;
+    for (int i = 0; i < static_cast<int>(obs.size()); ++i)
+    {
+        const Obstacle& o    = obs[i];
+        const float     yMin = o.BaseY;
+        const float     yMax = o.BaseY + o.Height;
+
+        float t   = 0.0f;
+        bool  hit = false;
+        if (o.Shape == ObstacleShape::Box)
+        {
+            const float rad = -o.YawDeg * kPi / 180.0f; // 反向 yaw -> 局部空间
+            const float c   = std::cos(rad);
+            const float s   = std::sin(rad);
+            const float ex  = eye.x - o.CX;
+            const float ez  = eye.z - o.CZ;
+            const Vec3  eyeL{ ex * c - ez * s, eye.y, ex * s + ez * c };
+            const Vec3  dirL{ dir.x * c - dir.z * s, dir.y, dir.x * s + dir.z * c };
+            hit = CollisionRender::RayAABBNearEnter(eyeL, dirL,
+                                                   -o.SX, yMin, -o.SZ,
+                                                   +o.SX, yMax, +o.SZ, t);
+        }
+        else
+        {
+            hit = CollisionRender::RayYCylinderNearEnter(
+                eye, dir, o.CX, o.CZ, o.Radius, yMin, yMax, t);
+        }
+        if (hit && t < outT)
+        {
+            outT   = t;
+            outIdx = i;
+        }
+    }
+    return outIdx >= 0;
 }
 
 } // namespace
@@ -218,33 +264,156 @@ bool PickGroundWorld(const AppState& app, const ImVec2& mp,
     return ScreenTo3DGroundWorld(app, mp, wx, wy, wz);
 }
 
-int PickObstacleIndex(const AppState& app, const ImVec2& mp)
+int PickObstacleIndex(AppState& app, const ImVec2& mp)
 {
-    if (!PhysWorld::IsActive())
+    // ---- 2D 顶视图：直接做 XZ 平面 footprint 命中（与可视图形完全一致）----
+    if (app.CurrentViewMode == ViewMode::TopDown2D)
     {
         float wx = 0.0f, wy = 0.0f, wz = 0.0f;
-        if (!PickGroundWorld(app, mp, wx, wy, wz)) return -1;
+        if (!ScreenTo2DWorld(app, mp, wx, wy, wz)) return -1;
         return FindObstacleAt(app, wx, wz);
     }
 
-    if (app.CurrentViewMode == ViewMode::Orbit3D)
+    // ---- 3D 轨道视角：解析射线 vs 全部障碍，取最近命中 ----
+    Vec3 eye{}, dir{};
+    if (!BuildOrbit3DViewRay(app, mp, eye, dir)) return -1;
+
+    int   bestIdx = -1;
+    float bestT   = std::numeric_limits<float>::infinity();
+    RaycastObstaclesNearest(app.Geom.Obstacles, eye, dir, bestIdx, bestT);
+
+    // 地形射线（仅作为"是否遮挡 & 调试可视化端点"使用），同源解析 / PhysX
+    bool  haveTer = false;
+    float tTer    = std::numeric_limits<float>::infinity();
+    Vec3  hitTer{};
+    if (PhysWorld::IsActive())
     {
-        Vec3 eye, dir;
-        if (!BuildOrbit3DViewRay(app, mp, eye, dir)) return -1;
-        float hx = 0.f, hy = 0.f, hz = 0.f;
-        int   obs = -1;
         const float o[3] = { eye.x, eye.y, eye.z };
         const float d[3] = { dir.x, dir.y, dir.z };
-        if (PhysWorld::RaycastClosest(o, d, 1.0e6f, hx, hy, hz, obs)) return obs;
-        return -1;
+        float hx = 0.f, hy = 0.f, hz = 0.f;
+        int   physObs = -1;
+        if (PhysWorld::RaycastClosest(o, d, 1.0e6f, hx, hy, hz, physObs) && physObs < 0)
+        {
+            const float ddx = hx - eye.x, ddy = hy - eye.y, ddz = hz - eye.z;
+            tTer    = std::sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
+            hitTer  = V3(hx, hy, hz);
+            haveTer = true;
+        }
+    }
+    if (!haveTer && app.Geom.Source == GeomSource::ObjFile && !app.Geom.Triangles.empty())
+    {
+        float hx = 0.f, hy = 0.f, hz = 0.f;
+        if (RaycastInputMesh(app, eye, dir, hx, hy, hz))
+        {
+            const float ddx = hx - eye.x, ddy = hy - eye.y, ddz = hz - eye.z;
+            tTer    = std::sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
+            hitTer  = V3(hx, hy, hz);
+            haveTer = true;
+        }
     }
 
-    float wx = 0.f, wy = 0.f, wz = 0.f;
-    if (!ScreenTo2DWorld(app, mp, wx, wy, wz)) return -1;
-    int   obs = -1;
-    float hitY = wy;
-    if (PhysWorld::RaycastVerticalTopDown(wx, wz, app.Geom.Bounds, hitY, obs)) return obs;
-    return FindObstacleAt(app, wx, wz);
+    // 地形遮挡检查：若地形比障碍更近，障碍被挡住不能选中。
+    // 5 cm 容差让"刚好擦过障碍上沿"这类边界情况仍可选中（避免像素级误差导致选不中）。
+    constexpr float kOcclusionEps = 0.05f;
+    if (bestIdx >= 0 && haveTer && tTer + kOcclusionEps < bestT)
+        bestIdx = -1;
+
+    // ---- 记录调试射线 ----
+    AppState::PickRayDebug& dbg = app.PickRay;
+    dbg.bValid        = true;
+    dbg.Origin        = eye;
+    dbg.ObstacleIdx   = bestIdx;
+    dbg.bHit          = (bestIdx >= 0) || haveTer;
+    dbg.TimeRemaining = 3.0f;
+    if (bestIdx >= 0)
+    {
+        dbg.HitOrEnd = eye + dir * bestT;
+    }
+    else if (haveTer)
+    {
+        dbg.HitOrEnd = hitTer;
+    }
+    else
+    {
+        // 落空：把端点放在场景外的远处
+        const float* bmn = app.Geom.Bounds + 0;
+        const float* bmx = app.Geom.Bounds + 3;
+        const float dx   = bmx[0] - bmn[0];
+        const float dy   = bmx[1] - bmn[1];
+        const float dz   = bmx[2] - bmn[2];
+        const float diag = std::sqrt(dx * dx + dy * dy + dz * dz);
+        const float tFar = std::max(50.0f, diag);
+        dbg.HitOrEnd     = eye + dir * tFar;
+    }
+
+    return bestIdx;
+}
+
+// =============================================================================
+// 点选射线调试可视化
+// =============================================================================
+//
+// 设计：
+//   - 与 NavStepDebug 同样作为屏幕空间叠加层（在 DrawCanvas3D 完成后调用），
+//     直接走 Render3D::Line3D_DrawImmediate 投影到屏幕，不参与 3D 深度测试。
+//   - 颜色按命中类型区分：障碍=亮绿；地形=橙；落空=红。
+//   - 持续 3 秒：前 2.5 秒满 alpha；最后 0.5 秒线性淡出至 0。
+//   - 命中点用 3 段轴向短线交叉做小标记，长度按场景对角线自适应。
+void DrawPickRayDebugOverlay(AppState& app, ImDrawList* dl,
+                             ImVec2 viewportMin, ImVec2 viewportSize)
+{
+    AppState::PickRayDebug& r = app.PickRay;
+    if (!app.bShowPickRayDebug) { r.bValid = false; return; }
+    if (!r.bValid) return;
+    if (!app.LastMap3D.bValid) return;     // 仅在 3D 视图下叠绘
+
+    // 推进淡出计时
+    const float dt = std::max(0.0f, ImGui::GetIO().DeltaTime);
+    r.TimeRemaining -= dt;
+    if (r.TimeRemaining <= 0.0f) { r.bValid = false; return; }
+
+    const float alpha01 = std::min(1.0f, r.TimeRemaining / 0.5f);
+    const unsigned char a8 =
+        static_cast<unsigned char>(std::clamp(alpha01, 0.0f, 1.0f) * 255.0f);
+
+    ImU32 colLine, colMark;
+    if (r.ObstacleIdx >= 0)
+    {
+        colLine = IM_COL32(140, 240, 110, a8);   // 障碍：亮绿
+        colMark = IM_COL32(255, 255, 120, a8);   // 命中点：黄
+    }
+    else if (r.bHit)
+    {
+        colLine = IM_COL32(255, 180,  80, a8);   // 地形：橙
+        colMark = IM_COL32(255, 200, 100, a8);
+    }
+    else
+    {
+        colLine = IM_COL32(255, 100, 100, a8);   // 落空：红
+        colMark = IM_COL32(255, 100, 100, a8);
+    }
+
+    const Mat4 vp = MatMul(app.LastMap3D.Proj, app.LastMap3D.View);
+
+    // 主射线
+    Render3D::Line3D_DrawImmediate(dl, vp, viewportMin, viewportSize,
+                                   r.Origin, r.HitOrEnd, colLine, 2.0f);
+
+    // 命中点标记 — 3 段世界轴向短线交叉
+    const float* bmn  = app.Geom.Bounds + 0;
+    const float* bmx  = app.Geom.Bounds + 3;
+    const float  ddx  = bmx[0] - bmn[0];
+    const float  ddy  = bmx[1] - bmn[1];
+    const float  ddz  = bmx[2] - bmn[2];
+    const float  diag = std::sqrt(ddx * ddx + ddy * ddy + ddz * ddz);
+    const float  s    = std::max(0.20f, diag * 0.012f);
+    const Vec3&  h    = r.HitOrEnd;
+    Render3D::Line3D_DrawImmediate(dl, vp, viewportMin, viewportSize,
+                                   V3(h.x - s, h.y, h.z), V3(h.x + s, h.y, h.z), colMark, 2.0f);
+    Render3D::Line3D_DrawImmediate(dl, vp, viewportMin, viewportSize,
+                                   V3(h.x, h.y - s, h.z), V3(h.x, h.y + s, h.z), colMark, 2.0f);
+    Render3D::Line3D_DrawImmediate(dl, vp, viewportMin, viewportSize,
+                                   V3(h.x, h.y, h.z - s), V3(h.x, h.y, h.z + s), colMark, 2.0f);
 }
 
 // =============================================================================
@@ -597,6 +766,74 @@ void HandleHotkeys(AppState& app, const InteractionCallbacks& cb)
             app.Cam.Eye.x += move.x * speed * dt;
             app.Cam.Eye.y += move.y * speed * dt;
             app.Cam.Eye.z += move.z * speed * dt;
+        }
+    }
+
+    // ---- 方向键移动选中障碍 ----
+    //   ↑ / ↓        : Y 轴（纵向 / 垂直）
+    //   ← / →        : XZ 平面 — 在 3D 视角下沿"相机右轴在 XZ 上的投影"，
+    //                  使屏幕左/右与按键左/右一致；2D 视角即世界 X 轴。
+    //   Shift / Ctrl : ×4 / ×0.25 速度修饰
+    //   松开所有方向键时触发一次 NavMesh / PhysX 重建（避免每帧重建造成卡顿）。
+    {
+        const float dt = std::max(0.0f, io.DeltaTime);
+        const bool kbAvailable =
+            !io.WantCaptureKeyboard && // 让 ImGui 滑块/输入有焦点时不抢方向键
+            app.Geom.Source == GeomSource::Procedural &&
+            app.SelectedObstacle >= 0 &&
+            app.SelectedObstacle < static_cast<int>(app.Geom.Obstacles.size()) &&
+            app.MoveState.Index < 0;   // 不与鼠标拖拽冲突
+
+#if defined(_WIN32)
+        const bool kU = kbAvailable && ImGui::IsKeyDown(VK_UP);
+        const bool kD = kbAvailable && ImGui::IsKeyDown(VK_DOWN);
+        const bool kL = kbAvailable && ImGui::IsKeyDown(VK_LEFT);
+        const bool kR = kbAvailable && ImGui::IsKeyDown(VK_RIGHT);
+#else
+        const bool kU = kbAvailable && ImGui::IsKeyDown(GLFW_KEY_UP);
+        const bool kD = kbAvailable && ImGui::IsKeyDown(GLFW_KEY_DOWN);
+        const bool kL = kbAvailable && ImGui::IsKeyDown(GLFW_KEY_LEFT);
+        const bool kR = kbAvailable && ImGui::IsKeyDown(GLFW_KEY_RIGHT);
+#endif
+        const bool moving = kU || kD || kL || kR;
+        if (moving && dt > 0.0f)
+        {
+            float speed = 3.0f;                 // 默认 3 m/s
+            if (io.KeyShift) speed *= 4.0f;     // 加速
+            if (io.KeyCtrl)  speed *= 0.25f;    // 精调
+            const float step = speed * dt;
+
+            // XZ 平面"水平"轴：相机 right 投影到 XZ 后再归一化
+            Vec3 horiz;
+            if (app.CurrentViewMode == ViewMode::Orbit3D)
+            {
+                const Vec3  fwd = OrbitViewForward(app.Cam);
+                const Vec3  rt  = OrbitViewRight(fwd, app.Cam.Yaw);
+                horiz = V3(rt.x, 0.0f, rt.z);
+                const float l = std::sqrt(horiz.x * horiz.x + horiz.z * horiz.z);
+                horiz = (l > 1e-6f) ? V3(horiz.x / l, 0.0f, horiz.z / l)
+                                    : V3(1.0f, 0.0f, 0.0f);
+            }
+            else
+            {
+                horiz = V3(1.0f, 0.0f, 0.0f); // 2D 顶视：右 = +X
+            }
+
+            Obstacle& o = app.Geom.Obstacles[app.SelectedObstacle];
+            if (kU) o.BaseY += step;
+            if (kD) o.BaseY -= step;
+            if (kR) { o.CX += horiz.x * step; o.CZ += horiz.z * step; }
+            if (kL) { o.CX -= horiz.x * step; o.CZ -= horiz.z * step; }
+
+            app.bKeyboardMoving = true;
+        }
+        else if (app.bKeyboardMoving)
+        {
+            // 松键瞬间：触发一次完整的几何/物理/导航重建
+            app.bKeyboardMoving = false;
+            if (cb.RebuildProceduralInputGeometry) cb.RebuildProceduralInputGeometry();
+            app.bGeomDirty = true;
+            if (cb.TryAutoRebuild) cb.TryAutoRebuild();
         }
     }
 

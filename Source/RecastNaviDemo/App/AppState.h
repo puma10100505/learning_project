@@ -119,7 +119,25 @@ struct AppState
     // -------------------------------------------------------------------------
     bool   bShowStatsWindow   = true;
     bool   bShowStepInspector = false;   ///< 是否显示 "Step Inspector" 浮动窗口
+    bool   bStepInspectorDocked = false;   ///< true = 贴在主窗口右侧栏；false = 独立浮动窗
+    float  StepInspectorDockWidth = 400.0f; ///< 停靠时右栏宽度（像素，可拖动分隔条）
     float  LeftPaneWidth      = 400.0f;  ///< 左侧配置区宽度（像素，可拖动）
+    bool   bKeyboardMoving    = false;   ///< 当前帧是否正在用方向键移动选中障碍（用于检测松键时机）
+    bool   bShowPickRayDebug  = true;    ///< 是否绘制最近一次点选时的射线/命中点
+
+    // -------------------------------------------------------------------------
+    // 最近一次点选射线（调试可视化：3D 视图叠绘 + 自动淡出）
+    // -------------------------------------------------------------------------
+    struct PickRayDebug
+    {
+        bool  bValid        = false;
+        bool  bHit          = false;     ///< 是否击中任何物体（障碍或地形）
+        int   ObstacleIdx   = -1;        ///< 命中的障碍索引；-1 = 击中地形或落空
+        Vec3  Origin        {};          ///< 射线起点（相机眼睛位置）
+        Vec3  HitOrEnd      {};          ///< 命中点；若未命中，为远端可视化端点
+        float TimeRemaining = 0.0f;      ///< 剩余可见秒数（用于淡出）
+    };
+    PickRayDebug PickRay;
 
     // -------------------------------------------------------------------------
     // ImGuizmo（3D 选中障碍的 Translate / Rotate / Scale Widget）

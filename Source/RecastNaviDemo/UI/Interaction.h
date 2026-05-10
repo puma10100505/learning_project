@@ -83,8 +83,14 @@ bool PickGroundWorld(const AppState& app, const ImVec2& mp,
 /// 从后往前遍历 Obstacles，返回第一个包含 (wx, wz) 的障碍索引，找不到返回 -1。
 int FindObstacleAt(const AppState& app, float wx, float wz);
 
-/// PhysX 场景就绪时，用场景射线（3D 透视 / 2D 顶视竖直射线）解析障碍刚体；否则退回 FindObstacleAt。
-int PickObstacleIndex(const AppState& app, const ImVec2& mousePos);
+/// 用解析法（OBB / 圆柱）对全部障碍做射线相交，取最近命中。
+/// 3D 模式下还会把射线起点 / 命中点写入 app.PickRay 以便可视化（见 DrawPickRayDebugOverlay）。
+int PickObstacleIndex(AppState& app, const ImVec2& mousePos);
+
+/// 在 3D 画布上叠绘"最近一次点选射线"（带 3 秒淡出）。需在 Renderer3D::DrawCanvas3D 之后调用。
+/// 仅当 app.bShowPickRayDebug 且 app.PickRay.bValid 时绘制；同时按 ImGui io.DeltaTime 推进淡出计时。
+void DrawPickRayDebugOverlay(AppState& app, ImDrawList* dl,
+                             ImVec2 viewportMin, ImVec2 viewportSize);
 
 // =============================================================================
 // 主交互入口

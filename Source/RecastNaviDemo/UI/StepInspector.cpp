@@ -488,34 +488,16 @@ void DrawStepSection(const NavStepBuilder::StepBuilder& sb,
     ImGui::PopID();
 }
 
-} // anonymous namespace
+// 「当前步默认展开」选项（浮动与停靠共用）
+bool sAutoOpenCurrentStep = true;
 
-// =============================================================================
-// 入口
-// =============================================================================
-void Draw(AppState& app)
+void DrawInspectorBody(AppState& app)
 {
-    if (!app.bShowStepInspector) return;
-
-    // 默认尺寸 / 位置（首次出现时；之后窗口位置/大小由 ImGui 自动持久化）
-    ImGui::SetNextWindowSize(ImVec2(560.0f, 640.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowPos (ImVec2(80.0f,  80.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSizeConstraints(ImVec2(360.0f, 240.0f), ImVec2(2400.0f, 1800.0f));
-
-    constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoCollapse;
-
-    if (!ImGui::Begin("Step Inspector / 分步详情", &app.bShowStepInspector, kFlags))
-    {
-        ImGui::End();
-        return;
-    }
-
     const auto& sb       = app.StepBuild;
     const bool  active   = NavStepBuilder::IsActive(sb);
     const auto  lastDone = sb.LastCompleted;
     const auto  next     = NavStepBuilder::PeekNextStep(sb);
 
-    // ---- 顶栏：当前会话状态 + 选项 ----
     ImGui::Text("Session: %s   |   Last completed: %s   |   Next: %s",
                 active ? "ACTIVE" : "(idle)",
                 NavStepBuilder::GetStepName(lastDone),
@@ -530,11 +512,9 @@ void Draw(AppState& app)
         ImGui::PopStyleColor();
     }
 
-    static bool sAutoOpenCurrent = true;
-    ImGui::Checkbox("Auto-expand current step / 当前步默认展开", &sAutoOpenCurrent);
+    ImGui::Checkbox("Auto-expand current step / 当前步默认展开", &sAutoOpenCurrentStep);
     ImGui::SameLine(); ImGui::TextDisabled("(其它步骤展开状态记忆于 imgui.ini)");
 
-    // ---- 流水线总进度条 ----
     {
         const float frac = active
             ? (static_cast<int>(lastDone) / float(NavStepBuilder::kStepCount))
@@ -547,13 +527,50 @@ void Draw(AppState& app)
 
     ImGui::Separator();
 
-    // ---- 各步骤详情区 ----
     ImGui::BeginChild("##stepscroll", ImVec2(0, 0), false,
                       ImGuiWindowFlags_HorizontalScrollbar);
     using NavStepBuilder::Step;
     for (int i = 1; i <= NavStepBuilder::kStepCount; ++i)
-        DrawStepSection(sb, static_cast<Step>(i), sAutoOpenCurrent);
+        DrawStepSection(sb, static_cast<Step>(i), sAutoOpenCurrentStep);
     ImGui::EndChild();
+}
+
+} // anonymous namespace
+
+// =============================================================================
+// 入口
+// =============================================================================
+void DrawDocked(AppState& app)
+{
+    ImGui::TextUnformatted("Step Inspector / 分步详情");
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Float / 浮动##si_float"))
+        app.bStepInspectorDocked = false;
+    ImGui::Separator();
+    DrawInspectorBody(app);
+}
+
+void Draw(AppState& app)
+{
+    if (!app.bShowStepInspector) return;
+    if (app.bStepInspectorDocked) return;
+
+    ImGui::SetNextWindowSize(ImVec2(560.0f, 640.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos (ImVec2(80.0f,  80.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(360.0f, 240.0f), ImVec2(2400.0f, 1800.0f));
+
+    constexpr ImGuiWindowFlags kFlags = ImGuiWindowFlags_NoCollapse;
+
+    if (!ImGui::Begin("Step Inspector / 分步详情", &app.bShowStepInspector, kFlags))
+    {
+        ImGui::End();
+        return;
+    }
+
+    if (ImGui::SmallButton("Dock / 停靠##si_dock"))
+        app.bStepInspectorDocked = true;
+    ImGui::Separator();
+    DrawInspectorBody(app);
 
     ImGui::End();
 }

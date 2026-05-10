@@ -431,8 +431,18 @@ void DrawEditPanel(AppState& app, const PanelCallbacks& cb)
         ImGui::BulletText("F       : Find Path");
         ImGui::BulletText("V       : 切换 2D / 3D");
         ImGui::BulletText("Esc     : 取消选择 / 模式归 None");
+        ImGui::TextDisabled("--- 选中障碍后的方向键移动 ---");
+        ImGui::BulletText("↑ / ↓   : Y 轴升降（纵向 / 垂直）");
+        ImGui::BulletText("← / →   : XZ 平面（沿屏幕左右；3D 下相对相机）");
+        ImGui::BulletText("Shift   : ×4 加速  |  Ctrl: ×0.25 精调");
         ImGui::TreePop();
     }
+
+    // ---- 点选射线调试可视化 ----
+    ImGui::Checkbox("Show pick ray (3D) / 显示点选射线",
+                    &app.bShowPickRayDebug);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(障碍=绿 / 地形=橙 / 落空=红, 3s 淡出)");
 
     if (app.Geom.Source == GeomSource::ObjFile &&
         (app.CurrentEditMode == EditMode::CreateBox ||
@@ -879,7 +889,7 @@ void DrawStepBuildPanel(AppState& app, const PanelCallbacks& cb)
     // ---- Step Inspector 浮动窗口开关 ----
     ImGui::Checkbox("Show Step Inspector window##sb_insp", &app.bShowStepInspector);
     ImGui::SameLine();
-    ImGui::TextDisabled("(浮动 / 可调大小; 显示算法说明 + 输出数据)");
+    ImGui::TextDisabled("(浮动或靠右停靠; 窗内按钮切换; 算法说明 + 输出数据)");
 
     // ---- 各步骤数据快照（只读展示） ----
     if (active && ImGui::TreeNodeEx("Intermediate data##sb_data",

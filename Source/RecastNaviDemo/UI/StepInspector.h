@@ -2,7 +2,7 @@
 /*
  * UI/StepInspector.h
  * ------------------
- * NavMesh 分步构建的"详情检视"浮动窗口（独立可拖动 / 可调大小）。
+ * NavMesh 分步构建的"详情检视"窗口：可独立浮动（拖动 / 调大小），也可停靠在主窗口右侧。
  *
  * 显示内容（按 10 个步骤分别展开）：
  *   - 状态徽章   ：Pending / Current / Done / Failed
@@ -26,7 +26,10 @@
 namespace StepInspector
 {
 
-/// 主入口：每帧绘制（可见时）。建议在 MainLayout::OnGUI 末尾调用。
+/// 主入口：浮动模式时每帧绘制（`app.bStepInspectorDocked` 为 false 时）。MainLayout::OnGUI 末尾调用。
 void Draw(AppState& app);
+
+/// 停靠模式：在 MainLayout 右侧子窗口内绘制（带「浮动」切换按钮 + 正文）。
+void DrawDocked(AppState& app);
 
 } // namespace StepInspector

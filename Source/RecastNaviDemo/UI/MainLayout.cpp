@@ -14,6 +14,33 @@
 #include <algorithm>    // std::max / std::min
 #include <cstdio>
 
+namespace
+{
+
+void DrawRightPaneToolbarAndCanvas(AppState& app, const InteractionCallbacks& icb)
+{
+    static const char* kEditName[] = {
+        "None", "PlaceStart", "PlaceEnd", "CreateObstacle", "Select&Move", "Delete",
+        "OML-Start", "OML-End"
+    };
+    const char* viewName = (app.CurrentViewMode == ViewMode::TopDown2D)
+                            ? "2D Top" : "3D Orbit";
+    ImGui::Text("View: %s   Edit: %s",
+                viewName,
+                kEditName[static_cast<int>(app.CurrentEditMode)]);
+    ImGui::SameLine(); ImGui::TextDisabled("  |  ");
+    ImGui::SameLine(); ImGui::TextColored(ImVec4(0.71f, 0.31f, 0.31f, 1), "Obstacle");
+    ImGui::SameLine(); ImGui::TextColored(ImVec4(0.31f, 0.78f, 0.39f, 1), "NavMesh");
+    ImGui::SameLine(); ImGui::TextColored(ImVec4(0.31f, 0.63f, 1.00f, 1), "Start");
+    ImGui::SameLine(); ImGui::TextColored(ImVec4(1.00f, 0.31f, 0.31f, 1), "End");
+    ImGui::SameLine(); ImGui::TextColored(ImVec4(1.00f, 0.86f, 0.24f, 1), "Path");
+    ImGui::Separator();
+
+    MainLayout::DrawCanvasPanel(app, icb);
+}
+
+} // namespace
+
 namespace MainLayout
 {
 
@@ -98,6 +125,9 @@ void DrawCanvasPanel(AppState& app, const InteractionCallbacks& icb)
             dp.MaxCellsToDraw = std::max(1000, app.StepDebugMaxCells);
             NavStepDebug::Draw3D(dl, panelMin, panelSize, dp);
         }
+
+        // ---- 最近一次点选射线 / 命中点（自动 3 秒淡出） ----
+        Interaction::DrawPickRayDebugOverlay(app, dl, panelMin, panelSize);
 
         // ---- 选中障碍中心的 ImGuizmo 三轴 Widget ----
         const bool wasUsingGizmo = Gizmo::IsUsingGizmo();
@@ -220,31 +250,56 @@ void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
         Splitters::VSplitter("##split_main", &app.LeftPaneWidth, 180.0f, kMaxLeft, kSplitterW);
         ImGui::SameLine(0.0f, 0.0f);
 
-        // ---- 右侧画布 ----
+        // ---- 右侧：画布（可选再分一列，靠右停靠 Step Inspector） ----
         if (ImGui::BeginChild("##RightPane",
                               ImVec2(0.0f, 0.0f),
                               true,
                               ImGuiWindowFlags_NoSavedSettings))
         {
-            // 顶部状态栏
-            static const char* kEditName[] = {
-                "None", "PlaceStart", "PlaceEnd", "CreateObstacle", "Select&Move", "Delete",
-                "OML-Start", "OML-End"
-            };
-            const char* viewName = (app.CurrentViewMode == ViewMode::TopDown2D)
-                                    ? "2D Top" : "3D Orbit";
-            ImGui::Text("View: %s   Edit: %s",
-                        viewName,
-                        kEditName[static_cast<int>(app.CurrentEditMode)]);
-            ImGui::SameLine(); ImGui::TextDisabled("  |  ");
-            ImGui::SameLine(); ImGui::TextColored(ImVec4(0.71f, 0.31f, 0.31f, 1), "Obstacle");
-            ImGui::SameLine(); ImGui::TextColored(ImVec4(0.31f, 0.78f, 0.39f, 1), "NavMesh");
-            ImGui::SameLine(); ImGui::TextColored(ImVec4(0.31f, 0.63f, 1.00f, 1), "Start");
-            ImGui::SameLine(); ImGui::TextColored(ImVec4(1.00f, 0.31f, 0.31f, 1), "End");
-            ImGui::SameLine(); ImGui::TextColored(ImVec4(1.00f, 0.86f, 0.24f, 1), "Path");
-            ImGui::Separator();
+            if (app.bShowStepInspector && app.bStepInspectorDocked)
+            {
+                constexpr float kSplitterW = 6.0f;
+                const ImVec2    ra         = ImGui::GetContentRegionAvail();
+                const bool      degenerate = ra.x < 360.0f;
+                const float maxInspW =
+                    std::max(220.0f, ra.x - 160.0f - kSplitterW);
+                if (!degenerate)
+                {
+                    app.StepInspectorDockWidth =
+                        std::max(260.0f,
+                                 std::min(maxInspW, app.StepInspectorDockWidth));
+                }
+                const float inspW =
+                    degenerate ? std::max(0.0f, std::min(app.StepInspectorDockWidth,
+                                                        ra.x - kSplitterW))
+                               : app.StepInspectorDockWidth;
+                const float canvasW = ra.x - inspW - kSplitterW;
 
-            DrawCanvasPanel(app, cb.Interaction);
+                ImGui::BeginChild("##RightCanvasCol",
+                                  ImVec2(canvasW, 0.0f),
+                                  false,
+                                  ImGuiWindowFlags_NoSavedSettings);
+                DrawRightPaneToolbarAndCanvas(app, cb.Interaction);
+                ImGui::EndChild();
+
+                ImGui::SameLine(0.0f, 0.0f);
+                Splitters::VSplitterRight("##split_step_insp",
+                                          &app.StepInspectorDockWidth,
+                                          260.0f,
+                                          maxInspW,
+                                          kSplitterW);
+                ImGui::SameLine(0.0f, 0.0f);
+                ImGui::BeginChild("##StepInspectorDock",
+                                  ImVec2(inspW, 0.0f),
+                                  true,
+                                  ImGuiWindowFlags_NoSavedSettings);
+                StepInspector::DrawDocked(app);
+                ImGui::EndChild();
+            }
+            else
+            {
+                DrawRightPaneToolbarAndCanvas(app, cb.Interaction);
+            }
         }
         ImGui::EndChild();
     }
@@ -255,7 +310,7 @@ void OnGUI(AppState& app, const MainLayoutCallbacks& cb)
     // 浮动趋势图窗口（放在主窗口 End 之后，让它独立可拖拽）
     DrawBuildStatsWindow(app);
 
-    // 浮动 "Step Inspector" 详情窗口（独立可拖拽 + 可调大小）
+    // "Step Inspector"：浮动模式下为独立窗口；停靠时由 ##RightPane 内绘制
     StepInspector::Draw(app);
 }
 
